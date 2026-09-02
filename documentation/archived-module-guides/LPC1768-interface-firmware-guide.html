@@ -1,0 +1,1081 @@
+<!DOCTYPE html>
+
+
+
+
+
+<!-- paulirish.com/2008/conditional-stylesheets-vs-css-hacks-answer-neither/ -->
+<!--[if IE 8]> <html class="no-js lt-ie9" lang="en"> <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en"> <!--<![endif]-->
+<head>
+    <title>
+Firmware LPC1768 LPC11U24 - Handbook
+ | mbed</title>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=9; IE=8; IE=7; IE=EDGE" />
+    <!-- Set the viewport width to device width for mobile -->
+    <meta name="viewport" content="user-scalable=yes,width=device-width,initial-scale=0.9" />
+
+
+    <!-- Included CSS Files -->
+    <link rel="stylesheet" href="/media/CACHE/css/764b1786354a.css" type="text/css" />
+    
+    <script type="text/javascript" src="/media/CACHE/js/ac66e7019875.js"></script>
+    <!--[if (gte IE 6)&(lte IE 8)]>
+        <script type="text/javascript" src="/media/js/selectivizr-min.js"></script>
+  <![endif]-->
+
+    
+    
+    
+	
+	
+    <link rel="stylesheet" href="/media/CACHE/css/0a9259862255.css" type="text/css" media="screen,projection,print" />
+    <script type="text/javascript" src="/media/CACHE/js/14a2315b11fb.js"></script>
+
+
+</head>
+<body>
+
+<div class="row nav-wrapper ">
+        <div class="twelve columns navigation">
+        
+			<ul class="nav-bar radius" id="nav">
+				<li><a href="/"><img height="16" width="16" class="icon icon_house" src="/media/img/blank.gif"/></a></li>
+                
+                    <li><a href="/platforms/">Platforms</a></li>
+                
+                
+                    <li><a href="/components/">Components</a></li>   
+                
+				<li class="handbook"><a href="/handbook/">Handbook</a></li>
+				<li class="cookbook"><a href="/cookbook/">Cookbook</a></li>
+				<li><a href="/code/">Code</a></li>
+				<li><a href="/questions/">Questions</a></li>
+				<li><a href="/forum/">Forum</a></li>
+				<li class="user-links"><a href="https://mbed.org/compiler/">Compiler</a></li>
+                <li class="user-links"><a class="dashboard-link" href="/dashboard/" >Dashboard</a></li>
+
+
+			</ul>
+			
+				<script>
+	$(function() {
+  var loc = window.location.href; // returns the full URL
+  if(/handbook/.test(loc)) {
+    $('li.handbook').addClass('active');
+  }
+   else if(/cookbook/.test(loc)) {
+    $('li.cookbook').addClass('active');
+  }
+});
+	
+	</script>
+
+        </div>
+    </div>
+
+    <div class="row" id="top">
+        <div class="three columns logo mobile-two">
+            <h1><a href="/">mbed</a></h1>
+        </div>
+        <div class="three columns header login-block push-six mobile-two">
+         
+            
+            <p class="logged-out"><script type="text/javascript">
+                if (document.location.pathname == "/tour/compiler") {
+                    document.write('<a class="button  radius success" href="}https://mbed.org/account/login/?next=/compiler/"><img alt="Login" height="16" width="16" class="icon icon_login" src="/media/img/blank.gif"/> Login <span class="hide-for-small"> or signup</span></a>');
+                } else {
+document.write('<a class="button  radius success" href="https://mbed.org/account/login/?next=' + document.location.pathname  + document.location.search + document.location.hash + '"><img alt="Login" height="16" width="16" class="icon icon_login" src="/media/img/blank.gif"/> Login <span class="hide-for-small"> or signup</span></a> ');
+                }
+                </script><br /></p>
+            
+        
+        </div>
+
+        <div class="six columns header pull-three search-block">
+             
+            <form id="search" action="/search/" method="GET">
+            <input type="hidden" name="type" value=""/>
+                <div class="row">
+                    <div class="ten mobile-three columns">
+                        <input type="search" name="q" id="id_q" placeholder="Search mbed.org..." class="search-input" />
+                    </div>
+                    <div class="two mobile-one columns">
+                        <input type="submit" value="Go" class="button radius  " />
+                    </div>
+                </div>
+            </form>
+            
+        </div>
+    </div><!-- end of #top -->
+    
+    <div id="breadcrumbs" class="row">
+        <div class="twelve columns" style="position: relative;">
+            <div class="breadcrumbs">
+                
+    
+    
+<a href="/handbook/">Handbook</a>
+
+
+    &raquo; <a href="/handbook/Firmware-LPC1768-LPC11U24">Firmware LPC1768 LPC11U24</a>
+
+
+
+            </div>
+            
+            <div class="breadcrumbs breadcrumbs-right">
+                
+            </div>
+
+        </div>
+    </div>
+    
+    
+    
+    <div class="row">
+        <div class="nine columns main-content" id="mbed-content">
+            
+        
+            
+    
+    
+
+    <link href="/media/css/doxygen.css" rel="stylesheet" type="text/css"/>
+	
+    <style type="text/css">
+    .linenumber {display: none;}
+    </style>
+
+	
+
+    
+    <div class="content-actions hide-on-print">
+        
+         
+    </div>
+    
+
+    <h2><a href="/handbook/Firmware-LPC1768-LPC11U24">Firmware LPC1768 LPC11U24</a></h2>
+
+    
+
+
+    <div class="wiki-content">
+        <div class="flashbox finfo action-bar"><h4>Table of Contents</h4><ol><li><a href="#1-save-the-latest-firmware-to-the-mbed">1. Save the latest firmware to the mbed Microcontroller</a></li><li><a href="#2-power-cycle-the-board-to-update-the">2. Power-cycle the board to update the firmware</a></li><li><a href="#3-finished">3. Finished!</a></li><li><a href="#firmware-changelog">Firmware changelog</a></li></ol></div><p>The latest firmware version is <strong>141212</strong>. To check your firmware version, open the MBED.HTM file on your mbed Microcontroller.</p>
+<p>These instructions explain how to upgrade your firmware.</p>
+<div class="flashbox fwarning"><h4 class="ftitle">Data loss warning</h4><p><strong> Firmware updates may format the mbed Microcontroller drive </strong></p>
+<p>If you need to keep anything on the mbed Microcontroller disk, make sure you save it somewhere first!</p>
+</div><h2 id="1-save-the-latest-firmware-to-the-mbed">1. Save the latest firmware to the mbed Microcontroller<a class="wiki_permalink" href="#1-save-the-latest-firmware-to-the-mbed" title="Permalink to this heading">&para;</a></h2>
+<p> <a href="/media/uploads/samux/mbedmicrontroller_141212.if">Download latest firmware</a> </p>
+<h2 id="2-power-cycle-the-board-to-update-the">2. Power-cycle the board to update the firmware<a class="wiki_permalink" href="#2-power-cycle-the-board-to-update-the" title="Permalink to this heading">&para;</a></h2>
+<p>To update the firmware, power-cycle the board by disconnecting and reconnecting the power (USB lead). After power-cycling the board, there will be a short pause as the firmware is updated, and then the mbed Microcontroller should appear as normal.</p>
+<h2 id="3-finished">3. Finished!<a class="wiki_permalink" href="#3-finished" title="Permalink to this heading">&para;</a></h2>
+<h2 id="firmware-changelog">Firmware changelog<a class="wiki_permalink" href="#firmware-changelog" title="Permalink to this heading">&para;</a></h2>
+<p><strong> rev 141212 [ <a href="/media/uploads/samux/mbedmicrontroller_141212.if">...</a> ] </strong></p>
+<ul><li>Added CMSIS-DAP support
+</li></ul>
+<p><strong> rev 21164 [ <a href="/media/downloads/firmware/mbedMicrocontroller_21164.if">...</a> ] </strong></p>
+<ul><li>Added support for LPC11U24
+</li></ul>
+<p><strong> rev 16457 [ <a href="/media/downloads/firmware/mbedMicrocontroller_16457.if">...</a> ] </strong></p>
+<ul><li>Unified firmware update for LPC1768 and LPC2368 boards
+</li><li>Improved programming and semihosting performance
+</li><li>LocalFileSystem disk now released to PC when mbed has no files open (used to only happen on program exit)
+</li><li>Removed special Windows "mbed.ini" mode requirement
+</li><li>Serial mode now works on windows without modification using new serial installer
+</li><li>Fix bootcode problem (was causing virus false-positives on some systems)
+</li><li>Updated MBED.HTM to new format
+</li></ul>
+<p><strong> rev 14366 </strong></p>
+<ul><li>Support for LocalFileSystem
+</li><li>Serial performance improvements
+</li></ul>
+<p><strong> rev 14129 </strong></p>
+<ul><li>Support for Mac and Linux <a href="PC-serial">PC serial</a> by default - No configuration needed!
+</li><li>Support for a new Windows <a href="PC-serial">PC serial</a> driver (<a href="Windows-serial-configuration">Windows serial configuration</a>)
+</li><li>Other minor updates
+</li></ul>
+<p><strong> rev 12249 </strong></p>
+<ul><li>Initial Beta Release
+</li></ul>
+<p><strong> revisions &lt; 12249 </strong></p>
+<ul><li>Early releases
+</li></ul>
+
+    </div>
+
+    <hr class="blue"/>
+
+    <div style="text-align: right; padding-bottom: 10px;"  class=" noprint">
+        
+        
+
+        <a class="button small radius secondary" href="/handbook/Special:Allwikipages">
+            <span><img alt="calendar" class="icon" src="/media/img/icons/calendar.png"/> All wikipages</span>
+        </a>
+
+    </div>
+    
+    
+
+
+
+    <link rel="stylesheet" href="/media/CACHE/css/0a9259862255.css" type="text/css" media="screen,projection,print" />
+
+
+<div id="component-discussions">
+        <div class="component-community panel">
+            
+                
+
+                
+                    
+
+<script language="javascript" type="text/javascript" src="/media/filebrowser/js/AddFileBrowser.js"></script>
+
+<div id="newtopic" class="" style="display: none;">
+    <p style="float: right; margin: 0px;">
+       <b><a href="javascript:void(0)" onclick="javascript:$('#newtopic').slideToggle('medium');"><img height="16" width="16" class="icon icon_cross" src="/media/img/blank.gif"/> Close</a></b>
+    </p>
+
+    <h3 class="sectionheader" style="margin-top: 0px;">Start new topic</h3>
+    <div id="result" style="display:none;">
+        <h4>Preview of your unsaved post:</h4>
+        <div id="resultcontent"></div><br/>
+    </div>
+
+    <form method="post"  action="/forum/wiki-Firmware-LPC1768-LPC11U24-handbook-forum/" >
+        <input type='hidden' name='csrfmiddlewaretoken' value='3VELnoBJBzdMLSyK7ME8Lfvf6l3bkkD1' />
+        <table class="formtable">
+            <tr><td>
+                <label for="id_topic_name">Topic Title:</label>
+                <input id="id_topic_name" maxlength="150" name="topic_name" size="60" type="text" />
+            </td></tr>
+            <tr><td>
+                <label for="id_tags">Topic Tags:</label>
+                <input id="id_tags" name="tags" style="width: 300px" type="text" /><script type="text/javascript">
+            jQuery("#id_tags").autocomplete(["__ldrex", "__strex", "_NARGS", "1", "1-wire", "100MHz", "10base-t 100base-tx", "11", "11062", "11bit", "11U24", "11u35", "12", "12C", "12v", "15A", "16 bit ADC", "1768", "1800", "2", "2.0", "2368", "23K256", "24 bits", "29bit", "2D", "3-Space", "3.1", "3.3v Vout", "32-bit", "32KB", "3D", "3g", "3pi", "4.21", "400khz", "401RE", "4088", "422", "4D SGC TFT Screen", "4DGL", "5110", "513137", "5v", "6", "60MHz", "64", "64-bit", "64bit", "64KB", "6610", "6610LCD", "6dof", "7", "7segment", "8.3", "9", "9 bit", "9-DOF", "9bit", "a", "AA", "acceleration", "accelerometer", "acceptance", "access", "accounts", "Accuracy", "acquisition", "ActiveSync", "AD345", "AD5666", "AD7190", "AD7746", "Adafruit", "adafruit GPS breakout", "adapter", "adc", "address", "ade7754", "ADK", "administration", "ADT7410", "Advancement", "adxl335", "ADXL345", "agilent", "AHBSRAM", "AHBSRAM0", "AHBSRAM1", "AHRS", "AIC23", "ain", "Airplay", "Airtunes", "ajax", "algebra", "all", "allocation", "almeno", "Altimeter", "altium", "amoled", "Amp", "amplifier", "Amps", "an", "Analog", "Analog Devices", "analog out", "AnalogIn", "AnalogInOut", "AnalogOut", "analogue", "analogue output", "ANCS", "and", "android", "AndroidAccessory", "ANGLE", "animatronics", "anologin", "ANT", "ANT+", "Antenna", "AP2", "apache", "api", "app-board", "append", "Apple", "application", "April", "arch gprs", "architecture", "arduino", "are", "ARES", "arguments", "arithmetic", "ARM", "ARM7", "array", "Arrays", "Artists", "as5050", "Ascii", "ASEE", "Assembler", "assembly", "assertion", "Astrobe", "async", "AT", "at45", "at90", "atoi", "attach", "attach()", "audio", "auto", "Automobile", "AUTOSAR", "average", "AVR", "AVReceiver", "awesome", "awesome!", "Ax500", "AxedaGO", "background", "balancing", "banging", "bare metal", "Base", "base board", "baseboard", "basic", "bass", "batteries", "Battery", "baud", "baudrate", "BBC", "Bee", "beginner", "belgium", "beta", "BetaBug", "beyond", "Bi-Directional", "Bidirectional", "big", "billy", "bin", "binary", "Binocular Disparity", "biped", "bit", "bit-band", "bitbang", "bitmap", "Bitmaps", "bits", "bitwise", "bitwise or", "Black Friday", "BLE", "bleeper", "blinkm", "blip", "Blob Algorithm", "blocks", "blocks free", "BLOD", "Blue", "bluegiga", "BlueRay", "bluetooth", "Bluetooth 4.0", "Bluetooth modules BX100", "blueusb", "bma180", "bmp085", "BMPTK", "Board", "boards", "bob2", "bog", "BOM", "bonjour", "bookmark", "books", "bool", "Boot", "bootloader", "bootstrapping", "brace", "braces", "brea", "breadboard", "break", "breakout", "breakout board", "brick", "broadcasting", "broken", "brown-out", "browser", "BSOD", "BTstack", "buffer", "bufferd", "bug", "bugs", "build", "Build Options", "burst", "bus", "BusIn", "BusInOut", "BusOut", "BUTTON", "buzzer", "BX10", "Byte", "bytes", "bzr", "C", "C Library", "c programming", "C++", "c++0x", "C027", "C24LCXX_I2C", "Cable", "caching", "Cad", "call", "callbacks", "camera", "CAN", "CAN adapter", "can-bus", "canbus", "cancel", "cannot", "CANRAM", "Capacitance", "Capacity", "captions", "captouch", "capture", "car", "card", "case", "cast", "cc2500", "CC3000", "CDC", "CEC", "CELL", "CGI", "chain", "Change", "Char", "char *", "character", "checkout", "chinese", "chip", "chip select", "Chord", "chrome", "chromium", "cinder", "Circuit", "circular", "class", "class D", "classes", "clean", "client", "clock", "clone", "close", "cloud", "cluster", "cmake", "cmis", "CMPS03", "cmsis", "CMSIS-DAP", "CNC", "CoAP", "code", "Code 10", "code folding", "code generation", "code red", "Code Sourcery", "code_red", "CodeRed", "codes", "CodeSourcery", "CoIDE", "colapse", "collaborate", "Collaboration update", "collision", "color", "colors", "com", "COM3", "command", "commands", "comment", "comments", "commit", "common", "comms", "Communication", "comparator", "compass", "compatibility", "competition", "compi", "compilation", "compile", "compiler", "compiler erro", "compiler error codes", "Compiling", "Compoler", "component", "component_database", "componentless", "components", "Computer", "concatenation", "Configuration", "connect", "connectors", "const", "constant", "constructor", "consumption", "contest", "contract", "control", "controller", "controllerless", "conversion", "CooCox", "cookbook", "copy", "copyrights", "corrupt", "Cortex", "Cortex-M0", "Cortex-M0+", "cortex-m4", "cos", "cosm", "counter", "counters", "counting", "cout", "CPHA", "CPOL", "cpplapack", "CPU", "CRC", "critical_section", "CRP", "crystal", "CS4331", "CS5331", "css", "CT32", "CTS", "current", "current sensor", "custom", "Custom Terminal", "cut", "CW", "CyaSSL", "D-", "D+", "da", "DA14580", "dac", "DAC noise", "daisy", "Dalek", "Dali", "damage", "DAP", "DAQ", "data", "data abort", "data entry", "Data Logging", "Database", "datalogging", "Date", "datestamp", "DC motor", "dc-offset", "dead", "deadlock", "deadmbed", "debounce", "debug", "debugger", "debugging", "debugging DigitalOut", "declaration", "DeepSleep", "default", "defined", "definition", "DEGREE", "delay", "delete", "demo", "deploy", "derive", "description", "Descriptors", "Design", "design101", "DesignSpark", "desk", "destroyed", "Destructor", "detach", "detection", "detection/awareness", "development", "developmet", "device", "devices", "DFRobot", "DFU", "DHCP", "DHT11", "Differant", "Digilent", "Digital", "digital compass", "Digital I/O", "digital servos", "DigitalDice", "DigitalIn", "DigitalInOut", "digitalOut", "DigitialOut", "dint", "diode", "DIP", "direction", "directory", "disable", "DISCONNECT", "Disk", "display", "Displays", "distance", "distributers", "DIY", "dll;matlab;", "DM9161", "DMA", "DMX", "DMX512", "doa", "document", "documentation", "does", "domotic", "don't", "dongle", "doorbell", "DotNet", "double", "DoubleEdge", "Dowload", "Download", "downloads", "doxygen", "DP83848", "dram", "drift", "Drive", "driver", "driverlibrary", "driving", "ds-5", "DS1052E", "ds1307", "DS1820", "DS18B20", "DS18S20", "DSP", "dual-core", "duplex", "duty cycle", "DVI", "Dynamic", "dynamixel", "dyndns", "e-ink hoopup", "E-Paper", "E260-D", "E289", "E980", "EA", "Eagle", "easy", "echo", "eclipse", "editor", "EEPROM", "effect", "EGAS", "ehternet", "EIDE", "eint", "elegant coding", "Element14", "eLua", "em-406", "EM-406A", "EM408", "email", "Embedded", "EmbeddedArtists", "empty", "empty binary file", "EMS", "emulator", "emwin", "enclosure", "Encoder", "encoders", "encoding", "encrypted firmware", "encryption", "Endpoint", "Endpoints events", "energy", "energy monitoring", "engine", "entire", "enum", "Environment", "ERIC", "err", "errata sheet", "Error", "Error code", "esc", "español", "eth", "ETH_RST", "etherCAT", "ethernet", "EthernetIfBeta", "EthernetInterface", "EthernetNetIf", "eve", "events", "example", "exception handling", "exit", "Expansion", "Export", "Export C", "external", "external memory", "extract", "eye-fi", "F302R8", "F401RE", "facebook", "fail.txt", "failed", "failure", "fall()", "FAQ", "fashion", "fast", "faster", "FastOut", "FAT", "FAT FS", "fatfilesystem", "FatFIlesystem.lib", "FATFS", "faulty mbed", "Favorites", "FDRM", "FDRM_KL25Z_USBSerial_example", "feature", "features", "fedora", "feedback", "Felica", "feof", "ffc", "fgetc", "Fiel", "fields", "FIFO", "file", "File Exclusion", "file format", "filename", "files", "Filesys", "filesystem", "filetree", "filter", "filtering", "filters", "find", "finder", "firefox", "firm", "firmata", "firmware", "firmware 141212", "firmware.bin", "fixedpoint", "flash", "flash drive", "flashing", "flexibility", "flicker", "float", "Floating point", "Flot", "flow", "Fm+", "folders", "following", "font", "Fools", "FOOTPRINT", "fopen", "for", "foreground", "fork", "format", "formating", "formatting", "Forum", "FOTA", "fpc", "fpc1011f", "FPF212", "FPGA", "fprint", "fprintf", "fragmentation", "frame", "frame rate", "framework", "FRDM", "FRDM-K64F", "FRDM-KL25Z", "free", "freebsd", "FreeRTOS", "Freescale", "freeze", "Freq", "frequency", "Fried", "frog", "front panel", "frustration", "fscanf", "fseek", "FSK", "FT232R", "FTDI", "FTDI Cable", "FTP", "fubction", "fun", "function", "function prototypes", "fuse", "future", "Fwrite", "G", "gadgeteer", "garbage", "gateway 504 timeout", "GATT Client", "gcc", "GCC_CR", "gdb", "generate", "Gesture", "getc", "GFX", "git", "glasses", "GLCD", "glitch", "global", "gmail", "gnu", "google", "gpdma", "GPIO", "GPRS", "GPS", "Graphics", "Graphics Driver", "graphing", "graycode", "group", "GSM", "guest", "GUI", "guitar", "gyro", "gyroscope", "h", "H-bridge", "hacking", "hacks", "half", "hall effect sensor", "HAM", "HAM Radio", "hand crank", "handler", "handshaking", "hang", "hangs", "hardhackers", "hardware", "HcHCCA", "HCSR04", "HD44780", "HDD", "HDL", "HDMI", "header", "headers", "heap", "heat", "hello", "helloworld", "help", "Helpful_1", "herd", "hex", "hexapod", "hg", "HID", "high-pass", "hire", "Hitachi", "Hitec", "HMC6352", "HMI", "Home Automation", "hookup", "Host", "HotSync", "hour glass", "how", "howto", "HSYNC", "html", "http", "HTTPClient", "httpd", "HTTPDynamicPage", "HTTPfile", "HTTPLog", "https", "HTTPServer", "HTTPServer_echoback", "HTTPServerExample", "HTTPText", "HTTs", "hub scynchronisig", "Humidity", "I/O", "I2C", "I2C/SPI-to-UART IC", "I2CC0", "i2cmaster", "i2cslave", "I2S", "I2S;", "IAP", "IAR", "ID", "ID12", "ide", "ideas", "ie7", "IE9", "if", "ifdef", "ignore", "ILI9325", "ILI9328", "ILI9341", "image", "Images", "impl", "import", "importing", "IMU", "In", "inches", "include file", "indent", "indexing", "industrial", "Inertial", "infinite loop", "infra", "infrared", "initialisation", "initialization", "initiliazation", "inline", "Input", "Insertion", "Install", "installer", "instance", "Instances", "Instructables", "int", "integer", "integration", "Intel ISEF", "interface", "interface chip", "interfacing", "intern", "internal", "Internet", "Interr", "interrupt", "interrupt callback", "Interrupt priority", "InterruptIn", "interrupts", "introduction", "intsall", "invalid", "IO", "IOT", "ip", "ip address", "IP checksum", "ipad", "iPhone", "IR", "IR Sensors", "IRC", "irq", "ISIS", "ISP", "ISR", "Issue", "issues", "italic", "ITG3200", "iTunes", "Japan", "Japanese", "Java", "JPEG", "jQuery", "JSON", "JTAG", "Jumentum", "k20d50m", "k64-m4-accel", "K64F", "KB", "keil", "kernel", "key", "keyboard", "keypad", "kickstarter", "kit", "kits", "KL-25Z", "KL05Z", "KL25z", "kl46z", "kl64f", "KS0108", "KURD", "L152RE", "L293D", "l298n", "labview", "labview2009", "Lack", "LAN", "lan8720", "landscape", "language", "lapack", "laser", "laser cut", "latency", "layout", "LCD", "LCP11U24", "ldr", "LE", "learning", "least", "led", "led matrix", "LED1", "LED3", "LEDboard", "LEDscreen", "LEDSflashfast", "LEFT", "LEM", "Level Converter", "level shifting", "level translation", "LF1S022", "LFN", "lib", "LibHumidity", "libraries", "library", "license", "lifespan", "light", "light sensor", "Like", "limit", "LIN", "line", "line 21", "Line Follower", "line numbers", "linefollow", "link", "LINK_LED", "LINK_SPEED", "linkedin", "linker", "lint", "linux", "lipo", "LiquidWare", "LIS302", "listener", "liwp", "LM175", "LM34", "load", "loading", "LocaFileSystem", "Local", "localdisk", "localfile", "LocalFileHandle", "LocalFileSystem", "LocalFileSystem not released", "localflash", "localhost", "localtime", "locks", "lockup", "logging", "logging levels", "logo", "Long", "Look Up Table LOT", "loops", "lost", "lost program", "lot", "low", "low power", "low-pass", "LPBmini", "LPC", "LPC_CAN", "LPC_MCI", "LPC_MIC", "LPC1114", "LPC1114FN28", "LPC11U24", "LPC11U35", "LPC11U67", "LPC11U68", "LPC11U6X", "lpc11uxx", "LPC1549", "LPC15xx", "LPC17", "lpc17_emac.c", "LPC1768", "LPC1768.sct", "LPC1769", "lpc1788", "LPC1857", "LPC18XX", "lpc2368", "LPC23xx.h", "lpc2478", "LPC407x", "LPC4088", "LPC408x", "lpc43xx", "lpc810max", "LPCmini", "LPCXpresso", "LPCXpresso1549", "LPS331AP", "LSM303", "lt8500", "LTC2400", "lua", "lwip", "M0", "M2M", "m2p", "m3pi", "m4", "mac", "MAC address", "mac os", "Machine", "macos", "macro", "madplayer", "magic", "magician", "magjack", "magnetics", "magnetometer", "Main", "mainpage", "Make", "Makefile;", "malloc", "MAM", "Management", "Manufacture", "manufacturing", "mapping", "marble run", "mask", "mass", "master", "materials", "math", "math.h", "MATLAB", "matrix", "Maturity of mbed", "max", "MAX11110AUT+T", "MAX233", "MAX5842", "MAX6675", "MAX6952 LED driver", "maximum", "maze", "mb", "mb90f549", "mbed", "mbed account", "MBED Application Board", "mbed firmware", "mbed LPC1768", "mbed rtos", "mbed SDK", "mbed SPI", "MBED website", "mbed_debug", "mbed_die", "MBED_MICROCONTROLLER", "mbed_official", "mbed_reset", "mbed_rtos", "mbed-rtos", "mbed.h", "mbed.lib", "mbed.org", "mbedchallenge", "mbedlib", "mBuino", "MCP23017", "mcp2551", "MCU", "MD25", "mean", "measure", "measurement", "mechatronics", "median", "Medical device", "mega", "MemberFunction", "memory", "memory allocation", "memory error", "Menbed", "menu", "mercurial", "Mesauer", "message", "Meter", "micro", "Microchip", "microlib", "micromouse", "microSD", "Microwire", "MID", "MIDI", "MIFARE", "milliseconds", "MiMic", "mindstorms", "mini", "minimu9", "minimum", "miniusb", "Mint", "Mirror", "Missing", "MK20Dx256", "mkit", "mobile phone", "mobileLCD", "Modbus", "modbustcp", "MODDMA", "MODDMA.h", "mode", "model", "modem", "MODGPS", "MODI2C", "modifications", "MODSERIAL", "Modula-2", "module", "monitor", "monitor mode", "Morse", "Mosi", "mossmann Bluetooth radio", "motion", "motor", "motor driver", "motors", "mount", "Mouse", "mouth", "mp3", "mp3player", "MPL3115A2", "mpr121", "MPU-6000", "MPU-6050", "MPU6000", "MPU6050", "MQTT", "msc", "MSCFileSystem", "MSCUsbHost", "mtu", "multi-core", "multicast", "multiple", "multiple binaries", "multiple devices", "multiplexing", "multitasking", "music", "mutiplex", "mysql", "N-Key", "n'", "n64 controller", "Name", "Names", "namespace", "nanopb", "NanoSocketiWifi", "navigation", "NB", "NDS", "Near Field Communication", "negotiate", "nested", "NET", "NetServices", "NetServicesMod", "network", "networking", "new", "new board", "NEW MBED", "new tcp-ip stack", "new users", "newbie", "Newhaven", "newlib", "newline", "news", "NFC", "NFS", "NHD-2.4-240320SF-CTXI#-1", "NMEA", "No Space in Execution Regions", "nohl", "noise", "Nokia", "Nokia LCD", "Nokia6610", "Non", "non-blocking", "non-public", "non-pulic", "non-volatile memory", "non-volotile", "not", "not available", "not mounting", "Notebook", "notebook pages", "notebooks", "notes", "novice", "nRF2401A", "nRF24L01", "nRF51822", "NTP", "ntp server", "ntpdate", "Nucleo", "nucleos", "nulll", "numbers", "numeric", "NVIC", "nvic_systemreset", "NVM", "nxp", "NXP/mbed", "OAuth", "Oberon", "object", "Object Design", "occupancy", "octopus card", "of", "offline", "offline compile", "offset", "OLED", "on", "on screen display", "One Wire", "OneWire", "online", "online compiler", "Op", "Open", "open drain", "openair", "OpenDrain", "OpennNETCF", "openocd", "opensolaris", "opensource", "opera", "operators", "Optimization", "options", "Optocoupler", "Orange", "OS", "osc", "OSC_ENA", "oscillator", "Oscilloscope", "osd", "OSEK", "ostream", "OSX", "OU", "Out", "output", "outputs", "Over", "overloading", "P0_15", "P0_3", "p15", "p29", "p2m", "Pachube", "package", "Page", "pain", "PAKET", "pal", "Parity", "parse", "parts", "Pascal", "Password", "paste", "PATA", "pbuf", "pc", "PC board", "pc-lint", "pc.printf", "PC.scanf():", "PCA9532", "PCB", "PCF8574", "PCF8575", "PCF8575C", "PCLKSEL0", "PCLKSEL1", "pcRx_interrupt()", "performance", "period", "peripheral", "peripheral clock", "Permission Denied", "persistent", "phase", "photos", "phy", "Pi", "PIC", "PIC32MZ", "picture", "pictures", "PID", "piezo", "Pin", "pin 18.", "pin21", "pin24", "pin25", "pinball", "PinDetect", "PING", "pinmap", "PinNames", "pinout", "pins", "Pinsel4", "PIO", "pir", "pixel", "plan", "plastic parts", "player", "playstation", "PLC", "PLL0", "PLL1", "Plotting", "Plus One", "PM", "POE", "pointer", "pointers", "polarity", "pollici", "polling", "polohu", "pololu", "port", "port expander", "porting", "portpin", "ports", "position contro", "post", "pow(", "Power", "power factor", "power management", "power managment", "power over ethernet", "Power Up", "Powering", "powerline", "powersource", "PPM", "ppmsum", "PPP", "prallax", "Precompiled", "preprocessor", "Press", "pressure", "preview", "print", "Printed Circuit Board", "printf", "printout", "priority", "private", "prject", "problem", "processing", "Processor_update", "Production", "profile", "program", "program details", "programming", "project", "project list", "projects", "promiscuous", "Promiscuous mode", "Promisuous mode. Moniter mode", "promotion", "prot", "Protection", "proteus", "protoboard", "protobuf", "protocol", "prototype", "prototype to hardware", "prototyping", "PS/2", "PS2", "PS3", "PSP", "public", "publish", "published", "publishing", "pulldown", "pullup", "pulse", "pulse direction", "Pulse;", "Pulsewidth", "push", "putc", "pwm", "PwmIn", "PwmOut", "pymite", "pyOCD", "python", "QEI", "qp", "qsort", "QSP Revue", "QTR-1RC", "quadrature", "quadrocopter", "quaternions", "questions", "quiz", "QVGA", "R", "racing", "rain", "RAM", "range", "RangeFinder", "Rasperry", "rate", "rates", "raw", "RC", "RC5", "re-entrancy", "read", "read_us", "readdir", "reader", "Reading", "readNB", "real", "real product", "real-time", "realloc", "realtimeclock", "reboot", "rebuild;", "rebuilt", "receive", "recognition", "recognized", "recommend", "recover", "red", "red suite", "reference", "reference design", "References", "Reflectance", "Register", "registers", "registration", "regression", "regulator", "Relay", "relays", "remote", "remote data collection", "Removal", "remove", "rename", "replace", "replace all", "Report", "Repository", "reprogram", "reset", "Reset Button", "resistor", "resolved", "response", "retrieval", "Retrieving", "Return Code 9", "Returntype int", "reverse", "review", "revision", "revisions", "rf", "RF4463PRO", "RFID", "rfm12", "RFM12B", "rgb", "ribbon", "RIGHT", "Rigol", "rise", "rise()", "RIT", "rj45", "rld", "rmdir", "RMII", "rms", "RN-XV", "rn41", "robo3001", "RoboClaw", "robodog", "robot", "Robotics", "robotis", "rollover", "ROM", "ROSMbed", "rotary", "router", "routine", "rover", "rpc", "RPCFunction", "RPCVariable", "RS-485", "rs232", "RS485", "RSA", "rss", "RTC", "rtos", "Rtostimer", "RTS", "RTX", "ruby", "rules", "rx", "RxIrq", "rxtx", "s", "SAA1064", "Safari", "SALE", "sampling", "sampling time.", "Save", "save as", "SC16IS750", "SCA3000", "scanf", "Scanning Matrix", "scatter file", "Scheduler", "Schematics", "sclk", "scmRTOS", "scope", "scp1000", "SCR", "Scratch", "screen", "script", "Scroll", "SD", "SD Card", "SD-Card", "SDCard", "SDFileSystem", "SDFileSystemSystem", "SDHC", "sdhcfilesystem", "SDK", "sdram", "SE95D", "search", "Sections of Aggregate Size", "secure boot", "security", "Seeedstudio", "segment", "segway", "select", "selection", "semaphore", "semihost", "semihosting", "Send", "sensor", "sensors", "Serial", "Serial Flash", "Serial LCD Library", "Serial Number", "serial port", "serial_api.h", "Serial::RxIrq", "serial.attach", "SerialHalfDuplex", "SerialPC", "server", "service", "servlet", "Servo", "servos", "set", "set_link()", "setting", "SETUP.cpp", "Shared resources", "Sharing", "Sharp", "Sheet", "shield", "shirt", "shoes", "shopping", "short", "show", "Show/hide", "SID", "signal", "signal processing", "signature", "SIM900", "SimpleSocket", "Simulator", "sin", "single axis", "sink", "size", "slave", "Sleep", "slow", "slow GPIO", "smart", "smartphone", "smd", "SMS", "SMT", "SMTP", "SNES", "SNIFFER", "snip", "snippets", "SNMP", "socket", "sockets", "Sof_event", "software", "software Uart", "solar", "solaris", "sound", "SoundRecorder", "source", "source code", "sourcery", "Sourcery;", "SP14Q002", "space", "spaces", "sparkfun", "Spartan 3E", "speaker", "specification", "Speed", "SPI", "spi 10mhz", "SPI input", "SPI master", "SPI Slave", "SPI3", "spice", "SPISlave", "spree", "SQL", "SQLite", "square", "sram", "SRF08", "ssb", "sscanf", "SSD1963", "SSH", "SSI", "SSL", "SSP", "SST", "ST", "stable", "stack", "Stamp", "standalone", "standard", "star", "StarBoard", "start", "starter", "startup", "State", "State Machine", "statement", "static", "status", "stderr", "stdout", "STEM", "Step", "step direction", "stepper motor", "stm32", "STM32 Bugs", "STM32F103RB", "STM32F401RE", "stop", "stop bit", "stops working", "storage", "strange", "Strange Error", "strcpy", "stream", "stretching", "string", "strtof", "strtol", "structures", "student", "Studio", "suart", "Subscriptions", "substr", "suggestion", "suggestions", "SumoBot", "super", "supply", "Support", "SVC", "svn", "SWD", "switch", "switcher", "SWL", "sync", "synchronize", "Syncronised", "Synergy", "syntax", "synth", "synthesizer", "System", "SystemInit", "SysTick", "tab", "table", "tabs", "Tag", "talkie", "target", "task number", "TCP", "tcp/ip", "TCPS", "TCPSocket", "TCPSocketServer", "team", "teensy", "Telnet", "Telnet server", "Temperature", "tera", "Tera Term", "TeraTerm", "term", "Terminal", "Testbed", "testing", "text", "TextLCD", "TextStar", "TFT", "the", "thread", "threads", "THROTTLE", "thumb", "TI", "Ticker", "time", "time saving or time consuming", "time-triggered", "Timeout", "timer", "timer2", "timer3", "timers", "timing", "tinyclr", "tip", "tlc5940", "TLS", "TLV1572", "TMP102", "to", "to?", "Toggle", "tolerant", "tollos", "toolchain", "toolchain;", "touch", "touch input", "touchpad", "Touchscreen", "tracker", "training", "Transceivers", "transfer", "transfer speed", "translation", "translator", "transmit", "tri-state", "triac", "trigger", "Trigonometric", "trimble", "troub", "troubleshooting", "try catch", "TSL2560", "TSL2561", "TTL", "ttyACM0", "turn", "tutorial", "twitter", "TwitterExample", "Two", "typedef", "typos", "UART", "UART0", "uartsb", "ubertooth", "ublox", "Ubuntu", "UDP", "UDPSocket", "uint16_t", "ultrasonic", "UM6", "uml", "umts", "UMTSStick", "undo", "unicode", "unique", "unit", "unix", "Unknown", "unmount", "unresponsive", "unsigned int", "unstable", "update", "updates", "UPGRADE", "Upload", "uploading", "UPnP", "url", "US Naval Academy", "usability", "usage", "usart", "USB", "USB connector", "USB device", "USB Host", "USB memory", "USB MSC", "usb prober", "USB to CAN", "USB_CDC_MSD_Hello", "USB_MSD", "USB_VBUS", "USB-stick", "USB2CAN", "USB3.0", "USBA", "USBB", "usbcdc", "USBD480", "USBDevice", "USBHID", "USBHostMSD", "USBKeyboard", "USBMIDI", "USBMouse", "USBMSD", "usbrx", "usbserial", "usbtx", "USBUDCAH", "use", "user", "username", "utf 8", "utf-8", "Utilities", "UVC;", "uvision", "V OUT", "Valid", "variable", "variables", "vars", "VB", "VB.NET", "VB6", "vector", "vector.cc", "vehicle", "Venus", "verification", "verify", "version", "version control", "VGA", "vibration", "VID", "video", "Vin", "virtual", "virtual disk", "virus", "visa", "vista", "Visual", "Visual Basic", "VMWare", "Vodafone", "Vodafonemodem", "voich", "volatile", "voltage", "volume", "VOUT", "vprintf", "VSYNC", "W5UXH", "wait", "wait()", "wakeup", "walkie", "warning", "warnings", "watchdog", "wav", "wave", "WavePlayer", "WDT", "we", "weak", "weather", "Web", "webfs", "webserver", "website", "Websockets", "What", "wheel", "while loop", "while(1)", "Wi-Fi", "width", "wifi", "WiFly", "Wii", "Wii60", "wiimote", "wiki", "Win2000", "win7", "wind", "windows", "Windows serial configuration", "Windows Serial Driver", "windows7", "Windows8", "wireless", "wiring", "wirless", "with", "Wixel", "Wiznet", "workflow", "working", "workshop", "world", "write", "writeable", "writer", "wrong", "ws2801", "WSE", "wt32", "wwdt", "WYSIWYG", "X", "X-10", "xbeat", "xbee", "XBeePro", "Xbox", "Xbox 360", "xively", "xml", "XP", "XTAL", "YEI", "yellow", "You Tube", "ZeroG", "zigbee", "zip"], {
+                width: 150,
+                max: 10,
+                multiple: true,
+                multipleSeparator: ",",
+                scroll: true,
+                scrollHeight: 300,
+            });
+            </script>
+            </td></tr>
+            <tr><td>
+                <div style="text-align: right; margin-bottom: 5px;"><a href="javascript:FileBrowser.show('id_content', '/filebrowser/browse/?pop=1&amp;mode=wiki&amp;editor=id_body');" class="fb_show">Insert images or files <img src="/media/filebrowser/img/filebrowser_icon_show.gif" height="18"alt=""/></a></div>
+                <textarea cols="40" id="id_body" name="body" rows="15" style="width: 100%;">
+</textarea>
+                <script type="text/javascript">
+    $(document).ready(function()
+    {
+    $("#showhelp").click(function() {
+        $("#help").slideToggle('fast')
+      }
+    );
+    });
+</script>
+            <div style="text-align: right;"><a href="#" onClick="return false;" id="showhelp"><img alt="arrow" src="/media/img/icons/bullet_arrow_down.png" class="icon"/> Editing tips</a>
+            </div>
+            <div id="help" style="display: none; margin: 10px 0 20px 0" class="flashbox finfo">
+
+                <h4 class="ftitle">Editing tips</h4>
+                
+                <div class="row">
+                	<div class="twelve columns">
+<h5>Headings</h5>
+<pre>= Heading 1 =
+== Heading 2 ==
+=== Heading 3 ===
+</pre>
+
+<h5>Styling</h5>
+<pre>**bold text**, //italic text//, ##monospaced text##
+__underlined text__, --strikethrough text--
+^^superscript text^^, ,,subscript text,,</pre>
+
+<h5>Lists</h5>
+<pre>* List Item 1
+* List Item 2
+ # Numbered List Item 2.1
+</pre>
+
+<h5>Links</h5>
+<pre>[[WikiPage]]
+[[http://mbed.org]]
+[[/handbook/SPI|More about SPI]]
+</pre>
+
+<h5>Upverter embed <small>(hint - use the unique id found in the embed code)</small></h5>
+<pre>
+&lt;&lt;upverter&gt;&gt;634b5640a5bbd8a7&lt;&lt;/upverter&gt;&gt;
+</pre>
+
+<h5>Code <small>(hint - publishing your code and linking to it makes it easier to import your program)</small></h5>
+<pre>
+&lt;&lt;code title=include the mbed library with this snippet&gt;&gt;
+#include "mbed.h"
+&lt;&lt;/code&gt;&gt;
+</pre>
+<h5>Linking to a program</h5>
+<pre>
+&lt;&lt;program  /users/simon/programs/SerialBuffer/latest/ &gt;&gt;</pre>
+
+<h5>Upverter embed <small>(hint - use the unique id found in the embed code)</small></h5>
+<pre>
+&lt;&lt;upverter&gt;&gt;634b5640a5bbd8a7&lt;&lt;/upverter&gt;&gt;
+</pre>
+
+<h5>Team embed example</h5>
+<pre>
+&lt;&lt;team http://mbed.org/teams/mqtt/ /&gt;&gt;
+</pre>
+
+<h5>Component embed example</h5>
+<pre>
+&lt;&lt;component http://mbed.org/components/AX-12/ /&gt;&gt;
+</pre>
+
+
+
+
+<h5>Table of Contents <small> is included by default, to disable put this snippet on the page.</small></h5>
+<pre>
+&lt;&lt;notoc&gt;&gt;
+</pre>
+
+<h5>Blocks</h5>
+<pre>
+&lt;&lt;quote&gt;&gt;
+Can I markup a quote, help or warning block?
+&lt;&lt;/quote&gt;&gt;
+</pre>
+
+<h5>Images</h5>
+<pre>
+&#123;&#123;/media/img/mbed.gif&#125;&#125;
+&#123;&#123;http://mbed.org/media/img/mbed.gif&#125;&#125; 
+[[WikiPage|&#123;&#123;/media/img/mbed.gif&#125;&#125;]]
+[[WikiPage|&#123;&#123;/media/img/mbed.gif&#125;&#125;]]
+</pre>
+
+<h5>Gallery <small>size argument can be either small or medium, default is large</small></h5>
+<pre>
+&lt;&lt;gallery size=small&gt;&gt;
+&#123;&#123;/media/img/mbed.gif&#125;&#125;
+&#123;&#123;/media/img/mbed.gif|mbed logo&#125;&#125;
+[[http://mbed.org|&#123;&#123;/media/img/mbed.gif&#125;&#125;]]
+[[http://mbed.org|&#123;&#123;/media/img/mbed.gif|mbed logo&#125;&#125;]]
+&lt;&lt;/gallery&gt;&gt;
+</pre>
+
+<h5>Videos</h5>
+<pre>
+&#123;&#123;http://www.youtube.com/watch?v=7LPDRcahhUE&#125;&#125;
+</pre>
+</div>
+                	
+                	<div class="twelve columns">
+                	<p style="text-align:right; margin-bottom: 0;">See the <a target="_blank" href="/cookbook/Wiki-Syntax">full wiki syntax (in new window)</a></p>
+                	</div>
+                
+                
+</div>
+                
+                
+ 
+            </div>
+
+
+            </td></tr>
+            <tr><td>
+                <input type="submit" name="submit" class="button large radius" style="font-weight: bold; margin-top: 5px;" value="Post new topic"/> &nbsp;
+                <input type="button"  href="#" onClick="return false;" id="preview" class="button secondary radius" value="Show preview"/>  <span id="loading"></span> &nbsp;
+            </td></tr>
+        </table>
+    </form>
+</div>
+
+                    <h2><a name="discussions" href="#discussions">Discussion topics</a></h2>
+                    
+
+
+    
+
+
+
+<p>Nothing here yet!</p>
+
+
+                
+            
+
+
+    <h2><a name="questions"> <A href="#questions">Questions</a></h2>
+    
+        
+            
+            <div class="question">
+                <a href="/questions/3880/How-do-I-know-what-version-is-loaded-on-/" style="color: inherit !important;">
+                    <div class="stats">
+                        
+                        <div class="answers" style="background:#B2EEB2;" title="This question has been solved.">
+                        
+
+                            <div class="qstat" >1</div>
+                            answers
+                        </div>
+                    </div>
+                </a>
+
+                
+                <img title="This question has been solved" height="16" width="16" class="icon icon_tick" src="/media/img/blank.gif"/>
+                
+
+                <a href="/questions/3880/How-do-I-know-what-version-is-loaded-on-/" class="title" title="I have a LPC1768 and would like to know what version of firmware is currently loaded.">
+                    How do I know what version is loaded on my current board?
+                </a>
+
+                <span class="qdata">
+                    <span class="authortext"><a href="https://mbed.org/users/mike2013/" ><img alt="" class="icon" width="16px" height="16px" src="/media/thumbs/29/66/29660f5ea855d8f1568d02a23d5c878a.jpg"/></a> <a href="https://mbed.org/users/mike2013/" > Mike Colls</a></span> <br />
+                    <abbr title="Mi 25 Jun 2014 11:07">3 Wochen, 4 Tage ago</abbr>
+                </span>
+
+                <p class="tags">
+                
+                <img height="16" width="16" class="icon icon_tag" src="/media/img/blank.gif"/>
+
+                
+                <a href="/questions/tag/firmware">firmware</a>, 
+                
+                <a href="/questions/tag/LPC11U24">LPC11U24</a>, 
+                
+                <a href="/questions/tag/LPC1768">LPC1768</a>
+                
+                
+                </p>
+            </div>
+            
+        
+            
+            <div class="question">
+                <a href="/questions/3753/Updating-mbedmicrontroller_141212-will-f/" style="color: inherit !important;">
+                    <div class="stats">
+                        
+                        <div class="answers" style="opacity: 0.4;" title="This question has no answers.">
+                        
+
+                            <div class="qstat"  style="color:#6B2B28;" >0</div>
+                            answers
+                        </div>
+                    </div>
+                </a>
+
+                
+
+                <a href="/questions/3753/Updating-mbedmicrontroller_141212-will-f/" class="title" title="After updating the firmware to mbedmicrontroller_141212  CMSIS DAP debugger i cannot use LocalFilesytem for write operation. ">
+                    Updating mbedmicrontroller_141212 will fail to create a file
+                </a>
+
+                <span class="qdata">
+                    <span class="authortext"><a href="https://mbed.org/users/Subinnxp/" ><img alt="" class="icon" width="16px" height="16px" src="/media/thumbs/29/66/29660f5ea855d8f1568d02a23d5c878a.jpg"/></a> <a href="https://mbed.org/users/Subinnxp/" > Subin Puthan</a></span> <br />
+                    <abbr title="Do 12 Jun 2014 10:48">1 Monat, 1 Woche ago</abbr>
+                </span>
+
+                <p class="tags">
+                
+                <img height="16" width="16" class="icon icon_tag" src="/media/img/blank.gif"/>
+
+                
+                <a href="/questions/tag/firmware">firmware</a>, 
+                
+                <a href="/questions/tag/LPC11U24">LPC11U24</a>, 
+                
+                <a href="/questions/tag/LPC1768">LPC1768</a>
+                
+                
+                </p>
+            </div>
+            
+        
+            
+            <div class="question">
+                <a href="/questions/1815/Update-firmaware-failed/" style="color: inherit !important;">
+                    <div class="stats">
+                        
+                        <div class="answers" style="background:#d7eaef;" title="This question has 1 answers.">
+                        
+
+                            <div class="qstat" >1</div>
+                            answers
+                        </div>
+                    </div>
+                </a>
+
+                
+
+                <a href="/questions/1815/Update-firmaware-failed/" class="title" title="I have downloaded the last firmawre, and On/Off mbed.
+&quot;depuis&quot;, i have lost access to mbed and no idea off what to do ...
+">
+                    Update firmaware failed
+                </a>
+
+                <span class="qdata">
+                    <span class="authortext"><a href="https://mbed.org/users/georgesla/" ><img alt="" class="icon" width="16px" height="16px" src="/media/thumbs/29/66/29660f5ea855d8f1568d02a23d5c878a.jpg"/></a> <a href="https://mbed.org/users/georgesla/" > Georges LAURET</a></span> <br />
+                    <abbr title="Sa 12 Okt 2013 23:53">9 Monate, 1 Woche ago</abbr>
+                </span>
+
+                <p class="tags">
+                
+                <img height="16" width="16" class="icon icon_tag" src="/media/img/blank.gif"/>
+
+                
+                <a href="/questions/tag/firmware">firmware</a>, 
+                
+                <a href="/questions/tag/LPC11U24">LPC11U24</a>, 
+                
+                <a href="/questions/tag/LPC1768">LPC1768</a>
+                
+                
+                </p>
+            </div>
+            
+        
+    
+    </div>
+</div>
+
+
+
+
+
+
+
+        </div>
+        
+        <div class="three columns sidebar ">
+            
+    
+    
+
+<div class="panel radius">
+<h5 class="subheader"><a href="/handbook/Special:RecentChanges"><b>Recent changes</b></a></h5>
+
+
+
+    
+        
+
+
+<div class="contentitem">
+
+    
+
+    <div class="contentitem-left" style=" vertical-align: top;">
+        
+
+        <div class="textwrapper" style=" margin-left: 0; ">
+            <div style="font-size: 1.1em; padding-bottom: 4px;">
+                
+
+                
+
+                <b><a href="/handbook/Firmware-LPC800-MAX">Firmware LPC800 MAX</a></b>
+
+                
+
+                
+
+                
+            </div>
+
+            <div class="margin-top: 0px;">
+                
+
+                
+            </div>
+        </div>
+    </div>
+</div>
+
+    
+
+    
+        
+
+
+<div class="contentitem">
+
+    
+
+    <div class="contentitem-left" style=" vertical-align: top;">
+        
+
+        <div class="textwrapper" style=" margin-left: 0; ">
+            <div style="font-size: 1.1em; padding-bottom: 4px;">
+                
+
+                
+
+                <b><a href="/handbook/Compile-API">Compile API</a></b>
+
+                
+
+                
+
+                
+            </div>
+
+            <div class="margin-top: 0px;">
+                
+
+                
+            </div>
+        </div>
+    </div>
+</div>
+
+    
+
+    
+        
+
+
+<div class="contentitem">
+
+    
+
+    <div class="contentitem-left" style=" vertical-align: top;">
+        
+
+        <div class="textwrapper" style=" margin-left: 0; ">
+            <div style="font-size: 1.1em; padding-bottom: 4px;">
+                
+
+                
+
+                <b><a href="/handbook/mbed-SDK-porting">mbed SDK porting</a></b>
+
+                
+
+                
+
+                
+            </div>
+
+            <div class="margin-top: 0px;">
+                
+
+                
+            </div>
+        </div>
+    </div>
+</div>
+
+    
+
+    
+        
+
+
+<div class="contentitem">
+
+    
+
+    <div class="contentitem-left" style=" vertical-align: top;">
+        
+
+        <div class="textwrapper" style=" margin-left: 0; ">
+            <div style="font-size: 1.1em; padding-bottom: 4px;">
+                
+
+                
+
+                <b><a href="/handbook/mbed-SDK">mbed SDK</a></b>
+
+                
+
+                
+
+                
+            </div>
+
+            <div class="margin-top: 0px;">
+                
+
+                
+            </div>
+        </div>
+    </div>
+</div>
+
+    
+
+    
+        
+
+
+<div class="contentitem">
+
+    
+
+    <div class="contentitem-left" style=" vertical-align: top;">
+        
+
+        <div class="textwrapper" style=" margin-left: 0; ">
+            <div style="font-size: 1.1em; padding-bottom: 4px;">
+                
+
+                
+
+                <b><a href="/handbook/mbed-Compiler-Getting-Started">mbed Compiler Getting Started</a></b>
+
+                
+
+                
+
+                
+            </div>
+
+            <div class="margin-top: 0px;">
+                
+
+                
+                    <img height="16" width="16" class="icon icon_tag" src="/media/img/blank.gif"/>
+                    
+                        <a href="/search/?q=compiler&amp;type=">compiler</a>, 
+                    
+                        <a href="/search/?q=editor&amp;type=">editor</a>, 
+                    
+                        <a href="/search/?q=tutorial&amp;type=">tutorial</a>
+                    
+                
+            </div>
+        </div>
+    </div>
+</div>
+
+    
+
+    
+        
+
+
+<div class="contentitem">
+
+    
+
+    <div class="contentitem-left" style=" vertical-align: top;">
+        
+
+        <div class="textwrapper" style=" margin-left: 0; ">
+            <div style="font-size: 1.1em; padding-bottom: 4px;">
+                
+
+                
+
+                <b><a href="/handbook/Press-resources">Press resources</a></b>
+
+                
+
+                
+
+                
+            </div>
+
+            <div class="margin-top: 0px;">
+                
+
+                
+            </div>
+        </div>
+    </div>
+</div>
+
+    
+
+    
+        
+
+
+<div class="contentitem">
+
+    
+
+    <div class="contentitem-left" style=" vertical-align: top;">
+        
+
+        <div class="textwrapper" style=" margin-left: 0; ">
+            <div style="font-size: 1.1em; padding-bottom: 4px;">
+                
+
+                
+
+                <b><a href="/handbook/Homepage">Homepage</a></b>
+
+                
+
+                
+
+                
+            </div>
+
+            <div class="margin-top: 0px;">
+                
+
+                
+            </div>
+        </div>
+    </div>
+</div>
+
+    
+
+    
+        
+
+
+<div class="contentitem">
+
+    
+
+    <div class="contentitem-left" style=" vertical-align: top;">
+        
+
+        <div class="textwrapper" style=" margin-left: 0; ">
+            <div style="font-size: 1.1em; padding-bottom: 4px;">
+                
+
+                
+
+                <b><a href="/handbook/HDK-and-CMSIS-DAP">HDK and CMSIS DAP</a></b>
+
+                
+
+                
+
+                
+            </div>
+
+            <div class="margin-top: 0px;">
+                
+
+                
+                    <img height="16" width="16" class="icon icon_tag" src="/media/img/blank.gif"/>
+                    
+                        <a href="/search/?q=CMSIS-DAP&amp;type=">CMSIS-DAP</a>, 
+                    
+                        <a href="/search/?q=HDK&amp;type=">HDK</a>, 
+                    
+                        <a href="/search/?q=interface&amp;type=">interface</a>
+                    
+                
+            </div>
+        </div>
+    </div>
+</div>
+
+    
+
+    
+        
+
+
+<div class="contentitem">
+
+    
+
+    <div class="contentitem-left" style=" vertical-align: top;">
+        
+
+        <div class="textwrapper" style=" margin-left: 0; ">
+            <div style="font-size: 1.1em; padding-bottom: 4px;">
+                
+
+                
+
+                <b><a href="/handbook/Help">Help</a></b>
+
+                
+
+                
+
+                
+            </div>
+
+            <div class="margin-top: 0px;">
+                
+
+                
+            </div>
+        </div>
+    </div>
+</div>
+
+    
+
+    
+        
+
+
+<div class="contentitem">
+
+    
+
+    <div class="contentitem-left" style=" vertical-align: top;">
+        
+
+        <div class="textwrapper" style=" margin-left: 0; ">
+            <div style="font-size: 1.1em; padding-bottom: 4px;">
+                
+
+                
+
+                <b><a href="/handbook/LocalFileSystem">LocalFileSystem</a></b>
+
+                
+
+                
+
+                
+            </div>
+
+            <div class="margin-top: 0px;">
+                
+
+                
+            </div>
+        </div>
+    </div>
+</div>
+
+    
+
+    
+        
+
+
+<div class="contentitem">
+
+    
+
+    <div class="contentitem-left" style=" vertical-align: top;">
+        
+
+        <div class="textwrapper" style=" margin-left: 0; ">
+            <div style="font-size: 1.1em; padding-bottom: 4px;">
+                
+
+                
+
+                <b><a href="/handbook/Firmware-FRDM-K64F">Firmware FRDM K64F</a></b>
+
+                
+
+                
+
+                
+            </div>
+
+            <div class="margin-top: 0px;">
+                
+
+                
+                    <img height="16" width="16" class="icon icon_tag" src="/media/img/blank.gif"/>
+                    
+                        <a href="/search/?q=cmsis&amp;type=">cmsis</a>, 
+                    
+                        <a href="/search/?q=K64F-Firmware&amp;type=">K64F-Firmware</a>
+                    
+                
+            </div>
+        </div>
+    </div>
+</div>
+
+    
+
+
+</div>
+
+
+
+        </div>
+    </div>
+    
+    
+    <div class="row footer ">
+        <div class="twelve columns">
+        <hr />
+        <a href="http://www.arm.com"><img src="/media/img/blank.gif" class="icon_arm_logo" width="48" height="48" style="float:right"></a>
+        <ul>
+            <li>&copy; mbed</li> 
+            <li><a href="/blog">blog</a></li>
+            <li><a href="/handbook/Jobs">we're hiring!</a></li>
+            <li><a href="/handbook/Help">support</a></li>
+            <li><a href="/handbook/Service-status">service status</a></li>
+            <li><a href="/privacy">privacy policy</a></li>
+            <li><a href="/terms">terms and conditions</a> </li>
+            <li class="last">Language: 
+             
+                 <a style="font-weight: " href="/setlang?lang=en">en</a> 
+             
+             <a style="font-weight: " href="/setlang?lang=ja">ja</a> 
+             <a style="font-weight: " href="/setlang?lang=es">es</a> 
+             <a style="font-weight: bold" href="/setlang?lang=de">de</a>
+             </li> 
+            </ul>
+           <p style="clear:left">mbed, the fastest way to create devices with ARM-based microcontrollers.</p>
+           <p class="backtotop"><a href="#top">^ back to top</a></p>
+       </div>
+
+	
+	</div>
+    <div id="flag-content" class="reveal-modal small">
+        <h2>Report Content</h2>
+        <a class="close-reveal-modal">&#215;</a>
+        <form action="" method="post" id="flag-content-form">
+            <input type='hidden' name='csrfmiddlewaretoken' value='3VELnoBJBzdMLSyK7ME8Lfvf6l3bkkD1' />
+            <ul>
+                <li>
+                <label for="id_reason_1">
+                    <input id="id_reason_1" name="reason" type="radio" value="1" />
+                    Spam
+                </label>
+                </li>
+                <li>
+                <label for="id_reason_2">
+                    <input id="id_reason_2" name="reason" type="radio" value="2" />
+                    Inappropriate
+                </label>
+                </li>
+            </ul>
+            <a class="button radius secondary cancel-flag">Cancel</a>
+            <input type="submit" value="Report" class="button radius" />
+        </form>
+    </div>
+
+
+
+<script type="text/javascript">
+var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");
+document.write(unescape("%3Cscript src='" + gaJsHost + "google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E"));
+</script>
+<script type="text/javascript">
+try{
+var pageTracker = _gat._getTracker("UA-1447836-8");
+
+pageTracker._setCustomVar(1, 'User Type', 'Guest', 2);
+
+pageTracker._trackPageview();
+} catch(err) {}
+</script>
+
+
+
+</body>
+</html>

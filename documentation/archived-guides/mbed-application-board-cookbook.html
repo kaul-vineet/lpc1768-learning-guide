@@ -1,0 +1,1611 @@
+<!DOCTYPE html>
+
+
+
+
+
+
+<html class="no-js" lang="en">
+
+<head>
+    
+
+    <title>
+mbed application board - Cookbook
+ | Mbed</title>
+    
+
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=9; IE=8; IE=7; IE=EDGE" />
+    <!-- Set the viewport width to device width for mobile -->
+    <meta name="viewport" content="user-scalable=yes,width=device-width,initial-scale=0.9" />
+
+    
+
+<!-- Google Analytics -->
+<script>
+(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+})(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+
+ga('create', 'UA-1447836-8');
+ga('require', 'GTM-WXMLD4S')
+</script>
+
+<!-- Google Tag Manager -->
+<script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+'https://www.googletagmanager.com/gtm.js?id='+i+dl+'&gtm_auth=SMYNPwM0ICsV00c1ZHETqQ&gtm_preview=env-2&gtm_cookies_win=x';f.parentNode.insertBefore(j,f);
+})(window,document,'script','dataLayer','GTM-M6FZ495');</script>
+
+
+    <script>
+    (function(h,o,t,j,a,r){
+        h.hj=h.hj||function(){(h.hj.q=h.hj.q||[]).push(arguments)};
+        h._hjSettings={hjid:971746,hjsv:6};
+        a=o.getElementsByTagName('head')[0];
+        r=o.createElement('script');r.async=1;
+        r.src=t+h._hjSettings.hjid+j+h._hjSettings.hjsv;
+        a.appendChild(r);
+    })(window,document,'https://static.hotjar.com/c/hotjar-','.js?sv=');
+</script>
+
+
+
+<!-- Favicons -->
+<link rel="apple-touch-icon" sizes="57x57" href="/static/img/favicons/apple-icon-57x57.png">
+<link rel="apple-touch-icon" sizes="60x60" href="/static/img/favicons/apple-icon-60x60.png">
+<link rel="apple-touch-icon" sizes="72x72" href="/static/img/favicons/apple-icon-72x72.png">
+<link rel="apple-touch-icon" sizes="76x76" href="/static/img/favicons/apple-icon-76x76.png">
+<link rel="apple-touch-icon" sizes="114x114" href="/static/img/favicons/apple-icon-114x114.png">
+<link rel="apple-touch-icon" sizes="120x120" href="/static/img/favicons/apple-icon-120x120.png">
+<link rel="apple-touch-icon" sizes="144x144" href="/static/img/favicons/apple-icon-144x144.png">
+<link rel="apple-touch-icon" sizes="152x152" href="/static/img/favicons/apple-icon-152x152.png">
+<link rel="apple-touch-icon" sizes="180x180" href="/static/img/favicons/apple-icon-180x180.png">
+<link rel="icon" type="image/png" sizes="192x192"  href="/static/img/favicons/android-icon-192x192.png">
+<link rel="icon" type="image/png" sizes="32x32" href="/static/img/favicons/favicon-32x32.png">
+<link rel="icon" type="image/png" sizes="96x96" href="/static/img/favicons/favicon-96x96.png">
+<link rel="icon" type="image/png" sizes="16x16" href="/static/img/favicons/favicon-16x16.png">
+<link rel="manifest" href="/static/img/favicons/manifest.json">
+<link rel="shortcut icon" href="/static/img/favicon.ico?">
+<meta name="msapplication-TileColor" content="#ffffff">
+<meta name="msapplication-TileImage" content="/static/img/favicons/ms-icon-144x144.png">
+<meta name="theme-color" content="#ffffff">
+
+<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Lato:300,400,700">
+
+<link rel="stylesheet" href="/static/CACHE/css/output.811e2930ab34.css" type="text/css">
+
+
+    
+    
+
+    <link rel="stylesheet" type="text/css" href="/static/legacy-main.986d36e4640c.css">
+    <script type="text/javascript" src="/static/legacy-bundle.d4c318d04056.js"></script>
+
+    <script src="/static/CACHE/js/output.b4f0ddd57a31.js"></script>
+    <script type="text/javascript">
+        var MTIProjectId='531df303-da6d-4e1e-934d-ec3ecdc164a9';
+        (function() {
+            var mtiTracking = document.createElement('script');
+            mtiTracking.type='text/javascript';
+            mtiTracking.async='true';
+            mtiTracking.src="/static/js/mtiFontTrackingCode.js";
+            (document.getElementsByTagName('head')[0]||document.getElementsByTagName('body')[0]).appendChild( mtiTracking );
+        })();
+    </script>
+
+    
+    
+    
+	
+	
+
+    
+</head>
+
+<body>
+
+    <!-- Google Tag Manager (noscript) -->
+    <noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-M6FZ495&gtm_auth=3a8Vwkp5SsDiYq6tYR1ObQ&gtm_preview=env-6&gtm_cookies_win=x"
+    height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+    <!-- End Google Tag Manager (noscript) -->
+
+    
+
+
+
+
+
+
+
+
+<div class="mbed-nav">
+    <div class="mbed-nav__mobile-menu-control">
+        <i class="mbed-nav__mobile-menu-control-open fas fa-bars fa-fw"></i>
+        <i class="mbed-nav__mobile-menu-control-close fas fa-times is-hidden fa-fw"></i>
+        <i class="mbed-nav__mobile-menu-control-back fas fa-angle-left is-hidden fa-fw"></i>
+    </div>
+    <div class="mbed-nav__logo">
+        <a href="https://os.mbed.com">
+            <svg><use xlink:href="/static/img/mbed_nav_spritesheet.8ac20221a123.svg?v3#logo"></use></svg>
+        </a>
+    </div>
+    <div class="mbed-nav__menu">
+
+        <!-- Main menu -->
+        <nav class="mbed-nav__main-menu">
+            <ul class="mbed-nav__dropdown-menu">
+                <li class="has-dropdown">
+                    Overview
+
+                    <div class="mbed-nav__dropdown-menu-content">
+
+                        <!-- Overview dropdown menu -->
+                        <div class="mbed-nav__overview-menu">
+                            <section>
+                                <p>Operating system</p>
+                                <ul>
+                                    <li>
+                                        <a href="https://os.mbed.com/mbed-os/" class="mbed-nav__icon-link-detail">
+                                            <svg><use xlink:href="/static/img/mbed_nav_spritesheet.8ac20221a123.svg?v3#mbed_os"></use></svg>
+                                            <div>
+                                                <p>Mbed OS</p>
+                                                <p>The open source OS for Cortex-M devices</p>
+                                            </div>
+                                        </a>
+                                    </li>
+                                </ul>
+                            </section>
+
+                            <section>
+                                <p>Development tools</p>
+                                <ul>
+                                    <li>
+                                        <a href="https://www.keil.arm.com/mbed/?utm_source=mbed_com&utm_medium=compiler_button&utm_campaign=mbed_com_promo" class="mbed-nav__icon-link-detail">
+                                             <svg><use href="/static/img/keil_studio_icon.2c56c28014c6.svg?#keil_studio_icon"></use></svg>
+                                            <div>
+                                                <p>Keil Studio Cloud</p>
+                                                <p>Arm's IDE for IoT, embedded and Mbed development</p>
+                                            </div>
+                                         </a>
+                                     </li>
+                                    <li>
+                                        <a href="https://os.mbed.com/studio/" class="mbed-nav__icon-link-detail">
+                                            <svg><use xlink:href="/static/img/mbed_nav_spritesheet.8ac20221a123.svg?v3#mbed_studio"></use></svg>
+                                            <div>
+                                                <p>Mbed Studio</p>
+                                                <p>Download the desktop IDE for Mbed OS</p>
+                                            </div>
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a href="https://os.mbed.com/docs/mbed-os/latest/quick-start/offline-with-mbed-cli.html" class="mbed-nav__icon-link-detail">
+
+                                            <svg><use xlink:href="/static/img/mbed_nav_spritesheet.8ac20221a123.svg?v3#mbed_cli"></use></svg>
+                                            <div>
+                                               <p>Mbed CLI</p>
+                                               <p>Command line access to Mbed tools and services</p>
+                                            </div>
+                                        </a>
+                                    </li>
+                                </ul>
+                            </section>
+
+                            <section>
+                                <p>Security and Connectivity</p>
+                                <ul>
+                                    <li>
+                                        <a href="https://tls.mbed.org" class="mbed-nav__icon-link-detail">
+                                            <svg><use xlink:href="/static/img/mbed_nav_spritesheet.8ac20221a123.svg?v3#mbed_tls_crypto"></use></svg>
+                                            <div>
+                                                <p>Mbed TLS and Mbed Crypto</p>
+                                                <p>Industry standard TLS stack and crypto library</p>
+                                            </div>
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a href="https://os.mbed.com/connectivity-technologies/" class="mbed-nav__icon-link-detail">
+                                            <svg><use xlink:href="/static/img/mbed_nav_spritesheet.8ac20221a123.svg?v3#connectivity"></use></svg>
+                                            <div>
+                                                <p>Connectivity</p>
+                                                <p>BLE, WiFi, Cellular, LoRaWAN and more</p>
+                                            </div>
+                                        </a>
+                                    </li>
+                                </ul>
+                            </section>
+                        </div>
+                    </div>
+                </li>
+                <li class="has-dropdown">
+                    Hardware
+
+                    <!-- Hardware dropdown menu -->
+                    <div class="mbed-nav__dropdown-menu-content">
+                        <div class="mbed-nav__hardware-dropdown">
+                            <ul class="mbed-nav__hardware-menu">
+                                <li>
+                                    <a href="https://os.mbed.com/platforms/" class="mbed-nav__icon-link-detail">
+                                        <svg><use xlink:href="/static/img/mbed_nav_spritesheet.8ac20221a123.svg?v3#boards"></use></svg>
+                                        <div>
+                                            <p>Boards</p>
+                                            <p>Build your Mbed projects with development boards for Arm Cortex processors and MCUs</p>
+                                        </div>
+                                    </a>
+                                </li>
+                                <li>
+                                    <a href="https://os.mbed.com/modules/" class="mbed-nav__icon-link-detail">
+                                        <svg><use xlink:href="/static/img/mbed_nav_spritesheet.8ac20221a123.svg?v3#modules"></use></svg>
+                                        <div>
+                                            <p>Modules</p>
+                                            <p>Modules include a MCU, connectivity and onboard memory, making them ideal for designing IoT products for mass production</p>
+                                        </div>
+                                    </a>
+                                </li>
+                                <li>
+                                    <a href="https://os.mbed.com/components/" class="mbed-nav__icon-link-detail">
+                                        <svg><use xlink:href="/static/img/mbed_nav_spritesheet.8ac20221a123.svg?v3#components"></use></svg>
+                                        <div>
+                                            <p>Components</p>
+                                            <p>The component database hosts libraries for different sensors, actuators, radios, inputs, middleware and IoT services</p>
+                                        </div>
+                                    </a>
+                                </li>
+                                <li>
+                                    <a href="https://os.mbed.com/hardware/" class="mbed-nav__icon-link-detail">
+                                        <svg><use xlink:href="/static/img/mbed_nav_spritesheet.8ac20221a123.svg?v3#hardware_overview"></use></svg>
+                                        <div>
+                                            <p>Hardware overview & Mbed Enabled</p>
+                                            <p>Learn about hardware support for Mbed, as well as the Mbed Enabled program, which identifies Mbed compatible products</p>
+                                        </div>
+                                    </a>
+                                </li>
+                                <li>
+                                    <a href="https://os.mbed.com/docs/mbed-os/latest/porting/arm-mbed-hdk.html" class="mbed-nav__icon-link-detail">
+                                        <svg><use xlink:href="/static/img/mbed_nav_spritesheet.8ac20221a123.svg?v3#mbed_hdk"></use></svg>
+                                        <div>
+                                            <p>Mbed HDK</p>
+                                            <p>Reference designs, schematics and board layouts to develop production hardware and Mbed-compatible development boards</p>
+                                        </div>
+                                    </a>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+
+                </li>
+                <li><a href="https://os.mbed.com/code/">Code</a></li>
+                <li class="has-dropdown">
+                    Documentation
+
+                    <!-- Documentation dropdown menu -->
+                    <div class="mbed-nav__dropdown-menu-content">
+                        <div class="mbed-nav__documentation-dropdown">
+                            <ul class="mbed-nav__documentation-menu">
+                                <li>
+                                    <a href="https://os.mbed.com/docs/mbed-os/">Mbed OS</a>
+                                </li>
+                                <li>
+                                    <a
+                                        href="https://developer.arm.com/documentation/102497/latest/Arm-Keil-Studio-Cloud">
+                                        Keil Studio
+                                    </a>
+                                </li>
+                                <li>
+                                    <a href="https://os.mbed.com/docs/mbed-studio/">Mbed Studio</a>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </li>
+                <li><a href="https://os.mbed.com/built-with-mbed/">Case studies</a></li>
+                <li class="has-dropdown">
+                    Community
+
+                    <!-- Community dropdown menu -->
+                    <div class="mbed-nav__dropdown-menu-content">
+                        <div class="mbed-nav__community-dropdown">
+                            <ul class="mbed-nav__community-menu">
+                                <li>
+                                    <a href="https://forums.mbed.com">Forum</a>
+                                </li>
+                                <li>
+                                    <a href="https://os.mbed.com/docs/mbed-os/latest/contributing/index.html">Contribute</a>
+                                </li>
+                                <li>
+                                    <a href="https://www.youtube.com/playlist?list=PLKjl7IFAwc4R4plIZe4IuHlsn8zW7rvKh">Mbed OS Tech Forum</a>
+                                </li>
+                                <li>
+                                    <a href="https://os.mbed.com/support/">Report a problem</a>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </li>
+                <li>
+                    <a href="https://os.mbed.com/blog/">Blog</a>
+                </li>
+            </ul>
+        </nav>
+    </div>
+    <div class="mbed-nav__user-controls">
+        <div class="mbed-nav__user-controls-top">
+            <div class="mbed-nav__search">
+                <form id="mbed-nav__search-box" class="is-hidden" action="https://os.mbed.com/search" method="GET">
+                    <div class="mbed-nav__search-box">
+                        <input type="search" name="q" placeholder="Search...">
+                        <button type="submit">
+                            <svg class="stroke-white"><use xlink:href="/static/img/mbed_nav_spritesheet.8ac20221a123.svg?v3#search"></use></svg>
+                        </button>
+                    </div>
+                </form>
+                <i class="mbed-nav__search-close fas fa-times is-hidden"></i>
+                <svg class="mbed-nav__search-open stroke-white"><use xlink:href="/static/img/mbed_nav_spritesheet.8ac20221a123.svg?v3#search"></use></svg>
+            </div>
+            <a class="mbed-nav__cta" href="https://studio.keil.arm.com/mbed" target="_blank">
+                Keil Studio Cloud
+            </a>
+
+            
+                
+                <nav class="mbed-nav__logged-out-nav">
+                    <ul class="mbed-nav__dropdown-menu">
+                        <li>
+                            <svg class="stroke-white"><use xlink:href="/static/img/mbed_nav_spritesheet.8ac20221a123.svg?v3#profile"></use></svg>
+
+                            <!-- Logged out dropdown menu -->
+                            <div class="mbed-nav__dropdown-menu-content">
+                                <div class="mbed-nav__logged-out-dropdown">
+                                    <ul class="mbed-nav__logged-out-menu">
+                                        <li><a href="/account/login/?next=/cookbook/mbed-application-board">Log in or Sign up</a></li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </li>
+                    </ul>
+                </nav>
+                
+            
+        </div>
+    </div>
+    <div class="mbed-nav__spacer"></div>
+</div>
+<div class="mbed-nav__mobile-menu-cover is-hidden">
+    <div class="mbed-nav__mobile-menu">
+
+        <div id="mbed-nav__main-menu-mobile">
+            <div class="mbed-nav__user-controls-mobile">
+                <div class="mbed-nav__user-controls-top-mobile">
+                    <form action="https://os.mbed.com/search" method="GET">
+                        <div class="mbed-nav__search-box mbed-nav__search-box--light">
+                            <input type="search" name="q" placeholder="Search...">
+                            <button type="submit">
+                                <svg class="stroke-dark-grey"><use xlink:href="/static/img/mbed_nav_spritesheet.8ac20221a123.svg?v3#search"></use></svg>
+                            </button>
+                        </div>
+                    </form>
+                    
+                        
+                        <a href="/account/login/?next=/cookbook/mbed-application-board">Log in or Sign up</a>
+                        
+                    
+                </div>
+            </div>
+
+            <ul class="mbed-nav__side-menu">
+                <li>
+                    <input type="checkbox" name="accordion-toggle" id="overview-accordion">
+                    <label for="overview-accordion">Overview</label>
+                    <div class="accordion_content">
+                        <ul class="overview-menu-mobile">
+                            <li>
+                                <p>Operating system</p>
+                                <ul>
+                                    <li>
+                                        <a href="https://os.mbed.com/mbed-os/" class="mbed-nav__icon-link">
+                                            <svg><use xlink:href="/static/img/mbed_nav_spritesheet.8ac20221a123.svg?v3#mbed_os"></use></svg>
+                                            <p>Mbed OS</p>
+                                        </a>
+                                    </li>
+                                    
+
+                                </ul>
+                            </li>
+                            <li>
+                                <p>Development tools</p>
+                                <ul>
+                                    <li>
+                                        <a href="https://os.mbed.com/studio/" class="mbed-nav__icon-link">
+                                            <svg><use xlink:href="/static/img/mbed_nav_spritesheet.8ac20221a123.svg?v3#mbed_studio"></use></svg>
+                                            <p>Mbed Studio</p>
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a href="https://www.keil.arm.com/mbed/?utm_source=mbed_com&utm_medium=compiler_button&utm_campaign=mbed_com_promo" class="mbed-nav__icon-link">
+                                             <svg><use href="/static/img/keil_studio_icon.2c56c28014c6.svg?#keil_studio_icon"></use></svg>
+                                            <p>Keil Studio</p>
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a href="https://os.mbed.com/docs/mbed-os/latest/quick-start/offline-with-mbed-cli.html" class="mbed-nav__icon-link">
+                                            <svg><use xlink:href="/static/img/mbed_nav_spritesheet.8ac20221a123.svg?v3#mbed_cli"></use></svg>
+                                            <p>Mbed CLI</p>
+                                        </a>
+                                    </li>
+                                </ul>
+                            </li>
+                            <li>
+                                <p>Security and connectivity</p>
+                                <ul>
+                                    <li>
+                                        <a href="https://tls.mbed.org" class="mbed-nav__icon-link">
+                                            <svg><use xlink:href="/static/img/mbed_nav_spritesheet.8ac20221a123.svg?v3#mbed_tls_crypto"></use></svg>
+                                            <p>Mbed TLS and Mbed Crypto</p>
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a href="https://os.mbed.com/connectivity-technologies/" class="mbed-nav__icon-link">
+                                            <svg><use xlink:href="/static/img/mbed_nav_spritesheet.8ac20221a123.svg?v3#connectivity"></use></svg>
+                                            <p>Connectivity</p>
+                                        </a>
+                                    </li>
+                                </ul>
+                            </li>
+                        </ul>
+                    </div>
+                </li>
+                <li>
+                    <input type="checkbox" name="accordion-toggle" id="hardware-accordion">
+                    <label for="hardware-accordion">Hardware</label>
+                    <div class="accordion_content">
+                        <ul>
+                            <li>
+                                <a href="https://os.mbed.com/platforms/" class="mbed-nav__icon-link">
+                                    <svg><use xlink:href="/static/img/mbed_nav_spritesheet.8ac20221a123.svg?v3#boards"></use></svg>
+                                    <p>Boards</p>
+                                </a>
+                            </li>
+                            <li>
+                                <a href="https://os.mbed.com/modules/" class="mbed-nav__icon-link">
+                                    <svg><use xlink:href="/static/img/mbed_nav_spritesheet.8ac20221a123.svg?v3#modules"></use></svg>
+                                    <p>Modules</p>
+                                </a>
+                            </li>
+                            <li>
+                                <a href="https://os.mbed.com/components/" class="mbed-nav__icon-link">
+                                    <svg><use xlink:href="/static/img/mbed_nav_spritesheet.8ac20221a123.svg?v3#components"></use></svg>
+                                    <p>Components</p>
+                                </a>
+                            </li>
+                            <li>
+                                <a href="https://os.mbed.com/hardware/" class="mbed-nav__icon-link">
+                                    <svg><use xlink:href="/static/img/mbed_nav_spritesheet.8ac20221a123.svg?v3#hardware_overview"></use></svg>
+                                    <p>Hardware overview & Mbed Enabled</p>
+                                </a>
+                            </li>
+                            <li>
+                                <a href="https://os.mbed.com/docs/mbed-os/latest/porting/arm-mbed-hdk.html" class="mbed-nav__icon-link">
+                                    <svg><use xlink:href="/static/img/mbed_nav_spritesheet.8ac20221a123.svg?v3#mbed_hdk"></use></svg>
+                                    <p>Mbed HDK</p>
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
+                </li>
+                <li><a href="https://os.mbed.com/code/">Code</a></li>
+                <li>
+                    <input type="checkbox" name="accordion-toggle" id="documentation-accordion">
+                    <label for="documentation-accordion">Documentation</label>
+                    <div class="accordion_content">
+                        <ul>
+                            <li><a href="https://os.mbed.com/docs/mbed-os/">Mbed OS</a></li>
+                            <li><a href="https://os.mbed.com/docs/mbed-studio/">Mbed Studio</a></li>
+                            <li>
+                              <a
+                                href="https://developer.arm.com/documentation/102497/1-5/Arm-Keil-Studio/?utm_source=mbed_com&utm_medium=nav_docs_link&utm_campaign=mbed_com_promo">
+                                Keil Studio
+                              </a>
+                            </li>
+                        </ul>
+                    </div>
+                </li>
+                <li><a href="https://os.mbed.com/built-with-mbed/">Case studies</a></li>
+                <li>
+                    <input type="checkbox" name="accordion-toggle" id="community-accordion">
+                    <label for="community-accordion">Community</label>
+                    <div class="accordion_content">
+                        <ul>
+                            <li><a href="https://forums.mbed.com">Forum</a></li>
+                            <li><a href="https://os.mbed.com/docs/mbed-os/latest/contributing/index.html">Contribute</a></li>
+                            <li><a href="https://www.youtube.com/playlist?list=PLKjl7IFAwc4R4plIZe4IuHlsn8zW7rvKh">Mbed OS Tech Forum</a></li>
+                            <li><a href="https://os.mbed.com/support/">Report a problem</a></li>
+                        </ul>
+                    </div>
+                </li>
+                <li><a href="https://os.mbed.com/blog/">Blog</a></li>
+            </ul>
+        </div>
+
+        
+    </div>
+</div>
+
+
+
+    <div id="main-content">
+        
+
+        
+
+        
+
+        
+            
+<div class="banner warning" data-dismissable data-dismissable-id="mbed_deprecation_july_2024">
+  <div class="banner-row">
+    <button class="dismiss-button fas fa-times"></button>
+    
+ <p>
+	 <i class="fas fa-bullhorn" aria-hidden="true"></i>
+     <strong>Important update:</strong> Arm Announces End of Life Timeline for Mbed. This site will be archived in July 2026.
+	 <a href="https://os.mbed.com/blog/entry/Important-Update-on-Mbed/" target="_blank">
+		 <strong>Read the full announcement</strong>.
+	 </a>
+ </p>
+
+  </div>
+</div>
+
+
+        
+
+        
+            
+
+        
+
+        
+        <div>
+            <div class="row" id="top">
+                <div class="six columns">
+                    <div class="breadcrumbs">
+                        
+    
+
+    
+
+<a href="/cookbook/">Cookbook</a>
+
+
+    &raquo; <a href="/cookbook/mbed-application-board">mbed application board</a>
+
+
+
+                    </div>
+                </div>
+                <div class="six columns header search-block">
+                    
+                    
+                </div>
+            </div>
+            
+        </div>
+        
+
+        
+<div class="row">
+    <div class="nine columns main-content" id="mbed-content">
+        
+    
+    
+
+    <link href="/static/css/doxygen.css" rel="stylesheet" type="text/css"/>
+	
+    <style type="text/css">
+    .linenumber {display: none;}
+    </style>
+
+	
+
+    <h2><a href="/cookbook/mbed-application-board">mbed application board</a></h2>
+
+    
+
+    <div class="wiki-content">
+        <div class="flashbox finfo action-bar"><h4>Table of Contents</h4><ol><li><a href="#where-to-buy">Where to buy</a></li><li><a href="#feature-list">Feature list</a></li><li><a href="#details">Details</a></li><li><a href="#schematics">Schematics</a></li></ol></div><p>The new application board has been designed to enable the maximum number of potential experiments and projects, with the minimum footprint. </p>
+<table><tr><td><img src="/media/uploads/chris/app_board_front_small_map1.png" alt="/media/uploads/chris/app_board_front_small_map1.png" title="/media/uploads/chris/app_board_front_small_map1.png" /></td><td><img src="/media/uploads/chris/app_board_back_small.png" alt="/media/uploads/chris/app_board_back_small.png" title="/media/uploads/chris/app_board_back_small.png" /></td></tr>
+</table>
+<p>Although that there are 2x20 way headers for the mbed for jumper wiring pins off-board, it's a fairly well encapsulated platform.</p>
+<h2 id="where-to-buy">Where to buy<a href="#where-to-buy" class="wiki_permalink" title="Permalink to this heading">&para;</a></h2>
+<ul><li><a href="http://www.coolcomponents.co.uk/catalog/mbed-application-board-p-1101.html" rel="nofollow">Cool Components</a>
+</li><li><a href="http://www.rs-components.com/search.html?mpn=7694182" rel="nofollow">RS Online</a>
+</li><li><a href="https://www.sparkfun.com/products/11695" rel="nofollow">Sparkfun</a>
+</li><li><a href="http://www.adafruit.com/products/1323" rel="nofollow">Adafruit</a>
+</li></ul>
+<h2 id="feature-list">Feature list<a href="#feature-list" class="wiki_permalink" title="Permalink to this heading">&para;</a></h2>
+<ol><li>128x32 Graphics 
+</li><li>5 way joystick
+</li><li>2 x Potentiometers
+</li><li>3.5mm Audio jack (Analog Out)
+</li><li>Speaker, PWM Connected
+</li><li>3 Axis +/1 1.5g Accelerometer
+</li><li>3.5mm Audio jack (Analog In)
+</li><li>2 x Servo motor headers
+</li><li>RGB LED, PWM connected
+</li><li>USB-mini-B Connector
+</li><li>Temperature sensor
+</li><li>Socket for for Xbee (Zigbee) or RN-XV (Wifi)
+</li><li>RJ45 Ethernet conenctor
+</li><li>USB-A Connector
+</li><li>1.3mm DC Jack input
+</li></ol>
+<h3 id="1-128x32-lcd">1. 128x32 LCD<a href="#1-128x32-lcd" class="wiki_permalink" title="Permalink to this heading">&para;</a></h3>
+<p>An example program to print text and variables to the LCD</p>
+<div class="flashbox fprogram"><h4 class="ftitle"><a style="font-weight: bold; position: relative; float: right;" class="button small radius" target="compiler" href="https://os.mbed.com/ide/import-program//users/chris/code/app-board-LCD/">Import program</a><a href="/users/chris/code/app-board-LCD/docs/tip/main_8cpp_source.html"><span><div class="wiki-api-header"><a href="/users/chris/code/app-board-LCD/docs/2db94ee076ee/main_8cpp_source.html">app-board-LCD - main.cpp</a></div></span></a></h4><div><div class="wiki-api-snippet"><div class="contents">
+<div class="fragment"><pre class="fragment"><a name="l00001"></a><span class="linenumber">00001 </span><span class="preprocessor">#include "mbed.h"</span>
+<a name="l00002"></a><span class="linenumber">00002 </span><span class="preprocessor">#include "C12832.h"</span>
+<a name="l00003"></a><span class="linenumber">00003 </span>
+<a name="l00004"></a><span class="linenumber">00004 </span>
+<a name="l00005"></a><span class="linenumber">00005 </span>C12832 lcd(p5, p7, p6, p8, p11);
+<a name="l00006"></a><span class="linenumber">00006 </span>
+<a name="l00007"></a><span class="linenumber">00007 </span><span class="keywordtype">int</span> main()
+<a name="l00008"></a><span class="linenumber">00008 </span>{
+<a name="l00009"></a><span class="linenumber">00009 </span>    <span class="keywordtype">int</span> j=0;
+<a name="l00010"></a><span class="linenumber">00010 </span>    lcd.cls();
+<a name="l00011"></a><span class="linenumber">00011 </span>    lcd.locate(0,3);
+<a name="l00012"></a><span class="linenumber">00012 </span>    lcd.printf(<span class="stringliteral">"mbed application board!"</span>);
+<a name="l00013"></a><span class="linenumber">00013 </span>
+<a name="l00014"></a><span class="linenumber">00014 </span>    <span class="keywordflow">while</span>(<span class="keyword">true</span>) {   <span class="comment">// this is the third thread</span>
+<a name="l00015"></a><span class="linenumber">00015 </span>        lcd.locate(0,15);
+<a name="l00016"></a><span class="linenumber">00016 </span>        lcd.printf(<span class="stringliteral">"Counting : %d"</span>,j);
+<a name="l00017"></a><span class="linenumber">00017 </span>        j++;
+<a name="l00018"></a><span class="linenumber">00018 </span>        wait(1.0);
+<a name="l00019"></a><span class="linenumber">00019 </span>    }
+<a name="l00020"></a><span class="linenumber">00020 </span>}
+</pre></div></div></div></div></div>
+<div class="flashbox flibrary"><h4 class="ftitle"><a style="font-weight: bold; position: relative; float: right;" class="button small radius" target="compiler" href="https://os.mbed.com/ide/import-program//users/chris/code/C12832/;mode:lib">Import library</a><a href="/users/chris/code/C12832/">C12832</a></h4><p>C12832 LCD with generic interface</p><p class="wiki-api-footer">Last commit <abbr class="timeago" title="2014-02-05T14:25:16+00:00">05 Feb 2014</abbr> by <span><span class="authortext"><a href="/users/chris/"><img alt="" class="icon" width="16px" height="16px" src="https://os.mbed.com/media/profiles/Chris_Profile_Pic_kyGJjzP.jpg" /></a> <a href="/users/chris/"> Chris Styles</a></span></span></p></div>
+<p>A full featured test program :
+</p><div class="flashbox fprogram"><h4 class="ftitle"><a style="font-weight: bold; position: relative; float: right;" class="button small radius" target="compiler" href="https://os.mbed.com/ide/import-program//users/dreschpe/code/lab1/">Import program</a><a href="/users/dreschpe/code/lab1/">lab1</a></h4><p>test program for mbed Lab Board </p><p class="wiki-api-footer">Last commit <abbr class="timeago" title="2012-12-05T08:06:20+00:00">05 Dec 2012</abbr> by <span><span class="authortext"><a href="/users/dreschpe/"><img alt="" class="icon" width="16px" height="16px" src="https://os.mbed.com/media/img/default_profile.jpg" /></a> <a href="/users/dreschpe/"> Peter Drescher</a></span></span></p></div>
+<p>Demo for using bitmap graphic :
+</p><div class="flashbox fprogram"><h4 class="ftitle"><a style="font-weight: bold; position: relative; float: right;" class="button small radius" target="compiler" href="https://os.mbed.com/ide/import-program//users/dreschpe/code/Christmas-LCD/">Import program</a><a href="/users/dreschpe/code/Christmas-LCD/">Christmas-LCD</a></h4><p>Demo for using bitmap graphic</p><p class="wiki-api-footer">Last commit <abbr class="timeago" title="2012-12-21T21:59:16+00:00">21 Dec 2012</abbr> by <span><span class="authortext"><a href="/users/dreschpe/"><img alt="" class="icon" width="16px" height="16px" src="https://os.mbed.com/media/img/default_profile.jpg" /></a> <a href="/users/dreschpe/"> Peter Drescher</a></span></span></p></div>
+<div class="flex-video"><iframe src="https://www.youtube.com/embed/g0UHKnOsYEk&amp;feature" frameborder="0" allowfullscreen="allowfullscreen" width="420" height="315"></iframe></div>
+<h3 id="2-joystick">2. Joystick<a href="#2-joystick" class="wiki_permalink" title="Permalink to this heading">&para;</a></h3>
+<p>An example program for the mbed application board that uses the joystick button. LED1,2,3,4 light in sequence with up, down, left, right, and pushing the button lights them all (as a 80's computer gamer, I want to call this "fire!")</p>
+<p>Note: that the orientation is looking at the screen in landscape, with the row of connectors at the bottom</p>
+<div class="flashbox fprogram"><h4 class="ftitle"><a style="font-weight: bold; position: relative; float: right;" class="button small radius" target="compiler" href="https://os.mbed.com/ide/import-program//users/chris/code/app-board-Joystick/">Import program</a><a href="/users/chris/code/app-board-Joystick/docs/tip/main_8cpp_source.html"><span><div class="wiki-api-header"><a href="/users/chris/code/app-board-Joystick/docs/0e4db18afd77/main_8cpp_source.html">app-board-Joystick - main.cpp</a></div></span></a></h4><div><div class="wiki-api-snippet"><div class="contents">
+<div class="fragment"><pre class="fragment"><a name="l00001"></a><span class="linenumber">00001 </span><span class="preprocessor">#include "mbed.h"</span>
+<a name="l00002"></a><span class="linenumber">00002 </span>
+<a name="l00003"></a><span class="linenumber">00003 </span>BusIn joy(p15,p12,p13,p16);
+<a name="l00004"></a><span class="linenumber">00004 </span>DigitalIn fire(p14);
+<a name="l00005"></a><span class="linenumber">00005 </span>
+<a name="l00006"></a><span class="linenumber">00006 </span>BusOut leds(LED1,LED2,LED3,LED4);
+<a name="l00007"></a><span class="linenumber">00007 </span>
+<a name="l00008"></a><span class="linenumber">00008 </span><span class="keywordtype">int</span> main()
+<a name="l00009"></a><span class="linenumber">00009 </span>{
+<a name="l00010"></a><span class="linenumber">00010 </span>    <span class="keywordflow">while</span>(1) {
+<a name="l00011"></a><span class="linenumber">00011 </span>        <span class="keywordflow">if</span> (fire) {
+<a name="l00012"></a><span class="linenumber">00012 </span>            leds=0xf;
+<a name="l00013"></a><span class="linenumber">00013 </span>        } <span class="keywordflow">else</span> {
+<a name="l00014"></a><span class="linenumber">00014 </span>            leds=joy;
+<a name="l00015"></a><span class="linenumber">00015 </span>        }
+<a name="l00016"></a><span class="linenumber">00016 </span>        wait(0.1);
+<a name="l00017"></a><span class="linenumber">00017 </span>    }
+<a name="l00018"></a><span class="linenumber">00018 </span>}
+</pre></div></div></div></div></div>
+<div class="flashbox fprogram"><h4 class="ftitle"><a style="font-weight: bold; position: relative; float: right;" class="button small radius" target="compiler" href="https://os.mbed.com/ide/import-program//users/4180_1/code/kill_the_bit/">Import program</a><a href="/users/4180_1/code/kill_the_bit/">kill_the_bit</a></h4><p>Classic Kill the Bit game for the application board. Press joystick down to kill off the leftmost LED, but if your timing is off more LEDs turn on. LEDs flash and speaker beeps when all LEDs are off.</p><p class="wiki-api-footer">Last commit <abbr class="timeago" title="2013-11-26T03:10:05+00:00">26 Nov 2013</abbr> by <span><span class="authortext"><a href="/users/4180_1/"><img alt="" class="icon" width="16px" height="16px" src="https://os.mbed.com/media/img/default_profile.jpg" /></a> <a href="/users/4180_1/"> jim hamblen</a></span></span></p></div>
+<div class="flashbox fprogram"><h4 class="ftitle"><a style="font-weight: bold; position: relative; float: right;" class="button small radius" target="compiler" href="https://os.mbed.com/ide/import-program//users/4180_1/code/appbd_edmaker/">Import program</a><a href="/users/4180_1/code/appbd_edmaker/">appbd_edmaker</a></h4><p>Executive decision maker for the mbed NXP1768 Application board. Ask a question, and press the center joystick button. Uses a pushbutton, PWM speaker, mbed LEDs, RGB LED, LCD, and the C rand function. </p><p class="wiki-api-footer">Last commit <abbr class="timeago" title="2015-02-03T19:42:36+00:00">03 Feb 2015</abbr> by <span><span class="authortext"><a href="/users/4180_1/"><img alt="" class="icon" width="16px" height="16px" src="https://os.mbed.com/media/img/default_profile.jpg" /></a> <a href="/users/4180_1/"> jim hamblen</a></span></span></p></div>
+<h3 id="3-2-x-potentiometers">3. 2 x Potentiometers<a href="#3-2-x-potentiometers" class="wiki_permalink" title="Permalink to this heading">&para;</a></h3>
+<p>To be completed</p>
+<h3 id="4-analog-out">4. Analog Out<a href="#4-analog-out" class="wiki_permalink" title="Permalink to this heading">&para;</a></h3>
+<p>Plug in a pair of earphones.</p>
+<div class="flashbox fprogram"><h4 class="ftitle"><a style="font-weight: bold; position: relative; float: right;" class="button small radius" target="compiler" href="https://os.mbed.com/ide/import-program//users/chris/code/app-board-AnalogOut/">Import program</a><a href="/users/chris/code/app-board-AnalogOut/docs/tip/main_8cpp_source.html"><span><div class="wiki-api-header"><a href="/users/chris/code/app-board-AnalogOut/docs/754db1ff50f2/main_8cpp_source.html">app-board-AnalogOut - main.cpp</a></div></span></a></h4><div><div class="wiki-api-snippet"><div class="contents">
+<div class="fragment"><pre class="fragment"><a name="l00001"></a><span class="linenumber">00001 </span><span class="preprocessor">#include "mbed.h"</span>
+<a name="l00002"></a><span class="linenumber">00002 </span>
+<a name="l00003"></a><span class="linenumber">00003 </span>AnalogOut Aout(p18);
+<a name="l00004"></a><span class="linenumber">00004 </span>AnalogIn pot1(p19);
+<a name="l00005"></a><span class="linenumber">00005 </span>
+<a name="l00006"></a><span class="linenumber">00006 </span><span class="keywordtype">int</span> main()
+<a name="l00007"></a><span class="linenumber">00007 </span>{
+<a name="l00008"></a><span class="linenumber">00008 </span>    <span class="keywordflow">while</span>(1) {
+<a name="l00009"></a><span class="linenumber">00009 </span>        <span class="keywordflow">for</span>(<span class="keywordtype">float</span> i=0.0; i&lt;1.0; i+=0.1) {
+<a name="l00010"></a><span class="linenumber">00010 </span>            Aout = i;
+<a name="l00011"></a><span class="linenumber">00011 </span>            wait(0.00001+(0.0001*pot1.read()));
+<a name="l00012"></a><span class="linenumber">00012 </span>        }
+<a name="l00013"></a><span class="linenumber">00013 </span>    }
+<a name="l00014"></a><span class="linenumber">00014 </span>}
+</pre></div></div></div></div></div>
+<p>Play music from a *.wav audio file on PC speakers. See <a href="http://mbed.org/users/4180_1/notebook/application-board-waveplayer-demo/">Application Board Waveplayer Demo</a> for complete instructions.</p>
+<div class="flashbox fprogram"><h4 class="ftitle"><a style="font-weight: bold; position: relative; float: right;" class="button small radius" target="compiler" href="https://os.mbed.com/ide/import-program//users/4180_1/code/AppBoard_Waveplayer/">Import program</a><a href="/users/4180_1/code/AppBoard_Waveplayer/">AppBoard_Waveplayer</a></h4><p>A wave player demo setup for the mbed application board.
+Reads a wave file from a USB flash drive, and outputs to the onboard speaker (very low volume) and the analog audio out jack that can be connected to a set of PC speakers for more volume. A wave file for the demo is available at http://mbed.org/media/uploads/4180_1/sample.wav. Copy it to the USB drive.
+See http://mbed.org/users/4180_1/notebook/application-board-waveplayer-demo/ for more details and instructions.</p><p class="wiki-api-footer">Last commit <abbr class="timeago" title="2013-11-01T15:30:47+00:00">01 Nov 2013</abbr> by <span><span class="authortext"><a href="/users/4180_1/"><img alt="" class="icon" width="16px" height="16px" src="https://os.mbed.com/media/img/default_profile.jpg" /></a> <a href="/users/4180_1/"> jim hamblen</a></span></span></p></div>
+<h3 id="5-speaker">5. Speaker<a href="#5-speaker" class="wiki_permalink" title="Permalink to this heading">&para;</a></h3>
+<p>A frequency sweep. Press the fire button to to play it again!</p>
+<div class="flashbox fprogram"><h4 class="ftitle"><a style="font-weight: bold; position: relative; float: right;" class="button small radius" target="compiler" href="https://os.mbed.com/ide/import-program//users/chris/code/app-board-Speaker/">Import program</a><a href="/users/chris/code/app-board-Speaker/docs/tip/main_8cpp_source.html"><span><div class="wiki-api-header"><a href="/users/chris/code/app-board-Speaker/docs/cfd337edff08/main_8cpp_source.html">app-board-Speaker - main.cpp</a></div></span></a></h4><div><div class="wiki-api-snippet"><div class="contents">
+<div class="fragment"><pre class="fragment"><a name="l00001"></a><span class="linenumber">00001 </span><span class="preprocessor">#include "mbed.h"</span>
+<a name="l00002"></a><span class="linenumber">00002 </span>
+<a name="l00003"></a><span class="linenumber">00003 </span>DigitalIn fire(p14);
+<a name="l00004"></a><span class="linenumber">00004 </span>PwmOut spkr(p26);
+<a name="l00005"></a><span class="linenumber">00005 </span>
+<a name="l00006"></a><span class="linenumber">00006 </span><span class="keywordtype">int</span> main()
+<a name="l00007"></a><span class="linenumber">00007 </span>{
+<a name="l00008"></a><span class="linenumber">00008 </span>    <span class="keywordflow">while</span> (1) {
+<a name="l00009"></a><span class="linenumber">00009 </span>        <span class="keywordflow">for</span> (<span class="keywordtype">float</span> i=2000.0; i&lt;10000.0; i+=100) {
+<a name="l00010"></a><span class="linenumber">00010 </span>            spkr.period(1.0/i);
+<a name="l00011"></a><span class="linenumber">00011 </span>            spkr=0.5;
+<a name="l00012"></a><span class="linenumber">00012 </span>            wait(0.1);
+<a name="l00013"></a><span class="linenumber">00013 </span>        }
+<a name="l00014"></a><span class="linenumber">00014 </span>        spkr=0.0;
+<a name="l00015"></a><span class="linenumber">00015 </span>        <span class="keywordflow">while</span>(!fire) {}
+<a name="l00016"></a><span class="linenumber">00016 </span>    }
+<a name="l00017"></a><span class="linenumber">00017 </span>}
+</pre></div></div></div></div></div>
+<p>Play music from a *.wav audio file on the speaker. See <a href="http://mbed.org/users/4180_1/notebook/application-board-waveplayer-demo/">Application Board Waveplayer Demo</a> for complete instructions.</p>
+<div class="flashbox fprogram"><h4 class="ftitle"><a style="font-weight: bold; position: relative; float: right;" class="button small radius" target="compiler" href="https://os.mbed.com/ide/import-program//users/4180_1/code/AppBoard_Waveplayer/">Import program</a><a href="/users/4180_1/code/AppBoard_Waveplayer/">AppBoard_Waveplayer</a></h4><p>A wave player demo setup for the mbed application board.
+Reads a wave file from a USB flash drive, and outputs to the onboard speaker (very low volume) and the analog audio out jack that can be connected to a set of PC speakers for more volume. A wave file for the demo is available at http://mbed.org/media/uploads/4180_1/sample.wav. Copy it to the USB drive.
+See http://mbed.org/users/4180_1/notebook/application-board-waveplayer-demo/ for more details and instructions.</p><p class="wiki-api-footer">Last commit <abbr class="timeago" title="2013-11-01T15:30:47+00:00">01 Nov 2013</abbr> by <span><span class="authortext"><a href="/users/4180_1/"><img alt="" class="icon" width="16px" height="16px" src="https://os.mbed.com/media/img/default_profile.jpg" /></a> <a href="/users/4180_1/"> jim hamblen</a></span></span></p></div>
+<h3 id="6-3-axis-accelerometer">6. 3 Axis Accelerometer<a href="#6-3-axis-accelerometer" class="wiki_permalink" title="Permalink to this heading">&para;</a></h3>
+<div class="flashbox fprogram"><h4 class="ftitle"><a style="font-weight: bold; position: relative; float: right;" class="button small radius" target="compiler" href="https://os.mbed.com/ide/import-program//users/Sissors/code/MMA7660_HelloWorld/">Import program</a><a href="/users/Sissors/code/MMA7660_HelloWorld/docs/tip/main_8cpp_source.html"><span><div class="wiki-api-header"><a href="/users/Sissors/code/MMA7660_HelloWorld/docs/0af77f74afb2/main_8cpp_source.html">MMA7660_HelloWorld - main.cpp</a></div></span></a></h4><div><div class="wiki-api-snippet"><div class="contents">
+<div class="fragment"><pre class="fragment"><a name="l00001"></a><span class="linenumber">00001 </span><span class="comment">//Uses the measured z-acceleration to drive leds 2 and 3 of the mbed</span>
+<a name="l00002"></a><span class="linenumber">00002 </span>
+<a name="l00003"></a><span class="linenumber">00003 </span><span class="preprocessor">#include "mbed.h"</span>
+<a name="l00004"></a><span class="linenumber">00004 </span><span class="preprocessor">#include "MMA7660.h"</span>
+<a name="l00005"></a><span class="linenumber">00005 </span>
+<a name="l00006"></a><span class="linenumber">00006 </span>MMA7660 MMA(p28, p27);
+<a name="l00007"></a><span class="linenumber">00007 </span>
+<a name="l00008"></a><span class="linenumber">00008 </span>DigitalOut connectionLed(LED1);
+<a name="l00009"></a><span class="linenumber">00009 </span>PwmOut Zaxis_p(LED2);
+<a name="l00010"></a><span class="linenumber">00010 </span>PwmOut Zaxis_n(LED3);
+<a name="l00011"></a><span class="linenumber">00011 </span>
+<a name="l00012"></a><span class="linenumber">00012 </span><span class="keywordtype">int</span> main() {  
+<a name="l00013"></a><span class="linenumber">00013 </span>    <span class="keywordflow">if</span> (MMA.testConnection())
+<a name="l00014"></a><span class="linenumber">00014 </span>        connectionLed = 1;
+<a name="l00015"></a><span class="linenumber">00015 </span>        
+<a name="l00016"></a><span class="linenumber">00016 </span>    <span class="keywordflow">while</span>(1) {
+<a name="l00017"></a><span class="linenumber">00017 </span>        Zaxis_p = MMA.z();
+<a name="l00018"></a><span class="linenumber">00018 </span>        Zaxis_n = -MMA.z();
+<a name="l00019"></a><span class="linenumber">00019 </span>    }
+<a name="l00020"></a><span class="linenumber">00020 </span>
+<a name="l00021"></a><span class="linenumber">00021 </span>}
+</pre></div></div></div></div></div>
+<div class="flashbox flibrary"><h4 class="ftitle"><a style="font-weight: bold; position: relative; float: right;" class="button small radius" target="compiler" href="https://os.mbed.com/ide/import-program//users/Sissors/code/MMA7660/;mode:lib">Import library</a><a href="/users/Sissors/code/MMA7660/">MMA7660</a></h4><p>Library for the MMA7660 triple axis accelerometer</p><p class="wiki-api-footer">Last commit <abbr class="timeago" title="2014-05-13T18:14:34+00:00">13 May 2014</abbr> by <span><span class="authortext"><a href="/users/Sissors/"><img alt="" class="icon" width="16px" height="16px" src="https://os.mbed.com/media/img/default_profile.jpg" /></a> <a href="/users/Sissors/"> Erik -</a></span></span></p></div>
+<p><br />
+</p><div class="flashbox fprogram"><h4 class="ftitle"><a style="font-weight: bold; position: relative; float: right;" class="button small radius" target="compiler" href="https://os.mbed.com/ide/import-program//users/4180_1/code/app-board-Bubble-Level/">Import program</a><a href="/users/4180_1/code/app-board-Bubble-Level/">app-board-Bubble-Level</a></h4><p> This demo uses the application board’s three axis accelerometer and the LCD display working in graphics mode to build an electronic version of a bubble level.</p><p class="wiki-api-footer">Last commit <abbr class="timeago" title="2013-09-22T17:44:42+00:00">22 Sep 2013</abbr> by <span><span class="authortext"><a href="/users/4180_1/"><img alt="" class="icon" width="16px" height="16px" src="https://os.mbed.com/media/img/default_profile.jpg" /></a> <a href="/users/4180_1/"> jim hamblen</a></span></span></p></div><p>
+<br /></p>
+<h3 id="7-analog-in">7. Analog In<a href="#7-analog-in" class="wiki_permalink" title="Permalink to this heading">&para;</a></h3>
+<p>To be completed</p>
+<h3 id="8-servo-motor">8. Servo Motor<a href="#8-servo-motor" class="wiki_permalink" title="Permalink to this heading">&para;</a></h3>
+<p>An example program that uses the two potentiometers to set the position of the servo motors. You'll need to supply 6v into the DC socket, (1.3mm, center/tip positive)</p>
+<div class="flashbox fprogram"><h4 class="ftitle"><a style="font-weight: bold; position: relative; float: right;" class="button small radius" target="compiler" href="https://os.mbed.com/ide/import-program//users/chris/code/app-board-Servo/">Import program</a><a href="/users/chris/code/app-board-Servo/docs/tip/main_8cpp_source.html"><span><div class="wiki-api-header"><a href="/users/chris/code/app-board-Servo/docs/d1fc4eddceab/main_8cpp_source.html">app-board-Servo - main.cpp</a></div></span></a></h4><div><div class="wiki-api-snippet"><div class="contents">
+<div class="fragment"><pre class="fragment"><a name="l00001"></a><span class="linenumber">00001 </span><span class="preprocessor">#include "mbed.h"</span>
+<a name="l00002"></a><span class="linenumber">00002 </span><span class="preprocessor">#include "Servo.h"</span>
+<a name="l00003"></a><span class="linenumber">00003 </span>
+<a name="l00004"></a><span class="linenumber">00004 </span>Servo s1(p21);
+<a name="l00005"></a><span class="linenumber">00005 </span>Servo s2(p22);
+<a name="l00006"></a><span class="linenumber">00006 </span>
+<a name="l00007"></a><span class="linenumber">00007 </span>AnalogIn p1(p19);
+<a name="l00008"></a><span class="linenumber">00008 </span>AnalogIn p2(p20);
+<a name="l00009"></a><span class="linenumber">00009 </span>
+<a name="l00010"></a><span class="linenumber">00010 </span><span class="keywordtype">int</span> main() {
+<a name="l00011"></a><span class="linenumber">00011 </span>    <span class="keywordflow">while</span>(1) {
+<a name="l00012"></a><span class="linenumber">00012 </span>        s1=p1;
+<a name="l00013"></a><span class="linenumber">00013 </span>        s2=p2;        
+<a name="l00014"></a><span class="linenumber">00014 </span>        wait(0.1);
+<a name="l00015"></a><span class="linenumber">00015 </span>    }
+<a name="l00016"></a><span class="linenumber">00016 </span>}
+</pre></div></div></div></div></div>
+<div class="flashbox flibrary"><h4 class="ftitle"><a style="font-weight: bold; position: relative; float: right;" class="button small radius" target="compiler" href="https://os.mbed.com/ide/import-program//users/simon/code/Servo/;mode:lib">Import library</a><a href="/users/simon/code/Servo/">Servo</a></h4><p>A class to control a model R/C servo, using a PwmOut</p><p class="wiki-api-footer">Last commit <abbr class="timeago" title="2010-09-02T17:34:43+00:00">02 Sep 2010</abbr> by <span><span class="authortext"><a href="/users/simon/"><img alt="" class="icon" width="16px" height="16px" src="https://os.mbed.com/media/img/default_profile.jpg" /></a> <a href="/users/simon/"> Simon Ford</a></span></span></p></div>
+<h3 id="9-rgb-led">9. RGB LED<a href="#9-rgb-led" class="wiki_permalink" title="Permalink to this heading">&para;</a></h3>
+<p>An example program that cycles the on board RGB LED through various colours. </p>
+<div class="flashbox finfo"><h4 class="ftitle">Information</h4><p>The RGB LED is common anode, so that "0" is on, and "1" is off. For PWM, the closer to 0.0 the brighter, the closer to 1.0 the dimmer. use (1.0 - value) to invert.</p>
+</div><div class="flashbox fprogram"><h4 class="ftitle"><a style="font-weight: bold; position: relative; float: right;" class="button small radius" target="compiler" href="https://os.mbed.com/ide/import-program//users/chris/code/app-board-RGB/">Import program</a><a href="/users/chris/code/app-board-RGB/docs/tip/main_8cpp_source.html"><span><div class="wiki-api-header"><a href="/users/chris/code/app-board-RGB/docs/f86c572491c3/main_8cpp_source.html">app-board-RGB - main.cpp</a></div></span></a></h4><div><div class="wiki-api-snippet"><div class="contents">
+<div class="fragment"><pre class="fragment"><a name="l00001"></a><span class="linenumber">00001 </span><span class="preprocessor">#include "mbed.h"</span>
+<a name="l00002"></a><span class="linenumber">00002 </span>
+<a name="l00003"></a><span class="linenumber">00003 </span>PwmOut r (p23);
+<a name="l00004"></a><span class="linenumber">00004 </span>PwmOut g (p24);
+<a name="l00005"></a><span class="linenumber">00005 </span>PwmOut b (p25);
+<a name="l00006"></a><span class="linenumber">00006 </span>
+<a name="l00007"></a><span class="linenumber">00007 </span><span class="keywordtype">int</span> main()
+<a name="l00008"></a><span class="linenumber">00008 </span>{
+<a name="l00009"></a><span class="linenumber">00009 </span>    r.period(0.001);
+<a name="l00010"></a><span class="linenumber">00010 </span>    <span class="keywordflow">while</span>(1) {
+<a name="l00011"></a><span class="linenumber">00011 </span>        <span class="keywordflow">for</span>(<span class="keywordtype">float</span> i = 0.0; i &lt; 1.0 ; i += 0.001) {
+<a name="l00012"></a><span class="linenumber">00012 </span>            <span class="keywordtype">float</span> p = 3 * i;
+<a name="l00013"></a><span class="linenumber">00013 </span>            r = 1.0 - ((p &lt; 1.0) ? 1.0 - p : (p &gt; 2.0) ? p - 2.0 : 0.0);
+<a name="l00014"></a><span class="linenumber">00014 </span>            g = 1.0 - ((p &lt; 1.0) ? p : (p &gt; 2.0) ? 0.0 : 2.0 - p);
+<a name="l00015"></a><span class="linenumber">00015 </span>            b = 1.0 - ((p &lt; 1.0) ? 0.0 : (p &gt; 2.0) ? 3.0 - p : p - 1.0);  ;  
+<a name="l00016"></a><span class="linenumber">00016 </span>            wait (0.01);
+<a name="l00017"></a><span class="linenumber">00017 </span>        }
+<a name="l00018"></a><span class="linenumber">00018 </span>    }
+<a name="l00019"></a><span class="linenumber">00019 </span>}
+</pre></div></div></div></div></div>
+<div class="flashbox fprogram"><h4 class="ftitle"><a style="font-weight: bold; position: relative; float: right;" class="button small radius" target="compiler" href="https://os.mbed.com/ide/import-program//users/dreschpe/code/app-board-RGB2/">Import program</a><a href="/users/dreschpe/code/app-board-RGB2/">app-board-RGB2</a></h4><p>Example program to cycle the RGB LED on the mbed application board through all colours</p><p class="wiki-api-footer">Last commit <abbr class="timeago" title="2012-12-05T08:08:41+00:00">05 Dec 2012</abbr> by <span><span class="authortext"><a href="/users/dreschpe/"><img alt="" class="icon" width="16px" height="16px" src="https://os.mbed.com/media/img/default_profile.jpg" /></a> <a href="/users/dreschpe/"> Peter Drescher</a></span></span></p></div>
+<h3 id="10-usb-device">10. USB Device<a href="#10-usb-device" class="wiki_permalink" title="Permalink to this heading">&para;</a></h3>
+<div class="flashbox fprogram"><h4 class="ftitle"><a style="font-weight: bold; position: relative; float: right;" class="button small radius" target="compiler" href="https://os.mbed.com/ide/import-program//users/samux/code/USBMouse_HelloWorld/">Import program</a><a href="/users/samux/code/USBMouse_HelloWorld/docs/tip/main_8cpp_source.html"><span><div class="wiki-api-header"><a href="/users/samux/code/USBMouse_HelloWorld/docs/26ecbbc27530/main_8cpp_source.html">USBMouse_HelloWorld - main.cpp</a></div></span></a></h4><div><div class="wiki-api-snippet"><div class="contents">
+<div class="fragment"><pre class="fragment"><a name="l00001"></a><span class="linenumber">00001 </span><span class="preprocessor">#include "mbed.h"</span>
+<a name="l00002"></a><span class="linenumber">00002 </span><span class="preprocessor">#include "USBMouse.h"</span>
+<a name="l00003"></a><span class="linenumber">00003 </span>
+<a name="l00004"></a><span class="linenumber">00004 </span>USBMouse mouse;
+<a name="l00005"></a><span class="linenumber">00005 </span>
+<a name="l00006"></a><span class="linenumber">00006 </span><span class="keywordtype">int</span> main() {
+<a name="l00007"></a><span class="linenumber">00007 </span>    int16_t x = 0;
+<a name="l00008"></a><span class="linenumber">00008 </span>    int16_t y = 0;
+<a name="l00009"></a><span class="linenumber">00009 </span>    int32_t radius = 10;
+<a name="l00010"></a><span class="linenumber">00010 </span>    int32_t angle = 0;
+<a name="l00011"></a><span class="linenumber">00011 </span>
+<a name="l00012"></a><span class="linenumber">00012 </span>    <span class="keywordflow">while</span> (1) {
+<a name="l00013"></a><span class="linenumber">00013 </span>        x = cos((<span class="keywordtype">double</span>)angle*3.14/180.0)*radius;
+<a name="l00014"></a><span class="linenumber">00014 </span>        y = sin((<span class="keywordtype">double</span>)angle*3.14/180.0)*radius;
+<a name="l00015"></a><span class="linenumber">00015 </span>        
+<a name="l00016"></a><span class="linenumber">00016 </span>        mouse.move(x, y);
+<a name="l00017"></a><span class="linenumber">00017 </span>        angle += 3;
+<a name="l00018"></a><span class="linenumber">00018 </span>        wait(0.001);
+<a name="l00019"></a><span class="linenumber">00019 </span>    }
+<a name="l00020"></a><span class="linenumber">00020 </span>}
+</pre></div></div></div></div></div>
+<div class="flashbox fprogram"><h4 class="ftitle"><a style="font-weight: bold; position: relative; float: right;" class="button small radius" target="compiler" href="https://os.mbed.com/ide/import-program//users/samux/code/USBKeyboard_HelloWorld/">Import program</a><a href="/users/samux/code/USBKeyboard_HelloWorld/">USBKeyboard_HelloWorld</a></h4><p>USBKeyboard Hello World</p><p class="wiki-api-footer">Last commit <abbr class="timeago" title="2013-03-01T13:23:58+00:00">01 Mar 2013</abbr> by <span><span class="authortext"><a href="/users/samux/"><img alt="" class="icon" width="16px" height="16px" src="https://os.mbed.com/media/img/default_profile.jpg" /></a> <a href="/users/samux/"> Samuel Mokrani</a></span></span></p></div>
+<div class="flashbox fprogram"><h4 class="ftitle"><a style="font-weight: bold; position: relative; float: right;" class="button small radius" target="compiler" href="https://os.mbed.com/ide/import-program//users/samux/code/USBSerial_HelloWorld/">Import program</a><a href="/users/samux/code/USBSerial_HelloWorld/">USBSerial_HelloWorld</a></h4><p>USBSerial Hello World</p><p class="wiki-api-footer">Last commit <abbr class="timeago" title="2013-03-01T13:33:02+00:00">01 Mar 2013</abbr> by <span><span class="authortext"><a href="/users/samux/"><img alt="" class="icon" width="16px" height="16px" src="https://os.mbed.com/media/img/default_profile.jpg" /></a> <a href="/users/samux/"> Samuel Mokrani</a></span></span></p></div>
+<div class="flashbox fprogram"><h4 class="ftitle"><a style="font-weight: bold; position: relative; float: right;" class="button small radius" target="compiler" href="https://os.mbed.com/ide/import-program//users/samux/code/USBHID_HelloWorld/">Import program</a><a href="/users/samux/code/USBHID_HelloWorld/">USBHID_HelloWorld</a></h4><p>USBHID Hello World</p><p class="wiki-api-footer">Last commit <abbr class="timeago" title="2013-03-01T13:22:56+00:00">01 Mar 2013</abbr> by <span><span class="authortext"><a href="/users/samux/"><img alt="" class="icon" width="16px" height="16px" src="https://os.mbed.com/media/img/default_profile.jpg" /></a> <a href="/users/samux/"> Samuel Mokrani</a></span></span></p></div>
+<h3 id="11-lm75b-temperature-sensor">11. LM75B Temperature sensor<a href="#11-lm75b-temperature-sensor" class="wiki_permalink" title="Permalink to this heading">&para;</a></h3>
+<p>An example program to read the current temperature from the LM75B and display it on the LCD</p>
+<div class="flashbox fprogram"><h4 class="ftitle"><a style="font-weight: bold; position: relative; float: right;" class="button small radius" target="compiler" href="https://os.mbed.com/ide/import-program//users/chris/code/app-board-LM75B/">Import program</a><a href="/users/chris/code/app-board-LM75B/docs/tip/main_8cpp_source.html"><span><div class="wiki-api-header"><a href="/users/chris/code/app-board-LM75B/docs/608f2bf4d3f7/main_8cpp_source.html">app-board-LM75B - main.cpp</a></div></span></a></h4><div><div class="wiki-api-snippet"><div class="contents">
+<div class="fragment"><pre class="fragment"><a name="l00001"></a><span class="linenumber">00001 </span><span class="preprocessor">#include "mbed.h"</span>
+<a name="l00002"></a><span class="linenumber">00002 </span><span class="preprocessor">#include "LM75B.h"</span>
+<a name="l00003"></a><span class="linenumber">00003 </span><span class="preprocessor">#include "C12832.h"</span>
+<a name="l00004"></a><span class="linenumber">00004 </span>
+<a name="l00005"></a><span class="linenumber">00005 </span>C12832 lcd(p5, p7, p6, p8, p11);
+<a name="l00006"></a><span class="linenumber">00006 </span>
+<a name="l00007"></a><span class="linenumber">00007 </span>LM75B sensor(p28,p27);
+<a name="l00008"></a><span class="linenumber">00008 </span>Serial pc(USBTX,USBRX);
+<a name="l00009"></a><span class="linenumber">00009 </span>
+<a name="l00010"></a><span class="linenumber">00010 </span><span class="keywordtype">int</span> main ()
+<a name="l00011"></a><span class="linenumber">00011 </span>{
+<a name="l00012"></a><span class="linenumber">00012 </span>
+<a name="l00013"></a><span class="linenumber">00013 </span>    <span class="comment">//Try to open the LM75B</span>
+<a name="l00014"></a><span class="linenumber">00014 </span>    <span class="keywordflow">if</span> (sensor.open()) {
+<a name="l00015"></a><span class="linenumber">00015 </span>        printf(<span class="stringliteral">"Device detected!\n"</span>);
+<a name="l00016"></a><span class="linenumber">00016 </span>
+<a name="l00017"></a><span class="linenumber">00017 </span>        <span class="keywordflow">while</span> (1) {
+<a name="l00018"></a><span class="linenumber">00018 </span>            lcd.cls();
+<a name="l00019"></a><span class="linenumber">00019 </span>            lcd.locate(0,3);
+<a name="l00020"></a><span class="linenumber">00020 </span>            lcd.printf(<span class="stringliteral">"Temp = %.3f\n"</span>, (<span class="keywordtype">float</span>)sensor);
+<a name="l00021"></a><span class="linenumber">00021 </span>            wait(1.0);
+<a name="l00022"></a><span class="linenumber">00022 </span>        }
+<a name="l00023"></a><span class="linenumber">00023 </span>
+<a name="l00024"></a><span class="linenumber">00024 </span>    } <span class="keywordflow">else</span> {
+<a name="l00025"></a><span class="linenumber">00025 </span>        error(<span class="stringliteral">"Device not detected!\n"</span>);
+<a name="l00026"></a><span class="linenumber">00026 </span>    }
+<a name="l00027"></a><span class="linenumber">00027 </span>
+<a name="l00028"></a><span class="linenumber">00028 </span>}
+</pre></div></div></div></div></div>
+<div class="flashbox flibrary"><h4 class="ftitle"><a style="font-weight: bold; position: relative; float: right;" class="button small radius" target="compiler" href="https://os.mbed.com/ide/import-program//users/chris/code/LM75B/;mode:lib">Import library</a><a href="/users/chris/code/LM75B/">LM75B</a></h4><p>A simply library for the LM75B I2C temperature sensor</p><p class="wiki-api-footer">Last commit <abbr class="timeago" title="2012-10-26T21:40:51+00:00">26 Oct 2012</abbr> by <span><span class="authortext"><a href="/users/chris/"><img alt="" class="icon" width="16px" height="16px" src="https://os.mbed.com/media/profiles/Chris_Profile_Pic_kyGJjzP.jpg" /></a> <a href="/users/chris/"> Chris Styles</a></span></span></p></div>
+<h3 id="12-xbee-socket">12. Xbee socket<a href="#12-xbee-socket" class="wiki_permalink" title="Permalink to this heading">&para;</a></h3>
+<p><strong> Websocket over Wifly - Hello World</strong> - This example send messages to the mbed websocker server over a wifi connection using the <a href="http://mbed.org/cookbook/WiflyInterface">RN-XV Wifly</a> module.</p>
+<p>The output can be seen at</p>
+<ul><li><a href="http://sockets.mbed.org/app-board/viewer">http:<em>sockets.mbed.org/app-board/viewer</em></a>
+</li></ul>
+<div class="flashbox fprogram"><h4 class="ftitle"><a style="font-weight: bold; position: relative; float: right;" class="button small radius" target="compiler" href="https://os.mbed.com/ide/import-program//users/chris/code/app-board-Wifly-Websocket/">Import program</a><a href="/users/chris/code/app-board-Wifly-Websocket/docs/tip/main_8cpp_source.html"><span><div class="wiki-api-header"><a href="/users/chris/code/app-board-Wifly-Websocket/docs/b420491ecd8d/main_8cpp_source.html">app-board-Wifly-Websocket - main.cpp</a></div></span></a></h4><div><div class="wiki-api-snippet"><div class="contents">
+<div class="fragment"><pre class="fragment"><a name="l00001"></a><span class="linenumber">00001 </span><span class="preprocessor">#include "mbed.h"</span>
+<a name="l00002"></a><span class="linenumber">00002 </span><span class="preprocessor">#include "WiflyInterface.h"</span>
+<a name="l00003"></a><span class="linenumber">00003 </span><span class="preprocessor">#include "Websocket.h"</span>
+<a name="l00004"></a><span class="linenumber">00004 </span><span class="preprocessor">#include "LM75B.h"</span>
+<a name="l00005"></a><span class="linenumber">00005 </span><span class="preprocessor">#include "MMA7660.h"</span>
+<a name="l00006"></a><span class="linenumber">00006 </span>
+<a name="l00007"></a><span class="linenumber">00007 </span>
+<a name="l00008"></a><span class="linenumber">00008 </span><span class="comment">/* wifly interface:</span>
+<a name="l00009"></a><span class="linenumber">00009 </span><span class="comment">*     - p9 and p10 are for the serial communication</span>
+<a name="l00010"></a><span class="linenumber">00010 </span><span class="comment">*     - p30 is for the reset pin</span>
+<a name="l00011"></a><span class="linenumber">00011 </span><span class="comment">*     - p29 is for the connection status</span>
+<a name="l00012"></a><span class="linenumber">00012 </span><span class="comment">*     - "mbed" is the ssid of the network</span>
+<a name="l00013"></a><span class="linenumber">00013 </span><span class="comment">*     - "password" is the password</span>
+<a name="l00014"></a><span class="linenumber">00014 </span><span class="comment">*     - WPA is the security</span>
+<a name="l00015"></a><span class="linenumber">00015 </span><span class="comment">*/</span>
+<a name="l00016"></a><span class="linenumber">00016 </span>
+<a name="l00017"></a><span class="linenumber">00017 </span>WiflyInterface wifly(p9, p10, p30, p29, <span class="stringliteral">"mbed"</span>, <span class="stringliteral">"password"</span>, WPA);
+<a name="l00018"></a><span class="linenumber">00018 </span>
+<a name="l00019"></a><span class="linenumber">00019 </span><span class="comment">// accelerometer</span>
+<a name="l00020"></a><span class="linenumber">00020 </span>MMA7660 acc(p28, p27);
+<a name="l00021"></a><span class="linenumber">00021 </span>
+<a name="l00022"></a><span class="linenumber">00022 </span><span class="comment">// temperature sensor</span>
+<a name="l00023"></a><span class="linenumber">00023 </span>LM75B tmp(p28,p27);
+<a name="l00024"></a><span class="linenumber">00024 </span>
+<a name="l00025"></a><span class="linenumber">00025 </span>
+<a name="l00026"></a><span class="linenumber">00026 </span><span class="keywordtype">int</span> main()
+<a name="l00027"></a><span class="linenumber">00027 </span>{
+<a name="l00028"></a><span class="linenumber">00028 </span>    <span class="keywordtype">char</span> json_str[100];
+<a name="l00029"></a><span class="linenumber">00029 </span>
+<a name="l00030"></a><span class="linenumber">00030 </span>    wifly.init(); <span class="comment">//Use DHCP</span>
+<a name="l00031"></a><span class="linenumber">00031 </span>    <span class="keywordflow">while</span> (!wifly.connect());
+<a name="l00032"></a><span class="linenumber">00032 </span>    printf(<span class="stringliteral">"IP Address is %s\n\r"</span>, wifly.getIPAddress());
+<a name="l00033"></a><span class="linenumber">00033 </span>
+<a name="l00034"></a><span class="linenumber">00034 </span>    <span class="comment">// See the output on http://sockets.mbed.org/app-board/viewer</span>
+<a name="l00035"></a><span class="linenumber">00035 </span>    Websocket ws(<span class="stringliteral">"ws://sockets.mbed.org:443/ws/app-board/wo"</span>);
+<a name="l00036"></a><span class="linenumber">00036 </span>    
+<a name="l00037"></a><span class="linenumber">00037 </span>    <span class="comment">// connect WS server</span>
+<a name="l00038"></a><span class="linenumber">00038 </span>    <span class="keywordflow">while</span> (!ws.connect());
+<a name="l00039"></a><span class="linenumber">00039 </span>
+<a name="l00040"></a><span class="linenumber">00040 </span>    <span class="keywordflow">while</span> (1) {
+<a name="l00041"></a><span class="linenumber">00041 </span>        <span class="comment">// create json string with acc/tmp data</span>
+<a name="l00042"></a><span class="linenumber">00042 </span>        sprintf(json_str, <span class="stringliteral">"{\"id\":\"app_board_wifly_EW2013\",\"ax\":%d,\"ay\":%d,\"az\":%d, \"tmp\":%d}"</span>, (<span class="keywordtype">int</span>)(acc.x()*360), (<span class="keywordtype">int</span>)(acc.y()*360), (<span class="keywordtype">int</span>)(acc.z()*360), (<span class="keywordtype">int</span>)tmp.read());
+<a name="l00043"></a><span class="linenumber">00043 </span>        
+<a name="l00044"></a><span class="linenumber">00044 </span>        <span class="comment">// send str</span>
+<a name="l00045"></a><span class="linenumber">00045 </span>        ws.send(json_str);
+<a name="l00046"></a><span class="linenumber">00046 </span>        
+<a name="l00047"></a><span class="linenumber">00047 </span>        wait(0.1);
+<a name="l00048"></a><span class="linenumber">00048 </span>    }
+<a name="l00049"></a><span class="linenumber">00049 </span>}
+</pre></div></div></div></div></div>
+<p><strong> HTTP Client over Wifly - Hello World </strong></p>
+<div class="flashbox fprogram"><h4 class="ftitle"><a style="font-weight: bold; position: relative; float: right;" class="button small radius" target="compiler" href="https://os.mbed.com/ide/import-program//users/chris/code/app-board-Wifly-HTTPClient/">Import program</a><a href="/users/chris/code/app-board-Wifly-HTTPClient/">app-board-Wifly-HTTPClient</a></h4><p>An example program using the HTTP Client over wifly, creat</p><p class="wiki-api-footer">Last commit <abbr class="timeago" title="2012-10-26T12:46:58+00:00">26 Oct 2012</abbr> by <span><span class="authortext"><a href="/users/chris/"><img alt="" class="icon" width="16px" height="16px" src="https://os.mbed.com/media/profiles/Chris_Profile_Pic_kyGJjzP.jpg" /></a> <a href="/users/chris/"> Chris Styles</a></span></span></p></div>
+<h3 id="13-ethernet-interface">13. Ethernet Interface<a href="#13-ethernet-interface" class="wiki_permalink" title="Permalink to this heading">&para;</a></h3>
+<p><strong> NTP Hello World </strong> - This example fetches the the time using NTP, and prints it over the USB Serial interface. Be sure to have been through <a href="/handbook/SerialPC">/handbook/SerialPC</a> to make sure you have a serial console</p>
+<div class="flashbox fprogram"><h4 class="ftitle"><a style="font-weight: bold; position: relative; float: right;" class="button small radius" target="compiler" href="https://os.mbed.com/ide/import-program//users/donatien/code/NTPClient_HelloWorld/">Import program</a><a href="/users/donatien/code/NTPClient_HelloWorld/">NTPClient_HelloWorld</a></h4><p>Simple example demonstrating how to use the NTP Client to set the time</p><p class="wiki-api-footer">Last commit <abbr class="timeago" title="2012-08-05T16:17:31+00:00">05 Aug 2012</abbr> by <span><span class="authortext"><a href="/users/donatien/"><img alt="" class="icon" width="16px" height="16px" src="https://os.mbed.com/media/img/default_profile.jpg" /></a> <a href="/users/donatien/"> Donatien Garnier</a></span></span></p></div>
+<p><strong> HTTP Client Hello World</strong> </p>
+<div class="flashbox fprogram"><h4 class="ftitle"><a style="font-weight: bold; position: relative; float: right;" class="button small radius" target="compiler" href="https://os.mbed.com/ide/import-program//users/donatien/code/HTTPClient_HelloWorld/">Import program</a><a href="/users/donatien/code/HTTPClient_HelloWorld/">HTTPClient_HelloWorld</a></h4><p>Simple example demonstrating how to use GET &amp; POST requests with the HTTP Client</p><p class="wiki-api-footer">Last commit <abbr class="timeago" title="2012-08-30T15:42:06+00:00">30 Aug 2012</abbr> by <span><span class="authortext"><a href="/users/donatien/"><img alt="" class="icon" width="16px" height="16px" src="https://os.mbed.com/media/img/default_profile.jpg" /></a> <a href="/users/donatien/"> Donatien Garnier</a></span></span></p></div>
+<p><strong> Websocket Accelerometer-Temperature demo </strong> - This example streams acceleration and temperature data to a websocket server. Visit <a href="http://sockets.mbed.org/app-board/viewer">app-board viewer</a> to have a real time feed.</p>
+<div class="flashbox fprogram"><h4 class="ftitle"><a style="font-weight: bold; position: relative; float: right;" class="button small radius" target="compiler" href="https://os.mbed.com/ide/import-program//users/chris/code/app-board-Ethernet-Websocket/">Import program</a><a href="/users/chris/code/app-board-Ethernet-Websocket/">app-board-Ethernet-Websocket</a></h4><p>Modifed version from Samuel Mokrani
+Changed URL to push data to sensor page
+Added visualisation page URL as a comment</p><p class="wiki-api-footer">Last commit <abbr class="timeago" title="2013-02-08T12:46:02+00:00">08 Feb 2013</abbr> by <span><span class="authortext"><a href="/users/chris/"><img alt="" class="icon" width="16px" height="16px" src="https://os.mbed.com/media/profiles/Chris_Profile_Pic_kyGJjzP.jpg" /></a> <a href="/users/chris/"> Chris Styles</a></span></span></p></div>
+<p><strong> WiFly-xively-jumpstart-demo </strong> - Xively Jumpstart demo with WiFly module.</p>
+<div class="flashbox fprogram"><h4 class="ftitle"><a style="font-weight: bold; position: relative; float: right;" class="button small radius" target="compiler" href="https://os.mbed.com/ide/import-program//users/mbed_official/code/WiFly-xively-jumpstart-demo/">Import program</a><a href="/users/mbed_official/code/WiFly-xively-jumpstart-demo/">WiFly-xively-jumpstart-demo</a></h4><p>Xively Jumpstart Demo with WiFly module</p><p class="wiki-api-footer">Last commit <abbr class="timeago" title="2014-01-28T04:50:18+00:00">28 Jan 2014</abbr> by <span><span class="authortext"><a href="/users/mbed_official/"><img alt="" class="icon" width="16px" height="16px" src="https://os.mbed.com/media/img/default_profile.jpg" /></a> <a href="/users/mbed_official/"> mbed official </a></span></span></p></div>
+<h3 id="14-usb-host">14. USB Host<a href="#14-usb-host" class="wiki_permalink" title="Permalink to this heading">&para;</a></h3>
+<div class="flashbox fwarning"><h4 class="ftitle">Important!</h4><p>When using the mbed as a USB host, 15k Ohm pull down resistors are needed on the D+ and D- signals, as per the USB specification. This can be achieved by switching both switches the DIP switch to the "USB Host" position</p>
+</div><p><img src="/media/uploads/chris/sw1r7r8.jpg" alt="SW1" title="SW1" width="250" /> </p>
+<p><strong> Flash disk Hello World </strong> This example program writes the file "test.csv" to a USB flash stick, taking 100 samples (20 per second for 5 seconds) from pot1. The resulting CSV file can easily be plotted as a graph in Excel!</p>
+<div class="flashbox fprogram"><h4 class="ftitle"><a style="font-weight: bold; position: relative; float: right;" class="button small radius" target="compiler" href="https://os.mbed.com/ide/import-program//users/chris/code/mbed-App-USBFlash/">Import program</a><a href="/users/chris/code/mbed-App-USBFlash/docs/tip/main_8cpp_source.html"><span><div class="wiki-api-header"><a href="/users/chris/code/mbed-App-USBFlash/docs/c887cf1c3ed9/main_8cpp_source.html">mbed-App-USBFlash - main.cpp</a></div></span></a></h4><div><div class="wiki-api-snippet"><div class="contents">
+<div class="fragment"><pre class="fragment"><a name="l00001"></a><span class="linenumber">00001 </span><span class="preprocessor">#include "mbed.h"</span>
+<a name="l00002"></a><span class="linenumber">00002 </span><span class="preprocessor">#include "MSCFileSystem.h"</span>
+<a name="l00003"></a><span class="linenumber">00003 </span>
+<a name="l00004"></a><span class="linenumber">00004 </span>MSCFileSystem fs(<span class="stringliteral">"fs"</span>);
+<a name="l00005"></a><span class="linenumber">00005 </span>DigitalOut led(LED1);
+<a name="l00006"></a><span class="linenumber">00006 </span>AnalogIn pot1(p19);
+<a name="l00007"></a><span class="linenumber">00007 </span>
+<a name="l00008"></a><span class="linenumber">00008 </span><span class="keywordtype">int</span> main()
+<a name="l00009"></a><span class="linenumber">00009 </span>{
+<a name="l00010"></a><span class="linenumber">00010 </span>    FILE *fp = fopen(<span class="stringliteral">"/fs/test.csv"</span>,<span class="stringliteral">"w"</span>);
+<a name="l00011"></a><span class="linenumber">00011 </span>    printf(<span class="stringliteral">"Create filehandle for test.csv\n"</span>);
+<a name="l00012"></a><span class="linenumber">00012 </span>
+<a name="l00013"></a><span class="linenumber">00013 </span>    printf(<span class="stringliteral">"Writing to file\n"</span>);
+<a name="l00014"></a><span class="linenumber">00014 </span>    <span class="keywordflow">for</span> (<span class="keywordtype">int</span> i=0; i&lt;100; i++)  {
+<a name="l00015"></a><span class="linenumber">00015 </span>        fprintf(fp,<span class="stringliteral">"%.2f\n"</span>,pot1.read());
+<a name="l00016"></a><span class="linenumber">00016 </span>        wait(0.05);
+<a name="l00017"></a><span class="linenumber">00017 </span>        led=!led;
+<a name="l00018"></a><span class="linenumber">00018 </span>    }
+<a name="l00019"></a><span class="linenumber">00019 </span>
+<a name="l00020"></a><span class="linenumber">00020 </span>    fclose(fp);
+<a name="l00021"></a><span class="linenumber">00021 </span>    printf(<span class="stringliteral">"Close the handle\n"</span>);
+<a name="l00022"></a><span class="linenumber">00022 </span>    led=1;
+<a name="l00023"></a><span class="linenumber">00023 </span>}
+</pre></div></div></div></div></div>
+<p><strong> USB 3G Modem : NTP Client Hello World </strong> This example uses a Vodafone USB 3G Modem  to connect to the internet and fetch the current time using NTP</p>
+<div class="flashbox fprogram"><h4 class="ftitle"><a style="font-weight: bold; position: relative; float: right;" class="button small radius" target="compiler" href="https://os.mbed.com/ide/import-program//users/donatien/code/VodafoneUSBModemNTPClientTest/">Import program</a><a href="/users/donatien/code/VodafoneUSBModemNTPClientTest/">VodafoneUSBModemNTPClientTest</a></h4><p>NTP Client Test with the Vodafone USB Modem library</p><p class="wiki-api-footer">Last commit <abbr class="timeago" title="2012-10-30T10:21:17+00:00">30 Oct 2012</abbr> by <span><span class="authortext"><a href="/users/donatien/"><img alt="" class="icon" width="16px" height="16px" src="https://os.mbed.com/media/img/default_profile.jpg" /></a> <a href="/users/donatien/"> Donatien Garnier</a></span></span></p></div>
+<p><strong> USB 3G Modem : HTTP Hello World </strong> This example uses a Vodafone USB 3G Modem to connect to the internet and fetch a web page using HTTP</p>
+<div class="flashbox fprogram"><h4 class="ftitle"><a style="font-weight: bold; position: relative; float: right;" class="button small radius" target="compiler" href="https://os.mbed.com/ide/import-program//users/donatien/code/VodafoneUSBModemHTTPClientTest/">Import program</a><a href="/users/donatien/code/VodafoneUSBModemHTTPClientTest/docs/tip/files.html"><span><div class="wiki-api-header"><a href="/users/donatien/code/VodafoneUSBModemHTTPClientTest/docs/13f0fa1662ab/files.html">VodafoneUSBModemHTTPClientTest - File list</a></div></span></a></h4><div><div class="wiki-api-snippet"><table>
+ <tbody>
+  <tr>
+   <td class="indexkey">
+    <b>
+     main.cpp
+    </b>
+    <a href="main_8cpp_source.html">
+     [code]
+    </a>
+   </td>
+   <td class="indexvalue">
+   </td>
+  </tr>
+ </tbody>
+</table>
+</div></div></div>
+<p><strong> USB 3G Modem : SMS Hello World </strong> This example uses a Vodafone USB 3G Modem, to connect to the mobile phone network for sending and receiving text messages</p>
+<div class="flashbox fprogram"><h4 class="ftitle"><a style="font-weight: bold; position: relative; float: right;" class="button small radius" target="compiler" href="https://os.mbed.com/ide/import-program//users/donatien/code/VodafoneUSBModemSMSTest/">Import program</a><a href="/users/donatien/code/VodafoneUSBModemSMSTest/">VodafoneUSBModemSMSTest</a></h4><p>SMS test with the Vodafone library</p><p class="wiki-api-footer">Last commit <abbr class="timeago" title="2012-10-30T10:21:30+00:00">30 Oct 2012</abbr> by <span><span class="authortext"><a href="/users/donatien/"><img alt="" class="icon" width="16px" height="16px" src="https://os.mbed.com/media/img/default_profile.jpg" /></a> <a href="/users/donatien/"> Donatien Garnier</a></span></span></p></div>
+<p><strong> USB 3G Modem : app-board Websocket demo </strong> This example uses a Vodafone USB 3G Modem, to connect to the mobile phone network for sending and receiving websocket messages containing accelerometer and temperature data.</p>
+<div class="flashbox fprogram"><h4 class="ftitle"><a style="font-weight: bold; position: relative; float: right;" class="button small radius" target="compiler" href="https://os.mbed.com/ide/import-program//users/samux/code/app-board-USBModem-Websocket/">Import program</a><a href="/users/samux/code/app-board-USBModem-Websocket/">app-board-USBModem-Websocket</a></h4><p>websocket over 3g using VodafoneUSBModem and app-board on-board sensors (acc - tmp)</p><p class="wiki-api-footer">Last commit <abbr class="timeago" title="2013-06-21T15:18:20+00:00">21 Jun 2013</abbr> by <span><span class="authortext"><a href="/users/samux/"><img alt="" class="icon" width="16px" height="16px" src="https://os.mbed.com/media/img/default_profile.jpg" /></a> <a href="/users/samux/"> Samuel Mokrani</a></span></span></p></div>
+<h2 id="details">Details<a href="#details" class="wiki_permalink" title="Permalink to this heading">&para;</a></h2>
+<table><tr><td>Form factor</td><td>55mm x 86mm x 19mm (with mbed)</td></tr>
+<tr><td>128x32 Graphics LCD, SPI Interface</td><td><a href="http://www.newhavendisplay.com/specs/NHD-C12832A1Z-FSW-FBW-3V3.pdf" rel="nofollow">Newhaven C12332A1Z</a><br />MOSI:p5<br />nRESET:p6<br />SCK:p7<br />A0:p8</td></tr>
+<tr><td>3 Axis +/1 1.5g Accelerometer,I2C Interface</td><td><a href="http://cache.freescale.com/files/sensors/doc/data_sheet/MMA7660FC.pdf" rel="nofollow">Freescale MMA7660</a><br />SCL:p27<br />SDA:p28<br />Address:0x98</td></tr>
+<tr><td>Temperature sensor</td><td><a href="http://www.nxp.com/documents/data_sheet/LM75B.pdf" rel="nofollow">LM75B</a><br />SCL:p27<br />SDA:p28<br />Address:0x90</td></tr>
+<tr><td>5 way Joystick</td><td><a href="http://www.alps.com/WebObjects/catalog.woa/E/HTML/MultiControl/Switch/SKRH/SKRHADE010.html" rel="nofollow">ALPS</a> SKRHADE010<br />Down:p12<br />Left:p13<br />Centre:p14<br />Up:p15<br />Right:p16</td></tr>
+<tr><td>2 x Potentiometers</td><td>Iskra PNZ10ZA, 10k<br />Pot 1 (left) :p19<br />Pot 2 (right):p20</td></tr>
+<tr><td>2 x 3.5mm Audio jack (Analog In/Out)</td><td>CUI Inc	SJ-3523-SMT<br />Analog In:p17<br />Analog Out:p18</td></tr>
+<tr><td>2 x Servo motor headers</td><td>PWM1:p22<br />PWM2:p21</td></tr>
+<tr><td>RGB LED, PWM connected</td><td><a href="http://www.cree.com/~/media/Files/Cree/LED%20Components%20and%20Modules/HB/Data%20Sheets/CLV1AFKB(874).pdf" rel="nofollow">Cree Inc CLV1A-FKB</a><br />Red:p23<br />Green:p24<br />Blue:p25</td></tr>
+<tr><td>Speaker, PWM Connected</td><td><a href="http://uk.farnell.com/multicomp/mcsmt-8030b-3717/magnetic-buzzer-transducer/dp/1801082" rel="nofollow">MULTICOMP	MCSMT-8030B-3717</a><br />p26</td></tr>
+<tr><td>USB-B Connector</td><td>Neltron, 5075ABMR-05-SM1</td></tr>
+<tr><td>USB-A Connector</td><td>MULTICOMP,USB-A-V</td></tr>
+<tr><td>RJ45 Ethernet conenctor</td><td><a href="http://ww2.pulseeng.com/products/datasheets/J414.pdf" rel="nofollow">Pulse Jack, J00-0045NL</a></td></tr>
+<tr><td>1.3mm DC Jack input</td><td>CLIFF, FC68145S<br />1.3mm<br />6v-9v<br />Centre positive</td></tr>
+</table>
+<h2 id="schematics">Schematics<a href="#schematics" class="wiki_permalink" title="Permalink to this heading">&para;</a></h2>
+<ul><li><a href="/media/uploads/chris/mbed-014.1_b.pdf">mbed-014.1_b.pdf</a> </li></ul>
+
+    </div>
+
+    <hr>
+
+    <div style="text-align: right; padding-bottom: 10px;">
+
+        
+
+        <a class="button small secondary" href="/cookbook/Special:Allpages">
+            <span><i class="far fa-list-alt" aria-hidden="true"></i> All wikipages</span>
+        </a>
+
+    </div>
+
+
+    </div>
+
+    <div class="three columns sidebar ">
+        
+    
+    
+    
+
+<div class="panel radius">
+<h5 class="subheader"><a href="/cookbook/Special:RecentChanges"><b>Recent changes</b></a></h5>
+
+
+
+    
+        
+
+
+<div class="contentitem">
+
+    
+
+    <div class="contentitem-left" style=" vertical-align: top;">
+        
+
+        <div class="textwrapper" style=" margin-left: 0; ">
+            <div style="font-size: 1.1em; padding-bottom: 4px;">
+                
+
+                
+
+                <b><a href="/cookbook/Reference-Design">Reference Design</a></b>
+
+                
+
+                
+
+                
+            </div>
+
+            <div class="margin-top: 0px;">
+                
+                  
+
+                  
+                      <i class="fas fa-tag" aria-hidden="true"></i>
+                      
+                          <a href="/search/?q=Design&amp;type=">Design</a>, 
+                      
+                          <a href="/search/?q=Eagle&amp;type=">Eagle</a>, 
+                      
+                          <a href="/search/?q=Referece&amp;type=">Referece</a>
+                      
+                  
+                
+            </div>
+        </div>
+    </div>
+</div>
+
+    
+
+    
+        
+
+
+<div class="contentitem">
+
+    
+
+    <div class="contentitem-left" style=" vertical-align: top;">
+        
+
+        <div class="textwrapper" style=" margin-left: 0; ">
+            <div style="font-size: 1.1em; padding-bottom: 4px;">
+                
+
+                
+
+                <b><a href="/cookbook/Power-Management">Power Management</a></b>
+
+                
+
+                
+
+                
+            </div>
+
+            <div class="margin-top: 0px;">
+                
+                  
+
+                  
+                      <i class="fas fa-tag" aria-hidden="true"></i>
+                      
+                          <a href="/search/?q=firmware&amp;type=">firmware</a>, 
+                      
+                          <a href="/search/?q=Power&amp;type=">Power</a>, 
+                      
+                          <a href="/search/?q=power control&amp;type=">power control</a>, 
+                      
+                          <a href="/search/?q=Sleep&amp;type=">Sleep</a>
+                      
+                  
+                
+            </div>
+        </div>
+    </div>
+</div>
+
+    
+
+    
+        
+
+
+<div class="contentitem">
+
+    
+
+    <div class="contentitem-left" style=" vertical-align: top;">
+        
+
+        <div class="textwrapper" style=" margin-left: 0; ">
+            <div style="font-size: 1.1em; padding-bottom: 4px;">
+                
+
+                
+
+                <b><a href="/cookbook/Interfacing-with-JavaScript">Interfacing with JavaScript</a></b>
+
+                
+
+                
+
+                
+            </div>
+
+            <div class="margin-top: 0px;">
+                
+                  
+
+                  
+                
+            </div>
+        </div>
+    </div>
+</div>
+
+    
+
+    
+        
+
+
+<div class="contentitem">
+
+    
+
+    <div class="contentitem-left" style=" vertical-align: top;">
+        
+
+        <div class="textwrapper" style=" margin-left: 0; ">
+            <div style="font-size: 1.1em; padding-bottom: 4px;">
+                
+
+                
+
+                <b><a href="/cookbook/deadmbed">deadmbed</a></b>
+
+                
+
+                
+
+                
+            </div>
+
+            <div class="margin-top: 0px;">
+                
+                  
+
+                  
+                      <i class="fas fa-tag" aria-hidden="true"></i>
+                      
+                          <a href="/search/?q=broken&amp;type=">broken</a>, 
+                      
+                          <a href="/search/?q=deadmbed&amp;type=">deadmbed</a>
+                      
+                  
+                
+            </div>
+        </div>
+    </div>
+</div>
+
+    
+
+    
+        
+
+
+<div class="contentitem">
+
+    
+
+    <div class="contentitem-left" style=" vertical-align: top;">
+        
+
+        <div class="textwrapper" style=" margin-left: 0; ">
+            <div style="font-size: 1.1em; padding-bottom: 4px;">
+                
+
+                
+
+                <b><a href="/cookbook/MODSERIAL">MODSERIAL</a></b>
+
+                
+
+                
+
+                
+            </div>
+
+            <div class="margin-top: 0px;">
+                
+                  
+
+                  
+                      <i class="fas fa-tag" aria-hidden="true"></i>
+                      
+                          <a href="/search/?q=MODSERIAL&amp;type=">MODSERIAL</a>, 
+                      
+                          <a href="/search/?q=rs232&amp;type=">rs232</a>, 
+                      
+                          <a href="/search/?q=Serial&amp;type=">Serial</a>
+                      
+                  
+                
+            </div>
+        </div>
+    </div>
+</div>
+
+    
+
+    
+        
+
+
+<div class="contentitem">
+
+    
+
+    <div class="contentitem-left" style=" vertical-align: top;">
+        
+
+        <div class="textwrapper" style=" margin-left: 0; ">
+            <div style="font-size: 1.1em; padding-bottom: 4px;">
+                
+
+                
+
+                <b><a href="/cookbook/HTTP-Client">HTTP Client</a></b>
+
+                
+
+                
+
+                
+            </div>
+
+            <div class="margin-top: 0px;">
+                
+                  
+
+                  
+                
+            </div>
+        </div>
+    </div>
+</div>
+
+    
+
+    
+        
+
+
+<div class="contentitem">
+
+    
+
+    <div class="contentitem-left" style=" vertical-align: top;">
+        
+
+        <div class="textwrapper" style=" margin-left: 0; ">
+            <div style="font-size: 1.1em; padding-bottom: 4px;">
+                
+
+                
+
+                <b><a href="/cookbook/Networking">Networking</a></b>
+
+                
+
+                
+
+                
+            </div>
+
+            <div class="margin-top: 0px;">
+                
+                  
+
+                  
+                
+            </div>
+        </div>
+    </div>
+</div>
+
+    
+
+    
+        
+
+
+<div class="contentitem">
+
+    
+
+    <div class="contentitem-left" style=" vertical-align: top;">
+        
+
+        <div class="textwrapper" style=" margin-left: 0; ">
+            <div style="font-size: 1.1em; padding-bottom: 4px;">
+                
+
+                
+
+                <b><a href="/cookbook/Working-with-the-networking-stack">Working with the networking stack</a></b>
+
+                
+
+                
+
+                
+            </div>
+
+            <div class="margin-top: 0px;">
+                
+                  
+
+                  
+                
+            </div>
+        </div>
+    </div>
+</div>
+
+    
+
+    
+        
+
+
+<div class="contentitem">
+
+    
+
+    <div class="contentitem-left" style=" vertical-align: top;">
+        
+
+        <div class="textwrapper" style=" margin-left: 0; ">
+            <div style="font-size: 1.1em; padding-bottom: 4px;">
+                
+
+                
+
+                <b><a href="/cookbook/Homepage/위키-Syntax">Homepage/위키 Syntax</a></b>
+
+                
+
+                
+
+                
+            </div>
+
+            <div class="margin-top: 0px;">
+                
+                  
+
+                  
+                
+            </div>
+        </div>
+    </div>
+</div>
+
+    
+
+    
+        
+
+
+<div class="contentitem">
+
+    
+
+    <div class="contentitem-left" style=" vertical-align: top;">
+        
+
+        <div class="textwrapper" style=" margin-left: 0; ">
+            <div style="font-size: 1.1em; padding-bottom: 4px;">
+                
+
+                
+
+                <b><a href="/cookbook/Homepage/mbed-Design-Challenge">Homepage/mbed Design Challenge</a></b>
+
+                
+
+                
+
+                
+            </div>
+
+            <div class="margin-top: 0px;">
+                
+                  
+
+                  
+                
+            </div>
+        </div>
+    </div>
+</div>
+
+    
+
+    
+        
+
+
+<div class="contentitem">
+
+    
+
+    <div class="contentitem-left" style=" vertical-align: top;">
+        
+
+        <div class="textwrapper" style=" margin-left: 0; ">
+            <div style="font-size: 1.1em; padding-bottom: 4px;">
+                
+
+                
+
+                <b><a href="/cookbook/Servo/kr">Servo/kr</a></b>
+
+                
+
+                
+
+                
+            </div>
+
+            <div class="margin-top: 0px;">
+                
+                  
+
+                  
+                      <i class="fas fa-tag" aria-hidden="true"></i>
+                      
+                          <a href="/search/?q=korean&amp;type=">korean</a>
+                      
+                  
+                
+            </div>
+        </div>
+    </div>
+</div>
+
+    
+
+
+</div>
+
+
+
+    </div>
+</div>
+
+    </div>
+
+    <script type="text/javascript">
+        $(document).ready(function() {
+            mbed.initDismissableBanners($('[data-dismissable]'));
+            mbed.initNavNotification();
+        });
+    </script>
+
+    
+<footer class="global-footer">
+    <ul class="global-footer-media global-footer-row">
+        <li>
+            <a class="footer-media-icon" title="Twitter" href="https://twitter.com/ArmSoftwareDev">
+                <span class="fab fa-twitter-square fa-2x"></span>
+                <span class="global-footer-show-on-large-screens">Twitter</span>
+            </a>
+        </li>
+        <li>
+            <a class="footer-media-icon" title="YouTube" href="https://www.youtube.com/c/ArmSoftwareDevelopers">
+                <span class="fab fa-youtube-square fa-2x"></span>
+                <span class="global-footer-show-on-large-screens">YouTube</span>
+            </a>
+        </li>
+        <li>
+            <a class="footer-media-icon" title="Forum" href="http://forums.mbed.com/">
+                <span class="fas fa-comments fa-2x"></span>
+                <span class="global-footer-show-on-large-screens">Forum</span>
+            </a>
+        </li>
+        <li>
+            <a class="footer-media-icon" title="Blog" href="http://blog.mbed.com/">
+                <span class="fas fa-pen-square fa-2x"></span>
+                <span class="global-footer-show-on-large-screens">Blog</span>
+            </a>
+        </li>
+    </ul>
+
+    <div class="global-footer-copyright global-footer-row">
+        <div class="copyright-statement">Copyright © <script>document.write(new Date().getFullYear());</script> Arm Limited (or its affiliates).</div>
+        <ul class="copyright-links">
+            <li><a href="https://os.mbed.com/">Home</a></li>
+            <li><a href="https://www.arm.com/company/policies/terms-and-conditions">Website Terms</a></li>
+            <li><a href="https://www.arm.com/company/policies/privacy">Privacy</a></li>
+            <li><a href="https://www.arm.com/company/policies/cookies">Cookies</a></li>
+            <li><a href="http://www.arm.com/company/policies/trademarks">Trademarks</a></li>
+        </ul>
+    </div>
+</footer>
+
+
+
+    <div id="cookiemodule">
+    <h5>Important Information for this Arm website</h5>
+    <div id="cookiecontent">
+        <p>
+            This site uses cookies to store information on your computer.
+            By continuing to use our site, you consent to our cookies.
+            If you are not happy with the use of these cookies, please review our
+            <a href="https://www.arm.com/company/policies/cookies">Cookie Policy</a>
+            to learn how they can be disabled.
+            By disabling cookies, some features of the site will not work.
+        </p>
+        <button id="acceptcookie">Accept and hide this message</button>
+    </div>
+</div>
+<script src="/static/js/cookie_law.js"></script>
+
+
+
+
+<div id="access-warning-modal" class="reveal-modal">
+    <h2>Access Warning</h2>
+    <p>You do not have the correct permissions to perform this operation.</p>
+    <a class="close-reveal-modal">&#215;</a>
+</div>
+
+
+
+</body>
+</html>

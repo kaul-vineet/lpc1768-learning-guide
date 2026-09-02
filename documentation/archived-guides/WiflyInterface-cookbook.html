@@ -1,0 +1,1521 @@
+<!DOCTYPE html>
+
+
+
+
+
+
+<html class="no-js" lang="en">
+
+<head>
+    
+
+    <title>
+WiflyInterface - Cookbook
+ | Mbed</title>
+    
+
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=9; IE=8; IE=7; IE=EDGE" />
+    <!-- Set the viewport width to device width for mobile -->
+    <meta name="viewport" content="user-scalable=yes,width=device-width,initial-scale=0.9" />
+
+    
+
+<!-- Google Analytics -->
+<script>
+(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+})(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+
+ga('create', 'UA-1447836-8');
+ga('require', 'GTM-WXMLD4S')
+</script>
+
+<!-- Google Tag Manager -->
+<script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+'https://www.googletagmanager.com/gtm.js?id='+i+dl+'&gtm_auth=SMYNPwM0ICsV00c1ZHETqQ&gtm_preview=env-2&gtm_cookies_win=x';f.parentNode.insertBefore(j,f);
+})(window,document,'script','dataLayer','GTM-M6FZ495');</script>
+
+
+    <script>
+    (function(h,o,t,j,a,r){
+        h.hj=h.hj||function(){(h.hj.q=h.hj.q||[]).push(arguments)};
+        h._hjSettings={hjid:971746,hjsv:6};
+        a=o.getElementsByTagName('head')[0];
+        r=o.createElement('script');r.async=1;
+        r.src=t+h._hjSettings.hjid+j+h._hjSettings.hjsv;
+        a.appendChild(r);
+    })(window,document,'https://static.hotjar.com/c/hotjar-','.js?sv=');
+</script>
+
+
+
+<!-- Favicons -->
+<link rel="apple-touch-icon" sizes="57x57" href="/static/img/favicons/apple-icon-57x57.png">
+<link rel="apple-touch-icon" sizes="60x60" href="/static/img/favicons/apple-icon-60x60.png">
+<link rel="apple-touch-icon" sizes="72x72" href="/static/img/favicons/apple-icon-72x72.png">
+<link rel="apple-touch-icon" sizes="76x76" href="/static/img/favicons/apple-icon-76x76.png">
+<link rel="apple-touch-icon" sizes="114x114" href="/static/img/favicons/apple-icon-114x114.png">
+<link rel="apple-touch-icon" sizes="120x120" href="/static/img/favicons/apple-icon-120x120.png">
+<link rel="apple-touch-icon" sizes="144x144" href="/static/img/favicons/apple-icon-144x144.png">
+<link rel="apple-touch-icon" sizes="152x152" href="/static/img/favicons/apple-icon-152x152.png">
+<link rel="apple-touch-icon" sizes="180x180" href="/static/img/favicons/apple-icon-180x180.png">
+<link rel="icon" type="image/png" sizes="192x192"  href="/static/img/favicons/android-icon-192x192.png">
+<link rel="icon" type="image/png" sizes="32x32" href="/static/img/favicons/favicon-32x32.png">
+<link rel="icon" type="image/png" sizes="96x96" href="/static/img/favicons/favicon-96x96.png">
+<link rel="icon" type="image/png" sizes="16x16" href="/static/img/favicons/favicon-16x16.png">
+<link rel="manifest" href="/static/img/favicons/manifest.json">
+<link rel="shortcut icon" href="/static/img/favicon.ico?">
+<meta name="msapplication-TileColor" content="#ffffff">
+<meta name="msapplication-TileImage" content="/static/img/favicons/ms-icon-144x144.png">
+<meta name="theme-color" content="#ffffff">
+
+<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Lato:300,400,700">
+
+<link rel="stylesheet" href="/static/CACHE/css/output.811e2930ab34.css" type="text/css">
+
+
+    
+    
+
+    <link rel="stylesheet" type="text/css" href="/static/legacy-main.986d36e4640c.css">
+    <script type="text/javascript" src="/static/legacy-bundle.d4c318d04056.js"></script>
+
+    <script src="/static/CACHE/js/output.b4f0ddd57a31.js"></script>
+    <script type="text/javascript">
+        var MTIProjectId='531df303-da6d-4e1e-934d-ec3ecdc164a9';
+        (function() {
+            var mtiTracking = document.createElement('script');
+            mtiTracking.type='text/javascript';
+            mtiTracking.async='true';
+            mtiTracking.src="/static/js/mtiFontTrackingCode.js";
+            (document.getElementsByTagName('head')[0]||document.getElementsByTagName('body')[0]).appendChild( mtiTracking );
+        })();
+    </script>
+
+    
+    
+    
+	
+	
+
+    
+</head>
+
+<body>
+
+    <!-- Google Tag Manager (noscript) -->
+    <noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-M6FZ495&gtm_auth=3a8Vwkp5SsDiYq6tYR1ObQ&gtm_preview=env-6&gtm_cookies_win=x"
+    height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+    <!-- End Google Tag Manager (noscript) -->
+
+    
+
+
+
+
+
+
+
+
+<div class="mbed-nav">
+    <div class="mbed-nav__mobile-menu-control">
+        <i class="mbed-nav__mobile-menu-control-open fas fa-bars fa-fw"></i>
+        <i class="mbed-nav__mobile-menu-control-close fas fa-times is-hidden fa-fw"></i>
+        <i class="mbed-nav__mobile-menu-control-back fas fa-angle-left is-hidden fa-fw"></i>
+    </div>
+    <div class="mbed-nav__logo">
+        <a href="https://os.mbed.com">
+            <svg><use xlink:href="/static/img/mbed_nav_spritesheet.8ac20221a123.svg?v3#logo"></use></svg>
+        </a>
+    </div>
+    <div class="mbed-nav__menu">
+
+        <!-- Main menu -->
+        <nav class="mbed-nav__main-menu">
+            <ul class="mbed-nav__dropdown-menu">
+                <li class="has-dropdown">
+                    Overview
+
+                    <div class="mbed-nav__dropdown-menu-content">
+
+                        <!-- Overview dropdown menu -->
+                        <div class="mbed-nav__overview-menu">
+                            <section>
+                                <p>Operating system</p>
+                                <ul>
+                                    <li>
+                                        <a href="https://os.mbed.com/mbed-os/" class="mbed-nav__icon-link-detail">
+                                            <svg><use xlink:href="/static/img/mbed_nav_spritesheet.8ac20221a123.svg?v3#mbed_os"></use></svg>
+                                            <div>
+                                                <p>Mbed OS</p>
+                                                <p>The open source OS for Cortex-M devices</p>
+                                            </div>
+                                        </a>
+                                    </li>
+                                </ul>
+                            </section>
+
+                            <section>
+                                <p>Development tools</p>
+                                <ul>
+                                    <li>
+                                        <a href="https://www.keil.arm.com/mbed/?utm_source=mbed_com&utm_medium=compiler_button&utm_campaign=mbed_com_promo" class="mbed-nav__icon-link-detail">
+                                             <svg><use href="/static/img/keil_studio_icon.2c56c28014c6.svg?#keil_studio_icon"></use></svg>
+                                            <div>
+                                                <p>Keil Studio Cloud</p>
+                                                <p>Arm's IDE for IoT, embedded and Mbed development</p>
+                                            </div>
+                                         </a>
+                                     </li>
+                                    <li>
+                                        <a href="https://os.mbed.com/studio/" class="mbed-nav__icon-link-detail">
+                                            <svg><use xlink:href="/static/img/mbed_nav_spritesheet.8ac20221a123.svg?v3#mbed_studio"></use></svg>
+                                            <div>
+                                                <p>Mbed Studio</p>
+                                                <p>Download the desktop IDE for Mbed OS</p>
+                                            </div>
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a href="https://os.mbed.com/docs/mbed-os/latest/quick-start/offline-with-mbed-cli.html" class="mbed-nav__icon-link-detail">
+
+                                            <svg><use xlink:href="/static/img/mbed_nav_spritesheet.8ac20221a123.svg?v3#mbed_cli"></use></svg>
+                                            <div>
+                                               <p>Mbed CLI</p>
+                                               <p>Command line access to Mbed tools and services</p>
+                                            </div>
+                                        </a>
+                                    </li>
+                                </ul>
+                            </section>
+
+                            <section>
+                                <p>Security and Connectivity</p>
+                                <ul>
+                                    <li>
+                                        <a href="https://tls.mbed.org" class="mbed-nav__icon-link-detail">
+                                            <svg><use xlink:href="/static/img/mbed_nav_spritesheet.8ac20221a123.svg?v3#mbed_tls_crypto"></use></svg>
+                                            <div>
+                                                <p>Mbed TLS and Mbed Crypto</p>
+                                                <p>Industry standard TLS stack and crypto library</p>
+                                            </div>
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a href="https://os.mbed.com/connectivity-technologies/" class="mbed-nav__icon-link-detail">
+                                            <svg><use xlink:href="/static/img/mbed_nav_spritesheet.8ac20221a123.svg?v3#connectivity"></use></svg>
+                                            <div>
+                                                <p>Connectivity</p>
+                                                <p>BLE, WiFi, Cellular, LoRaWAN and more</p>
+                                            </div>
+                                        </a>
+                                    </li>
+                                </ul>
+                            </section>
+                        </div>
+                    </div>
+                </li>
+                <li class="has-dropdown">
+                    Hardware
+
+                    <!-- Hardware dropdown menu -->
+                    <div class="mbed-nav__dropdown-menu-content">
+                        <div class="mbed-nav__hardware-dropdown">
+                            <ul class="mbed-nav__hardware-menu">
+                                <li>
+                                    <a href="https://os.mbed.com/platforms/" class="mbed-nav__icon-link-detail">
+                                        <svg><use xlink:href="/static/img/mbed_nav_spritesheet.8ac20221a123.svg?v3#boards"></use></svg>
+                                        <div>
+                                            <p>Boards</p>
+                                            <p>Build your Mbed projects with development boards for Arm Cortex processors and MCUs</p>
+                                        </div>
+                                    </a>
+                                </li>
+                                <li>
+                                    <a href="https://os.mbed.com/modules/" class="mbed-nav__icon-link-detail">
+                                        <svg><use xlink:href="/static/img/mbed_nav_spritesheet.8ac20221a123.svg?v3#modules"></use></svg>
+                                        <div>
+                                            <p>Modules</p>
+                                            <p>Modules include a MCU, connectivity and onboard memory, making them ideal for designing IoT products for mass production</p>
+                                        </div>
+                                    </a>
+                                </li>
+                                <li>
+                                    <a href="https://os.mbed.com/components/" class="mbed-nav__icon-link-detail">
+                                        <svg><use xlink:href="/static/img/mbed_nav_spritesheet.8ac20221a123.svg?v3#components"></use></svg>
+                                        <div>
+                                            <p>Components</p>
+                                            <p>The component database hosts libraries for different sensors, actuators, radios, inputs, middleware and IoT services</p>
+                                        </div>
+                                    </a>
+                                </li>
+                                <li>
+                                    <a href="https://os.mbed.com/hardware/" class="mbed-nav__icon-link-detail">
+                                        <svg><use xlink:href="/static/img/mbed_nav_spritesheet.8ac20221a123.svg?v3#hardware_overview"></use></svg>
+                                        <div>
+                                            <p>Hardware overview & Mbed Enabled</p>
+                                            <p>Learn about hardware support for Mbed, as well as the Mbed Enabled program, which identifies Mbed compatible products</p>
+                                        </div>
+                                    </a>
+                                </li>
+                                <li>
+                                    <a href="https://os.mbed.com/docs/mbed-os/latest/porting/arm-mbed-hdk.html" class="mbed-nav__icon-link-detail">
+                                        <svg><use xlink:href="/static/img/mbed_nav_spritesheet.8ac20221a123.svg?v3#mbed_hdk"></use></svg>
+                                        <div>
+                                            <p>Mbed HDK</p>
+                                            <p>Reference designs, schematics and board layouts to develop production hardware and Mbed-compatible development boards</p>
+                                        </div>
+                                    </a>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+
+                </li>
+                <li><a href="https://os.mbed.com/code/">Code</a></li>
+                <li class="has-dropdown">
+                    Documentation
+
+                    <!-- Documentation dropdown menu -->
+                    <div class="mbed-nav__dropdown-menu-content">
+                        <div class="mbed-nav__documentation-dropdown">
+                            <ul class="mbed-nav__documentation-menu">
+                                <li>
+                                    <a href="https://os.mbed.com/docs/mbed-os/">Mbed OS</a>
+                                </li>
+                                <li>
+                                    <a
+                                        href="https://developer.arm.com/documentation/102497/latest/Arm-Keil-Studio-Cloud">
+                                        Keil Studio
+                                    </a>
+                                </li>
+                                <li>
+                                    <a href="https://os.mbed.com/docs/mbed-studio/">Mbed Studio</a>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </li>
+                <li><a href="https://os.mbed.com/built-with-mbed/">Case studies</a></li>
+                <li class="has-dropdown">
+                    Community
+
+                    <!-- Community dropdown menu -->
+                    <div class="mbed-nav__dropdown-menu-content">
+                        <div class="mbed-nav__community-dropdown">
+                            <ul class="mbed-nav__community-menu">
+                                <li>
+                                    <a href="https://forums.mbed.com">Forum</a>
+                                </li>
+                                <li>
+                                    <a href="https://os.mbed.com/docs/mbed-os/latest/contributing/index.html">Contribute</a>
+                                </li>
+                                <li>
+                                    <a href="https://www.youtube.com/playlist?list=PLKjl7IFAwc4R4plIZe4IuHlsn8zW7rvKh">Mbed OS Tech Forum</a>
+                                </li>
+                                <li>
+                                    <a href="https://os.mbed.com/support/">Report a problem</a>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </li>
+                <li>
+                    <a href="https://os.mbed.com/blog/">Blog</a>
+                </li>
+            </ul>
+        </nav>
+    </div>
+    <div class="mbed-nav__user-controls">
+        <div class="mbed-nav__user-controls-top">
+            <div class="mbed-nav__search">
+                <form id="mbed-nav__search-box" class="is-hidden" action="https://os.mbed.com/search" method="GET">
+                    <div class="mbed-nav__search-box">
+                        <input type="search" name="q" placeholder="Search...">
+                        <button type="submit">
+                            <svg class="stroke-white"><use xlink:href="/static/img/mbed_nav_spritesheet.8ac20221a123.svg?v3#search"></use></svg>
+                        </button>
+                    </div>
+                </form>
+                <i class="mbed-nav__search-close fas fa-times is-hidden"></i>
+                <svg class="mbed-nav__search-open stroke-white"><use xlink:href="/static/img/mbed_nav_spritesheet.8ac20221a123.svg?v3#search"></use></svg>
+            </div>
+            <a class="mbed-nav__cta" href="https://studio.keil.arm.com/mbed" target="_blank">
+                Keil Studio Cloud
+            </a>
+
+            
+                
+                <nav class="mbed-nav__logged-out-nav">
+                    <ul class="mbed-nav__dropdown-menu">
+                        <li>
+                            <svg class="stroke-white"><use xlink:href="/static/img/mbed_nav_spritesheet.8ac20221a123.svg?v3#profile"></use></svg>
+
+                            <!-- Logged out dropdown menu -->
+                            <div class="mbed-nav__dropdown-menu-content">
+                                <div class="mbed-nav__logged-out-dropdown">
+                                    <ul class="mbed-nav__logged-out-menu">
+                                        <li><a href="/account/login/?next=/cookbook/WiflyInterface">Log in or Sign up</a></li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </li>
+                    </ul>
+                </nav>
+                
+            
+        </div>
+    </div>
+    <div class="mbed-nav__spacer"></div>
+</div>
+<div class="mbed-nav__mobile-menu-cover is-hidden">
+    <div class="mbed-nav__mobile-menu">
+
+        <div id="mbed-nav__main-menu-mobile">
+            <div class="mbed-nav__user-controls-mobile">
+                <div class="mbed-nav__user-controls-top-mobile">
+                    <form action="https://os.mbed.com/search" method="GET">
+                        <div class="mbed-nav__search-box mbed-nav__search-box--light">
+                            <input type="search" name="q" placeholder="Search...">
+                            <button type="submit">
+                                <svg class="stroke-dark-grey"><use xlink:href="/static/img/mbed_nav_spritesheet.8ac20221a123.svg?v3#search"></use></svg>
+                            </button>
+                        </div>
+                    </form>
+                    
+                        
+                        <a href="/account/login/?next=/cookbook/WiflyInterface">Log in or Sign up</a>
+                        
+                    
+                </div>
+            </div>
+
+            <ul class="mbed-nav__side-menu">
+                <li>
+                    <input type="checkbox" name="accordion-toggle" id="overview-accordion">
+                    <label for="overview-accordion">Overview</label>
+                    <div class="accordion_content">
+                        <ul class="overview-menu-mobile">
+                            <li>
+                                <p>Operating system</p>
+                                <ul>
+                                    <li>
+                                        <a href="https://os.mbed.com/mbed-os/" class="mbed-nav__icon-link">
+                                            <svg><use xlink:href="/static/img/mbed_nav_spritesheet.8ac20221a123.svg?v3#mbed_os"></use></svg>
+                                            <p>Mbed OS</p>
+                                        </a>
+                                    </li>
+                                    
+
+                                </ul>
+                            </li>
+                            <li>
+                                <p>Development tools</p>
+                                <ul>
+                                    <li>
+                                        <a href="https://os.mbed.com/studio/" class="mbed-nav__icon-link">
+                                            <svg><use xlink:href="/static/img/mbed_nav_spritesheet.8ac20221a123.svg?v3#mbed_studio"></use></svg>
+                                            <p>Mbed Studio</p>
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a href="https://www.keil.arm.com/mbed/?utm_source=mbed_com&utm_medium=compiler_button&utm_campaign=mbed_com_promo" class="mbed-nav__icon-link">
+                                             <svg><use href="/static/img/keil_studio_icon.2c56c28014c6.svg?#keil_studio_icon"></use></svg>
+                                            <p>Keil Studio</p>
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a href="https://os.mbed.com/docs/mbed-os/latest/quick-start/offline-with-mbed-cli.html" class="mbed-nav__icon-link">
+                                            <svg><use xlink:href="/static/img/mbed_nav_spritesheet.8ac20221a123.svg?v3#mbed_cli"></use></svg>
+                                            <p>Mbed CLI</p>
+                                        </a>
+                                    </li>
+                                </ul>
+                            </li>
+                            <li>
+                                <p>Security and connectivity</p>
+                                <ul>
+                                    <li>
+                                        <a href="https://tls.mbed.org" class="mbed-nav__icon-link">
+                                            <svg><use xlink:href="/static/img/mbed_nav_spritesheet.8ac20221a123.svg?v3#mbed_tls_crypto"></use></svg>
+                                            <p>Mbed TLS and Mbed Crypto</p>
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a href="https://os.mbed.com/connectivity-technologies/" class="mbed-nav__icon-link">
+                                            <svg><use xlink:href="/static/img/mbed_nav_spritesheet.8ac20221a123.svg?v3#connectivity"></use></svg>
+                                            <p>Connectivity</p>
+                                        </a>
+                                    </li>
+                                </ul>
+                            </li>
+                        </ul>
+                    </div>
+                </li>
+                <li>
+                    <input type="checkbox" name="accordion-toggle" id="hardware-accordion">
+                    <label for="hardware-accordion">Hardware</label>
+                    <div class="accordion_content">
+                        <ul>
+                            <li>
+                                <a href="https://os.mbed.com/platforms/" class="mbed-nav__icon-link">
+                                    <svg><use xlink:href="/static/img/mbed_nav_spritesheet.8ac20221a123.svg?v3#boards"></use></svg>
+                                    <p>Boards</p>
+                                </a>
+                            </li>
+                            <li>
+                                <a href="https://os.mbed.com/modules/" class="mbed-nav__icon-link">
+                                    <svg><use xlink:href="/static/img/mbed_nav_spritesheet.8ac20221a123.svg?v3#modules"></use></svg>
+                                    <p>Modules</p>
+                                </a>
+                            </li>
+                            <li>
+                                <a href="https://os.mbed.com/components/" class="mbed-nav__icon-link">
+                                    <svg><use xlink:href="/static/img/mbed_nav_spritesheet.8ac20221a123.svg?v3#components"></use></svg>
+                                    <p>Components</p>
+                                </a>
+                            </li>
+                            <li>
+                                <a href="https://os.mbed.com/hardware/" class="mbed-nav__icon-link">
+                                    <svg><use xlink:href="/static/img/mbed_nav_spritesheet.8ac20221a123.svg?v3#hardware_overview"></use></svg>
+                                    <p>Hardware overview & Mbed Enabled</p>
+                                </a>
+                            </li>
+                            <li>
+                                <a href="https://os.mbed.com/docs/mbed-os/latest/porting/arm-mbed-hdk.html" class="mbed-nav__icon-link">
+                                    <svg><use xlink:href="/static/img/mbed_nav_spritesheet.8ac20221a123.svg?v3#mbed_hdk"></use></svg>
+                                    <p>Mbed HDK</p>
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
+                </li>
+                <li><a href="https://os.mbed.com/code/">Code</a></li>
+                <li>
+                    <input type="checkbox" name="accordion-toggle" id="documentation-accordion">
+                    <label for="documentation-accordion">Documentation</label>
+                    <div class="accordion_content">
+                        <ul>
+                            <li><a href="https://os.mbed.com/docs/mbed-os/">Mbed OS</a></li>
+                            <li><a href="https://os.mbed.com/docs/mbed-studio/">Mbed Studio</a></li>
+                            <li>
+                              <a
+                                href="https://developer.arm.com/documentation/102497/1-5/Arm-Keil-Studio/?utm_source=mbed_com&utm_medium=nav_docs_link&utm_campaign=mbed_com_promo">
+                                Keil Studio
+                              </a>
+                            </li>
+                        </ul>
+                    </div>
+                </li>
+                <li><a href="https://os.mbed.com/built-with-mbed/">Case studies</a></li>
+                <li>
+                    <input type="checkbox" name="accordion-toggle" id="community-accordion">
+                    <label for="community-accordion">Community</label>
+                    <div class="accordion_content">
+                        <ul>
+                            <li><a href="https://forums.mbed.com">Forum</a></li>
+                            <li><a href="https://os.mbed.com/docs/mbed-os/latest/contributing/index.html">Contribute</a></li>
+                            <li><a href="https://www.youtube.com/playlist?list=PLKjl7IFAwc4R4plIZe4IuHlsn8zW7rvKh">Mbed OS Tech Forum</a></li>
+                            <li><a href="https://os.mbed.com/support/">Report a problem</a></li>
+                        </ul>
+                    </div>
+                </li>
+                <li><a href="https://os.mbed.com/blog/">Blog</a></li>
+            </ul>
+        </div>
+
+        
+    </div>
+</div>
+
+
+
+    <div id="main-content">
+        
+
+        
+
+        
+
+        
+            
+<div class="banner warning" data-dismissable data-dismissable-id="mbed_deprecation_july_2024">
+  <div class="banner-row">
+    <button class="dismiss-button fas fa-times"></button>
+    
+ <p>
+	 <i class="fas fa-bullhorn" aria-hidden="true"></i>
+     <strong>Important update:</strong> Arm Announces End of Life Timeline for Mbed. This site will be archived in July 2026.
+	 <a href="https://os.mbed.com/blog/entry/Important-Update-on-Mbed/" target="_blank">
+		 <strong>Read the full announcement</strong>.
+	 </a>
+ </p>
+
+  </div>
+</div>
+
+
+        
+
+        
+            
+
+        
+
+        
+        <div>
+            <div class="row" id="top">
+                <div class="six columns">
+                    <div class="breadcrumbs">
+                        
+    
+
+    
+
+<a href="/cookbook/">Cookbook</a>
+
+
+    &raquo; <a href="/cookbook/WiflyInterface">WiflyInterface</a>
+
+
+
+                    </div>
+                </div>
+                <div class="six columns header search-block">
+                    
+                    
+                </div>
+            </div>
+            
+        </div>
+        
+
+        
+<div class="row">
+    <div class="nine columns main-content" id="mbed-content">
+        
+    
+    
+
+    <link href="/static/css/doxygen.css" rel="stylesheet" type="text/css"/>
+	
+    <style type="text/css">
+    .linenumber {display: none;}
+    </style>
+
+	
+
+    <h2><a href="/cookbook/WiflyInterface">WiflyInterface</a></h2>
+
+    
+
+    <div class="wiki-content">
+        <div class="flashbox finfo action-bar"><h4>Table of Contents</h4><ol><li><a href="#software">Software</a></li><li><a href="#hardware">Hardware</a></li><li><a href="#hello-world">Hello World!</a></li><li><a href="#more-details">More details</a></li><li><a href="#links-to-wifly-resources">Links to Wifly Resources</a></li><li><a href="#stuff-the-wifly-can-do">Stuff the WiFly can do</a></li><li><a href="#troubleshooting">Troubleshooting</a></li><li><a href="#get-the-manual">Get the manual</a></li><li><a href="#wiring">Wiring</a></li><li><a href="#power-quality">Power Quality</a></li><li><a href="#software-config">Software Config</a></li><li><a href="#connecting-to-an-access-point-ap">Connecting to an Access Point (AP)</a></li><li><a href="#remote-configuration-by-telnet">Remote Configuration by Telnet</a></li><li><a href="#remote-configuration-by-web-page">Remote Configuration by Web Page</a></li></ol></div><div style="padding: 10px; float:right"><div class="flashbox fprogram"><h4 class="ftitle"><a style="font-weight: bold; position: relative; float: right;" class="button small radius" target="compiler" href="https://os.mbed.com/ide/import-program//users/samux/code/Wifly_HelloWorld/">Import program</a><a href="/users/samux/code/Wifly_HelloWorld/">Wifly_HelloWorld</a></h4><p>Hello World with a wifly module (RN 131 C/G - RN-XV)</p><p class="wiki-api-footer">Last commit <abbr class="timeago" title="2012-08-24T13:52:40+00:00">24 Aug 2012</abbr> by <span><span class="authortext"><a href="/users/samux/"><img alt="" class="icon" width="16px" height="16px" src="https://os.mbed.com/media/img/default_profile.jpg" /></a> <a href="/users/samux/"> Samuel Mokrani</a></span></span></p></div>
+</div><p> <img src="/media/uploads/samux/wifly.png" alt="1200" title="1200" width="800" /> </p>
+<div class="flashbox finfo"><h4 class="ftitle">Information</h4><p>With this library, you will be able to add a wireless connectivity to your mbed. This library relies on wifly modules from Roving Networks (now Microchip).
+These modules can be found on <a href="https://www.sparkfun.com/products/10822" rel="nofollow">sparkfun</a> for instance.</p>
+<p>The objective of this library is to provide the same API as the <a href="http://mbed.org/handbook/Ethernet-Interface">EthernetInterface</a>. So all programs using the EthernetInterface are compatible
+with the WiflyInterface.</p>
+<p>For some applications, it can be useful to dig a little deeper, in which case the <a href="http://www.microchip.com/mymicrochip/filehandler.aspx?ddocname=en557989" rel="nofollow">Wifly User Manual</a> will be helpful.</p>
+</div><h1 id="software">Software<a href="#software" class="wiki_permalink" title="Permalink to this heading">&para;</a></h1>
+<p>The WiflyInterface library provides you with a simple API to connect to the internet.</p>
+<div class="flashbox flibrary"><h4 class="ftitle"><a style="font-weight: bold; position: relative; float: right;" class="button small radius" target="compiler" href="https://os.mbed.com/ide/import-program//users/mbed_official/code/WiflyInterface/;mode:lib">Import library</a><a href="/users/mbed_official/code/WiflyInterface/docs/fb4494783863/classWiflyInterface.html"><span><div class="wiki-api-header"><a href="/users/mbed_official/code/WiflyInterface/docs/fb4494783863//classWiflyInterface.html">WiflyInterface - WiflyInterface Class Reference</a></div></span></a></h4><div><div class="wiki-api-snippet"><table class="memberdecls">
+ <tbody>
+  <tr>
+   <td colspan="2">
+    <h2>
+     <a name="pub-methods">
+     </a>
+     Public Member Functions
+    </h2>
+   </td>
+  </tr>
+  <tr>
+   <td align="right" class="memItemLeft" valign="top">
+   </td>
+   <td class="memItemRight" valign="bottom">
+    <a class="el" href="classWiflyInterface.html#a6df2d9cd7b9da8d6d07393d4f1e64cc2">
+     WiflyInterface
+    </a>
+    (PinName tx, PinName rx, PinName reset, PinName tcp_status, const char *ssid, const char *phrase, Security sec=NONE)
+   </td>
+  </tr>
+  <tr>
+   <td class="mdescLeft">
+   </td>
+   <td class="mdescRight">
+    Constructor.
+    <a href="#a6df2d9cd7b9da8d6d07393d4f1e64cc2">
+    </a>
+    <br />
+   </td>
+  </tr>
+  <tr>
+   <td align="right" class="memItemLeft" valign="top">
+    int
+   </td>
+   <td class="memItemRight" valign="bottom">
+    <a class="el" href="classWiflyInterface.html#a05848de25ac2dbec233935058a1d24b4">
+     init
+    </a>
+    ()
+   </td>
+  </tr>
+  <tr>
+   <td class="mdescLeft">
+   </td>
+   <td class="mdescRight">
+    Initialize the interface with DHCP.
+    <a href="#a05848de25ac2dbec233935058a1d24b4">
+    </a>
+    <br />
+   </td>
+  </tr>
+  <tr>
+   <td align="right" class="memItemLeft" valign="top">
+    int
+   </td>
+   <td class="memItemRight" valign="bottom">
+    <a class="el" href="classWiflyInterface.html#a5852b821307d82770909982771270602">
+     init
+    </a>
+    (const char *ip, const char *mask, const char *gateway)
+   </td>
+  </tr>
+  <tr>
+   <td class="mdescLeft">
+   </td>
+   <td class="mdescRight">
+    Initialize the interface with a static IP address.
+    <a href="#a5852b821307d82770909982771270602">
+    </a>
+    <br />
+   </td>
+  </tr>
+  <tr>
+   <td align="right" class="memItemLeft" valign="top">
+    int
+   </td>
+   <td class="memItemRight" valign="bottom">
+    <a class="el" href="classWiflyInterface.html#a6045e10b730f1c443651f5209bd9e913">
+     connect
+    </a>
+    ()
+   </td>
+  </tr>
+  <tr>
+   <td class="mdescLeft">
+   </td>
+   <td class="mdescRight">
+    Connect Bring the interface up, start DHCP if needed.
+    <a href="#a6045e10b730f1c443651f5209bd9e913">
+    </a>
+    <br />
+   </td>
+  </tr>
+  <tr>
+   <td align="right" class="memItemLeft" valign="top">
+    int
+   </td>
+   <td class="memItemRight" valign="bottom">
+    <a class="el" href="classWiflyInterface.html#addf2eb6605d27b20816cd38b0aa4bc71">
+     disconnect
+    </a>
+    ()
+   </td>
+  </tr>
+  <tr>
+   <td class="mdescLeft">
+   </td>
+   <td class="mdescRight">
+    Disconnect Bring the interface down.
+    <a href="#addf2eb6605d27b20816cd38b0aa4bc71">
+    </a>
+    <br />
+   </td>
+  </tr>
+  <tr>
+   <td align="right" class="memItemLeft" valign="top">
+    char *
+   </td>
+   <td class="memItemRight" valign="bottom">
+    <a class="el" href="classWiflyInterface.html#abb462ac3f4156f9121fb51f2f69905ef">
+     getIPAddress
+    </a>
+    ()
+   </td>
+  </tr>
+  <tr>
+   <td class="mdescLeft">
+   </td>
+   <td class="mdescRight">
+    Get IP address.
+    <a href="#abb462ac3f4156f9121fb51f2f69905ef">
+    </a>
+    <br />
+   </td>
+  </tr>
+ </tbody>
+</table>
+</div></div></div>
+<h1 id="hardware">Hardware<a href="#hardware" class="wiki_permalink" title="Permalink to this heading">&para;</a></h1>
+<p>A basic hardware configuration (if you don't use a battery to power the module) is:</p>
+<table><tr><th>RN-131</th><th></th><th>+++++</th><th>RN-XV</th><th></th></tr>
+<tr><td>wifly pin</td><td>Mbed pin</td><td></td><td>wifly_pin</td><td>Mbed pin</td></tr>
+<tr><td>3.3V RIN</td><td>GND</td><td></td><td></td><td></td></tr>
+<tr><td>GND</td><td>GND</td><td></td><td>GND</td><td>GND</td></tr>
+<tr><td>VDD BATT</td><td>VOUT</td><td></td><td></td><td></td></tr>
+<tr><td>VDD IN</td><td>VOUT</td><td></td><td>VDD_3V3</td><td>VOUT</td></tr>
+<tr><td>RX</td><td>TX</td><td></td><td>UART_RX</td><td>TX</td></tr>
+<tr><td>TX</td><td>RX</td><td></td><td>UART_TX</td><td>RX</td></tr>
+<tr><td>GPIO 6</td><td>any DigitalIn</td><td></td><td>GPIO 6</td><td>any DigitalIn</td></tr>
+<tr><td>RESET</td><td>any DigitalIn</td><td></td><td>RESET</td><td>any DigitalIn</td></tr>
+</table>
+<h3 id="connections-that-match-hello-example">Connections that match "Hello Example" code shown below<a href="#connections-that-match-hello-example" class="wiki_permalink" title="Permalink to this heading">&para;</a></h3>
+<p><img src="/media/uploads/WiredHome/wifly_wiflyexample.png" alt="/media/uploads/WiredHome/wifly_wiflyexample.png" title="/media/uploads/WiredHome/wifly_wiflyexample.png" /> </p>
+<h3 id="connections-that-match-mbed-application">Connections that match mbed Application Board<a href="#connections-that-match-mbed-application" class="wiki_permalink" title="Permalink to this heading">&para;</a></h3>
+<p><img src="/media/uploads/WiredHome/wifly_mbedappboard.png" alt="/media/uploads/WiredHome/wifly_mbedappboard.png" title="/media/uploads/WiredHome/wifly_mbedappboard.png" /> <br />
+<a href="http://mbed.org/components/mbed-Application-Board/">mbed Application Board</a></p>
+<h3 id="connections-that-match-smartboard">Connections that match SmartBoard<a href="#connections-that-match-smartboard" class="wiki_permalink" title="Permalink to this heading">&para;</a></h3>
+<p><img src="/media/uploads/WiredHome/wifly_smartboard.png" alt="/media/uploads/WiredHome/wifly_smartboard.png" title="/media/uploads/WiredHome/wifly_smartboard.png" /> <br />
+<a href="http://mbed.org/users/WiredHome/notebook/smartboard-wifly/?c=9777">SmartBoard Wifly</a></p>
+<h1 id="hello-world">Hello World!<a href="#hello-world" class="wiki_permalink" title="Permalink to this heading">&para;</a></h1>
+<p>Please be sure to read the Wifly datasheet and API of Wifly class, if you are using it, for maximum ease of use.</p>
+<div class="flashbox fcode"><h4 class="ftitle"> </h4><pre class="mbed-code" offset="0">#include "mbed.h"
+#include "WiflyInterface.h"
+
+Serial pc(USBTX, USBRX);
+
+/* wifly object where:
+*     - p9 and p10 are for the serial communication
+*     - p25 is for the reset pin
+*     - p26 is for the connection status
+*     - "mbed" is the ssid of the network
+*     - "password" is the password
+*     - WPA is the security
+*/
+//
+WiflyInterface wifly(p9, p10, p25, p26, "mbed", "password", WPA);
+// mbed Application Board
+//WiflyInterface wifly(p9, p10, p30, p29, "mbed", "password", WPA);
+
+int main() {
+    wifly.init(); // use DHCP
+    while (!wifly.connect()); // join the network
+    printf("IP Address is %s\n\r", wifly.getIPAddress());
+    wifly.disconnect();
+}
+</pre></div><div class="flashbox fprogram"><h4 class="ftitle"><a style="font-weight: bold; position: relative; float: right;" class="button small radius" target="compiler" href="https://os.mbed.com/ide/import-program//users/samux/code/Wifly_HelloWorld/">Import program</a><a href="/users/samux/code/Wifly_HelloWorld/">Wifly_HelloWorld</a></h4><p>Hello World with a wifly module (RN 131 C/G - RN-XV)</p><p class="wiki-api-footer">Last commit <abbr class="timeago" title="2012-08-24T13:52:40+00:00">24 Aug 2012</abbr> by <span><span class="authortext"><a href="/users/samux/"><img alt="" class="icon" width="16px" height="16px" src="https://os.mbed.com/media/img/default_profile.jpg" /></a> <a href="/users/samux/"> Samuel Mokrani</a></span></span></p></div><p>
+The previous program tries to connect the network. If the network is joined, it prints the ip address of the wifly module.</p>
+<h1 id="more-details">More details<a href="#more-details" class="wiki_permalink" title="Permalink to this heading">&para;</a></h1>
+<p>In order to test that your hardware has been setted up correctly, you can use this program:
+</p><div class="flashbox fprogram"><h4 class="ftitle"><a style="font-weight: bold; position: relative; float: right;" class="button small radius" target="compiler" href="https://os.mbed.com/ide/import-program//users/samux/code/Wifly_configure/">Import program</a><a href="/users/samux/code/Wifly_configure/">Wifly_configure</a></h4><p>Configure wifly module</p><p class="wiki-api-footer">Last commit <abbr class="timeago" title="2011-11-06T12:12:21+00:00">06 Nov 2011</abbr> by <span><span class="authortext"><a href="/users/samux/"><img alt="" class="icon" width="16px" height="16px" src="https://os.mbed.com/media/img/default_profile.jpg" /></a> <a href="/users/samux/"> Samuel Mokrani</a></span></span></p></div><p>.</p>
+<div class="flashbox finfo"><h4 class="ftitle">Information</h4><p>If everything is connected correctly, you should get the response "CMD" when you put in three consecutive dollar signs "$$$". The module is now in command mode. To return the module to this factory state, if you want to, you should enter in command mode "factory RESET\r".</p>
+</div><p>Here is a configuration example: <br /></p>
+<p> <img src="/media/uploads/samux/wifly_conf.png" alt="/media/uploads/samux/wifly_conf.png" title="/media/uploads/samux/wifly_conf.png" /> </p>
+<ul><li>First I enter in command mode by pressing <strong>$$$</strong>
+<ul><li>the response is CMD
+</li></ul></li><li><strong>set wlan ssid my_network\r</strong> 
+<ul><li>the response is AOK (AOK has replaced set... local echo activated)
+</li></ul></li><li><strong>set wlan phrase my_password\r</strong> (I use <em>set wlan phrase</em> because my network use WPA as security. If you have a WEP security, you have to use <em>set wlan key your_password</em>)
+<ul><li>the response is AOK
+</li></ul></li><li><strong>join\r</strong>
+<ul><li>the response is quite long but <em>Associated!</em> means that you are connected
+</li></ul></li></ul>
+<h1 id="links-to-wifly-resources">Links to Wifly Resources<a href="#links-to-wifly-resources" class="wiki_permalink" title="Permalink to this heading">&para;</a></h1>
+<p>Roving networks was acquired by Microchip, and there are a number of online resources. If you do not already have it, be sure to download the user manual, as there are a lot of commands. </p>
+<ul><li><a href="http://www.microchip.com/wwwproducts/Devices.aspx?product=RN171" rel="nofollow">Microchip's RN171</a>
+</li><li><a href="http://ww1.microchip.com/downloads/en/DeviceDoc/50002230A.pdf" rel="nofollow">RN171 User Manual</a>
+</li><li><a href="http://www.microchip.com/wwwproducts/Devices.aspx?product=RN131" rel="nofollow">Microchip's RN131</a>
+On Sparkfun:
+</li><li>[<a href="https://www.sparkfun.com/search/results?term=rn171|various" rel="nofollow">https://www.sparkfun.com/search/results?term=rn171|various</a> Wifly RN-171 modules]]
+<ul><li>Note that some versions use an external antenna - see the related products section.
+</li></ul></li></ul>
+<h3 id="things-to-be-aware-of">Things to be aware of:<a href="#things-to-be-aware-of" class="wiki_permalink" title="Permalink to this heading">&para;</a></h3>
+<ul><li>If sending data using the on board TCP/IP stack, it might be necessary, if you are experiencing problems, to change the flush size/timeout to the maximum, or it sends the data as it receives it.
+</li><li>Sometimes an unresponsive module will need an external reset (there is also a watchdog), might need to be part of a design to guard from total failure. This is not uncommon when the server is very unreliable (when you are using your own) or there is some disconnection between the module and the router (due to inteference/distance). Your mbed application should also implement a <a href="http://mbed.org/cookbook/WatchDog-Timer">watchdog</a>, which in turn can then reset the Wifly module.
+</li><li>Need to be aware of times to complete commands such as connecting to a network, as DHCP can take a while among other things. Rather than looking for ASCII confirmation of things like an open TCP connection, it may be easier to configure one of the GPIO pins to do the job.
+</li><li>If you hang your module, and can't seem to get back in control of it, you may need to perform the hardware reset procedure described in section A.13 (of user manual v1.2r). This can happen if you inadvertently save a bad configuration.
+</li></ul>
+<h2 id="stuff-the-wifly-can-do">Stuff the WiFly can do<a href="#stuff-the-wifly-can-do" class="wiki_permalink" title="Permalink to this heading">&para;</a></h2>
+<ul><li>Communicate over wifi
+</li><li>Upgrade its firmware over TCP
+</li><li>Sleep
+</li><li>Be controlled completely using GPIO pins.
+</li><li>Operate as a wifi client, or as an access point or ad-hoc mode. (ad-hoc replaced with access point mode - see User manual section 4.8)
+</li><li>Operate as a standalone server
+</li></ul>
+<h3 id="programs-using-this-library">Programs using this library:<a href="#programs-using-this-library" class="wiki_permalink" title="Permalink to this heading">&para;</a></h3>
+<ul><li><div class="flashbox fprogram"><h4 class="ftitle"><a style="font-weight: bold; position: relative; float: right;" class="button small radius" target="compiler" href="https://os.mbed.com/ide/import-program//users/samux/code/Websocket_Wifly_HelloWorld/">Import program</a><a href="/users/samux/code/Websocket_Wifly_HelloWorld/">Websocket_Wifly_HelloWorld</a></h4><p>WebSocket Hello World using the wifly interface</p><p class="wiki-api-footer">Last commit <abbr class="timeago" title="2012-08-24T14:06:31+00:00">24 Aug 2012</abbr> by <span><span class="authortext"><a href="/users/samux/"><img alt="" class="icon" width="16px" height="16px" src="https://os.mbed.com/media/img/default_profile.jpg" /></a> <a href="/users/samux/"> Samuel Mokrani</a></span></span></p></div>
+</li><li><div class="flashbox fprogram"><h4 class="ftitle"><a style="font-weight: bold; position: relative; float: right;" class="button small radius" target="compiler" href="https://os.mbed.com/ide/import-program//users/samux/code/HTTPClient_Wifly_HelloWorld/">Import program</a><a href="/users/samux/code/HTTPClient_Wifly_HelloWorld/">HTTPClient_Wifly_HelloWorld</a></h4><p>HTTPClient Hello World with the WiflyInterface</p><p class="wiki-api-footer">Last commit <abbr class="timeago" title="2012-08-24T15:21:55+00:00">24 Aug 2012</abbr> by <span><span class="authortext"><a href="/users/samux/"><img alt="" class="icon" width="16px" height="16px" src="https://os.mbed.com/media/img/default_profile.jpg" /></a> <a href="/users/samux/"> Samuel Mokrani</a></span></span></p></div>
+</li><li><div class="flashbox fprogram"><h4 class="ftitle"><a style="font-weight: bold; position: relative; float: right;" class="button small radius" target="compiler" href="https://os.mbed.com/ide/import-program//users/samux/code/NTPClient_Wifly_HelloWorld/">Import program</a><a href="/users/samux/code/NTPClient_Wifly_HelloWorld/">NTPClient_Wifly_HelloWorld</a></h4><p>NTPClient using the mbed_official WiflyInterface</p><p class="wiki-api-footer">Last commit <abbr class="timeago" title="2012-08-24T15:27:22+00:00">24 Aug 2012</abbr> by <span><span class="authortext"><a href="/users/samux/"><img alt="" class="icon" width="16px" height="16px" src="https://os.mbed.com/media/img/default_profile.jpg" /></a> <a href="/users/samux/"> Samuel Mokrani</a></span></span></p></div>
+</li><li><div class="flashbox fprogram"><h4 class="ftitle"><a style="font-weight: bold; position: relative; float: right;" class="button small radius" target="compiler" href="https://os.mbed.com/ide/import-program//users/samux/code/RPC_Wifly_HelloWorld/">Import program</a><a href="/users/samux/code/RPC_Wifly_HelloWorld/">RPC_Wifly_HelloWorld</a></h4><p>RPC hello world using the Wifly Interface</p><p class="wiki-api-footer">Last commit <abbr class="timeago" title="2012-08-24T14:34:54+00:00">24 Aug 2012</abbr> by <span><span class="authortext"><a href="/users/samux/"><img alt="" class="icon" width="16px" height="16px" src="https://os.mbed.com/media/img/default_profile.jpg" /></a> <a href="/users/samux/"> Samuel Mokrani</a></span></span></p></div>
+</li><li><div class="flashbox fprogram"><h4 class="ftitle"><a style="font-weight: bold; position: relative; float: right;" class="button small radius" target="compiler" href="https://os.mbed.com/ide/import-program//users/samux/code/Wifly_TCPEchoServer/">Import program</a><a href="/users/samux/code/Wifly_TCPEchoServer/">Wifly_TCPEchoServer</a></h4><p>wifly tcp echo server example</p><p class="wiki-api-footer">Last commit <abbr class="timeago" title="2012-12-20T15:31:13+00:00">20 Dec 2012</abbr> by <span><span class="authortext"><a href="/users/samux/"><img alt="" class="icon" width="16px" height="16px" src="https://os.mbed.com/media/img/default_profile.jpg" /></a> <a href="/users/samux/"> Samuel Mokrani</a></span></span></p></div>
+</li><li><div class="flashbox fprogram"><h4 class="ftitle"><a style="font-weight: bold; position: relative; float: right;" class="button small radius" target="compiler" href="https://os.mbed.com/ide/import-program//users/samux/code/Wifly_TCPEchoClient/">Import program</a><a href="/users/samux/code/Wifly_TCPEchoClient/">Wifly_TCPEchoClient</a></h4><p>wifly tcp echo client example</p><p class="wiki-api-footer">Last commit <abbr class="timeago" title="2012-12-20T15:26:57+00:00">20 Dec 2012</abbr> by <span><span class="authortext"><a href="/users/samux/"><img alt="" class="icon" width="16px" height="16px" src="https://os.mbed.com/media/img/default_profile.jpg" /></a> <a href="/users/samux/"> Samuel Mokrani</a></span></span></p></div>
+</li></ul>
+<h3 id="projects-with-this-module">Projects with this module:<a href="#projects-with-this-module" class="wiki_permalink" title="Permalink to this heading">&para;</a></h3>
+<ul><li>Pachube wireless data logging
+</li><li><a href="http://mbed.org/users/Nathan/notebook/internet-of-things/">Internet of things</a>
+</li><li>Web Server - <a href="http://mbed.org/users/WiredHome/notebook/smartboard-wifly/">SmartBoard WiFly</a> using a modified WiflyInterface.
+</li></ul>
+<h1 id="troubleshooting">Troubleshooting<a href="#troubleshooting" class="wiki_permalink" title="Permalink to this heading">&para;</a></h1>
+<p>Occasionally, people have had a challenge getting the Wifly module to work. This section may have a few tips for troubleshooting.</p>
+<h2 id="get-the-manual">Get the manual<a href="#get-the-manual" class="wiki_permalink" title="Permalink to this heading">&para;</a></h2>
+<p>Perhaps the most important tip - get the manual and read it. It is quite detailed, and many questions are answered in the manual. Often, and we all fall into this trap, you go for the quick fix (and it usually works).</p>
+<h2 id="wiring">Wiring<a href="#wiring" class="wiki_permalink" title="Permalink to this heading">&para;</a></h2>
+<ol><li>Check your wiring carefully. There are only a few signals to connect, but it is not uncommon to mis-wire one.
+<ol><li>Do you have the ground connection?
+</li><li>Is your power connection to the Wifly module from the VOUT pin of the mbed?
+</li><li>Review RXD and TXD - be sure they are not swapped.
+</li></ol></li></ol>
+<h2 id="power-quality">Power Quality<a href="#power-quality" class="wiki_permalink" title="Permalink to this heading">&para;</a></h2>
+<ol><li>This should not be a problem when the Wifly module is powered from the mbed and that from the USB connector. If you have a separate power supply powering the module, you may want to check it, or try another.
+</li></ol>
+<h2 id="software-config">Software Config<a href="#software-config" class="wiki_permalink" title="Permalink to this heading">&para;</a></h2>
+<ol><li>Which mbed UART is your module wired to? Check the schematics up above, and take careful note of the pin assignments used in the corresponding WiflyInterface constructor.
+</li><li>Factory Reset the WiFly module (this is described in section A.13 of the <a href="http://ww1.microchip.com/downloads/en/DeviceDoc/50002230A.pdf" rel="nofollow">RN171 User Manual</a>)
+<ol><li>If you have a good software connection and the module is responding, you can issue "factory RESET" to the module, followed by "reboot".
+</li><li>If you cannot get the a response, you can issue a hardware reset of the module. GPIO9 is a pin on the Wifly module. Set it high and then apply power. Then toggle the pin 5 times slowly.
+</li></ol></li></ol>
+<h2 id="connecting-to-an-access-point-ap">Connecting to an Access Point (AP)<a href="#connecting-to-an-access-point-ap" class="wiki_permalink" title="Permalink to this heading">&para;</a></h2>
+<p>Using the Wifly_configure program (see above), you can issue the commands manually to the Wifly module. This can help solve connection problems. </p>
+<ol><li>Type "scan" and see that the AP of interest is listed. Compare the signal strength of it compared to others. To eliminate "range" as a problem, move the Wifly module closer to the AP during testing.
+</li><li>Check or reenter your ssid and pass-phrase. Take note that space characters must be replaced with '$'.
+</li><li>Check the security setting on your AP. Then re-check the command to match that on the Wifly module.
+</li><li>Check other settings on your AP, does it have MAC filtering turned on and your module MAC address is not in the filter?
+</li><li>As a nearly last resort, reduce the security setting on your AP to see if you can then connect. Don't forget to increase the security setting after the test.
+</li></ol>
+<h2 id="remote-configuration-by-telnet">Remote Configuration by Telnet<a href="#remote-configuration-by-telnet" class="wiki_permalink" title="Permalink to this heading">&para;</a></h2>
+<p>If you can't get it to join your network, perhaps you can join its network. The Wifly module supports telnet over the wireless network. If you can connect to it, then you may be able to configure it as needed.</p>
+<ol><li>In addition to the required connections - GND, 3.3V, TX, and RX, also connect GPIO9 (pin 8) to 3.3V.
+</li><li>Cycle power with GPIO9 is high. 
+<ul><li>Modules with firmware v2.38.3 and lower will enter ADHOC mode.
+</li><li>Modules with firmware v2.45 and higher will enter AP (access point) mode. 
+</li></ul></li><li>Associate your PC to the “WiFly” ssid.
+</li><li>Telnet to the Wifly Module.
+<ul><li>For modules with firmware v2.38.3, the IP address and port is 169.254.1.1:2000.
+</li><li>For modules with firmware v2.45 and higher, the IP address and port is 1.2.3.4:2000.
+</li><li>You should now see HELLO on your telnet screen.
+</li></ul></li><li>Type $$$ and you should see the CMD response on your telnet screen.
+</li><li>Perform the commands:
+<ol><li>set wlan phrase YOUR_PASS_PHRASE
+</li><li>set wlan ssid YOUR_SSID
+</li><li>Optional: set the security mode.
+</li><li>save
+</li><li>reboot
+<ul><li>Before you reboot, remove the 3.3v from GPIO9, so the unit can go into normal mode.
+</li><li>If your terminal locally echos what you type and the module does too, you may see 2 of everything you type. This is normal, and you should do your best to ignore the extra characters.
+</li><li>With the reboot, your will lose your connection. If your terminal window is connected to the mbed via USB, and the Wifly_configure application is running, you may see the RN-XV reboot and connect to your network.
+</li><li>Your computer will also lose the AP as the Wifly module goes into normal mode. Connect the PC back to your regular network.
+</li></ul></li></ol></li><li>If you saw the Wifly module connect, you should see its new IP address. Telnet to that new IP.
+<ul><li>You should now see HELLO on your telnet screen.
+</li></ul></li><li>Type $$$ and you should see the CMD response on your telnet screen.
+<ul><li>It should respond with the CMD prompt.
+</li></ul></li><li>Type “ftp u” and the firmware update is performed.
+<ul><li>An older Wifly module may still try to connect to Roving Networks ftp site. If that is the case, there are detailed instructions in the user manual from the Microchip site on how to change that.
+</li></ul></li></ol>
+<h2 id="remote-configuration-by-web-page">Remote Configuration by Web Page<a href="#remote-configuration-by-web-page" class="wiki_permalink" title="Permalink to this heading">&para;</a></h2>
+<p>Similar to the remote configuration by telnet, but in this case with just your browser. This is available in firmware v4.0 and higher.</p>
+<ol><li>In addition to the required connections - GND, 3.3V, TX, and RX, add a push-button to connect GPIO9 (pin 8) to 3.3V.
+</li><li>Cycle power and after a moment or two press the button to momentarily set GPIO9 is high.
+<ul><li>The module should now launch the configuration web server and access point.
+</li></ul></li><li>Associate your PC to the “WiFly” ssid.
+</li><li>Launch your web browser and open the page "<a href="http://config&#34;" rel="nofollow">http://config"</a>.
+</li><li>Click on the Network configuration tab.
+</li><li>Enter your network SSID, or click on the Refresh List button and then select it from the list (if your network is not hidden).
+</li><li>Enter your pass phrase.
+</li><li>Click Save Configuration button.
+</li><li>Click the Exit Web Configuration app. The module reboots to the new configuration.</li></ol>
+
+    </div>
+
+    <hr>
+
+    <div style="text-align: right; padding-bottom: 10px;">
+
+        
+
+        <a class="button small secondary" href="/cookbook/Special:Allpages">
+            <span><i class="far fa-list-alt" aria-hidden="true"></i> All wikipages</span>
+        </a>
+
+    </div>
+
+
+    </div>
+
+    <div class="three columns sidebar ">
+        
+    
+    
+    
+
+<div class="panel radius">
+<h5 class="subheader"><a href="/cookbook/Special:RecentChanges"><b>Recent changes</b></a></h5>
+
+
+
+    
+        
+
+
+<div class="contentitem">
+
+    
+
+    <div class="contentitem-left" style=" vertical-align: top;">
+        
+
+        <div class="textwrapper" style=" margin-left: 0; ">
+            <div style="font-size: 1.1em; padding-bottom: 4px;">
+                
+
+                
+
+                <b><a href="/cookbook/Reference-Design">Reference Design</a></b>
+
+                
+
+                
+
+                
+            </div>
+
+            <div class="margin-top: 0px;">
+                
+                  
+
+                  
+                      <i class="fas fa-tag" aria-hidden="true"></i>
+                      
+                          <a href="/search/?q=Design&amp;type=">Design</a>, 
+                      
+                          <a href="/search/?q=Eagle&amp;type=">Eagle</a>, 
+                      
+                          <a href="/search/?q=Referece&amp;type=">Referece</a>
+                      
+                  
+                
+            </div>
+        </div>
+    </div>
+</div>
+
+    
+
+    
+        
+
+
+<div class="contentitem">
+
+    
+
+    <div class="contentitem-left" style=" vertical-align: top;">
+        
+
+        <div class="textwrapper" style=" margin-left: 0; ">
+            <div style="font-size: 1.1em; padding-bottom: 4px;">
+                
+
+                
+
+                <b><a href="/cookbook/Power-Management">Power Management</a></b>
+
+                
+
+                
+
+                
+            </div>
+
+            <div class="margin-top: 0px;">
+                
+                  
+
+                  
+                      <i class="fas fa-tag" aria-hidden="true"></i>
+                      
+                          <a href="/search/?q=firmware&amp;type=">firmware</a>, 
+                      
+                          <a href="/search/?q=Power&amp;type=">Power</a>, 
+                      
+                          <a href="/search/?q=power control&amp;type=">power control</a>, 
+                      
+                          <a href="/search/?q=Sleep&amp;type=">Sleep</a>
+                      
+                  
+                
+            </div>
+        </div>
+    </div>
+</div>
+
+    
+
+    
+        
+
+
+<div class="contentitem">
+
+    
+
+    <div class="contentitem-left" style=" vertical-align: top;">
+        
+
+        <div class="textwrapper" style=" margin-left: 0; ">
+            <div style="font-size: 1.1em; padding-bottom: 4px;">
+                
+
+                
+
+                <b><a href="/cookbook/Interfacing-with-JavaScript">Interfacing with JavaScript</a></b>
+
+                
+
+                
+
+                
+            </div>
+
+            <div class="margin-top: 0px;">
+                
+                  
+
+                  
+                
+            </div>
+        </div>
+    </div>
+</div>
+
+    
+
+    
+        
+
+
+<div class="contentitem">
+
+    
+
+    <div class="contentitem-left" style=" vertical-align: top;">
+        
+
+        <div class="textwrapper" style=" margin-left: 0; ">
+            <div style="font-size: 1.1em; padding-bottom: 4px;">
+                
+
+                
+
+                <b><a href="/cookbook/deadmbed">deadmbed</a></b>
+
+                
+
+                
+
+                
+            </div>
+
+            <div class="margin-top: 0px;">
+                
+                  
+
+                  
+                      <i class="fas fa-tag" aria-hidden="true"></i>
+                      
+                          <a href="/search/?q=broken&amp;type=">broken</a>, 
+                      
+                          <a href="/search/?q=deadmbed&amp;type=">deadmbed</a>
+                      
+                  
+                
+            </div>
+        </div>
+    </div>
+</div>
+
+    
+
+    
+        
+
+
+<div class="contentitem">
+
+    
+
+    <div class="contentitem-left" style=" vertical-align: top;">
+        
+
+        <div class="textwrapper" style=" margin-left: 0; ">
+            <div style="font-size: 1.1em; padding-bottom: 4px;">
+                
+
+                
+
+                <b><a href="/cookbook/MODSERIAL">MODSERIAL</a></b>
+
+                
+
+                
+
+                
+            </div>
+
+            <div class="margin-top: 0px;">
+                
+                  
+
+                  
+                      <i class="fas fa-tag" aria-hidden="true"></i>
+                      
+                          <a href="/search/?q=MODSERIAL&amp;type=">MODSERIAL</a>, 
+                      
+                          <a href="/search/?q=rs232&amp;type=">rs232</a>, 
+                      
+                          <a href="/search/?q=Serial&amp;type=">Serial</a>
+                      
+                  
+                
+            </div>
+        </div>
+    </div>
+</div>
+
+    
+
+    
+        
+
+
+<div class="contentitem">
+
+    
+
+    <div class="contentitem-left" style=" vertical-align: top;">
+        
+
+        <div class="textwrapper" style=" margin-left: 0; ">
+            <div style="font-size: 1.1em; padding-bottom: 4px;">
+                
+
+                
+
+                <b><a href="/cookbook/HTTP-Client">HTTP Client</a></b>
+
+                
+
+                
+
+                
+            </div>
+
+            <div class="margin-top: 0px;">
+                
+                  
+
+                  
+                
+            </div>
+        </div>
+    </div>
+</div>
+
+    
+
+    
+        
+
+
+<div class="contentitem">
+
+    
+
+    <div class="contentitem-left" style=" vertical-align: top;">
+        
+
+        <div class="textwrapper" style=" margin-left: 0; ">
+            <div style="font-size: 1.1em; padding-bottom: 4px;">
+                
+
+                
+
+                <b><a href="/cookbook/Networking">Networking</a></b>
+
+                
+
+                
+
+                
+            </div>
+
+            <div class="margin-top: 0px;">
+                
+                  
+
+                  
+                
+            </div>
+        </div>
+    </div>
+</div>
+
+    
+
+    
+        
+
+
+<div class="contentitem">
+
+    
+
+    <div class="contentitem-left" style=" vertical-align: top;">
+        
+
+        <div class="textwrapper" style=" margin-left: 0; ">
+            <div style="font-size: 1.1em; padding-bottom: 4px;">
+                
+
+                
+
+                <b><a href="/cookbook/Working-with-the-networking-stack">Working with the networking stack</a></b>
+
+                
+
+                
+
+                
+            </div>
+
+            <div class="margin-top: 0px;">
+                
+                  
+
+                  
+                
+            </div>
+        </div>
+    </div>
+</div>
+
+    
+
+    
+        
+
+
+<div class="contentitem">
+
+    
+
+    <div class="contentitem-left" style=" vertical-align: top;">
+        
+
+        <div class="textwrapper" style=" margin-left: 0; ">
+            <div style="font-size: 1.1em; padding-bottom: 4px;">
+                
+
+                
+
+                <b><a href="/cookbook/Homepage/위키-Syntax">Homepage/위키 Syntax</a></b>
+
+                
+
+                
+
+                
+            </div>
+
+            <div class="margin-top: 0px;">
+                
+                  
+
+                  
+                
+            </div>
+        </div>
+    </div>
+</div>
+
+    
+
+    
+        
+
+
+<div class="contentitem">
+
+    
+
+    <div class="contentitem-left" style=" vertical-align: top;">
+        
+
+        <div class="textwrapper" style=" margin-left: 0; ">
+            <div style="font-size: 1.1em; padding-bottom: 4px;">
+                
+
+                
+
+                <b><a href="/cookbook/Homepage/mbed-Design-Challenge">Homepage/mbed Design Challenge</a></b>
+
+                
+
+                
+
+                
+            </div>
+
+            <div class="margin-top: 0px;">
+                
+                  
+
+                  
+                
+            </div>
+        </div>
+    </div>
+</div>
+
+    
+
+    
+        
+
+
+<div class="contentitem">
+
+    
+
+    <div class="contentitem-left" style=" vertical-align: top;">
+        
+
+        <div class="textwrapper" style=" margin-left: 0; ">
+            <div style="font-size: 1.1em; padding-bottom: 4px;">
+                
+
+                
+
+                <b><a href="/cookbook/Servo/kr">Servo/kr</a></b>
+
+                
+
+                
+
+                
+            </div>
+
+            <div class="margin-top: 0px;">
+                
+                  
+
+                  
+                      <i class="fas fa-tag" aria-hidden="true"></i>
+                      
+                          <a href="/search/?q=korean&amp;type=">korean</a>
+                      
+                  
+                
+            </div>
+        </div>
+    </div>
+</div>
+
+    
+
+
+</div>
+
+
+
+    </div>
+</div>
+
+    </div>
+
+    <script type="text/javascript">
+        $(document).ready(function() {
+            mbed.initDismissableBanners($('[data-dismissable]'));
+            mbed.initNavNotification();
+        });
+    </script>
+
+    
+<footer class="global-footer">
+    <ul class="global-footer-media global-footer-row">
+        <li>
+            <a class="footer-media-icon" title="Twitter" href="https://twitter.com/ArmSoftwareDev">
+                <span class="fab fa-twitter-square fa-2x"></span>
+                <span class="global-footer-show-on-large-screens">Twitter</span>
+            </a>
+        </li>
+        <li>
+            <a class="footer-media-icon" title="YouTube" href="https://www.youtube.com/c/ArmSoftwareDevelopers">
+                <span class="fab fa-youtube-square fa-2x"></span>
+                <span class="global-footer-show-on-large-screens">YouTube</span>
+            </a>
+        </li>
+        <li>
+            <a class="footer-media-icon" title="Forum" href="http://forums.mbed.com/">
+                <span class="fas fa-comments fa-2x"></span>
+                <span class="global-footer-show-on-large-screens">Forum</span>
+            </a>
+        </li>
+        <li>
+            <a class="footer-media-icon" title="Blog" href="http://blog.mbed.com/">
+                <span class="fas fa-pen-square fa-2x"></span>
+                <span class="global-footer-show-on-large-screens">Blog</span>
+            </a>
+        </li>
+    </ul>
+
+    <div class="global-footer-copyright global-footer-row">
+        <div class="copyright-statement">Copyright © <script>document.write(new Date().getFullYear());</script> Arm Limited (or its affiliates).</div>
+        <ul class="copyright-links">
+            <li><a href="https://os.mbed.com/">Home</a></li>
+            <li><a href="https://www.arm.com/company/policies/terms-and-conditions">Website Terms</a></li>
+            <li><a href="https://www.arm.com/company/policies/privacy">Privacy</a></li>
+            <li><a href="https://www.arm.com/company/policies/cookies">Cookies</a></li>
+            <li><a href="http://www.arm.com/company/policies/trademarks">Trademarks</a></li>
+        </ul>
+    </div>
+</footer>
+
+
+
+    <div id="cookiemodule">
+    <h5>Important Information for this Arm website</h5>
+    <div id="cookiecontent">
+        <p>
+            This site uses cookies to store information on your computer.
+            By continuing to use our site, you consent to our cookies.
+            If you are not happy with the use of these cookies, please review our
+            <a href="https://www.arm.com/company/policies/cookies">Cookie Policy</a>
+            to learn how they can be disabled.
+            By disabling cookies, some features of the site will not work.
+        </p>
+        <button id="acceptcookie">Accept and hide this message</button>
+    </div>
+</div>
+<script src="/static/js/cookie_law.js"></script>
+
+
+
+
+<div id="access-warning-modal" class="reveal-modal">
+    <h2>Access Warning</h2>
+    <p>You do not have the correct permissions to perform this operation.</p>
+    <a class="close-reveal-modal">&#215;</a>
+</div>
+
+
+
+</body>
+</html>
