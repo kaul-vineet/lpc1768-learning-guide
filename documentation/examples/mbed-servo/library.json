@@ -1,0 +1,13 @@
+{
+  "name": "mbed-servo",
+  "keywords": "mbed, servo",
+  "description": "This library allows to control servos in mbed",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/mbed-libraries/mbed-servo"
+  },
+  "version": "1.0.1",
+  "license": "MIT",
+  "frameworks": "mbed",
+  "platforms": "*"
+}
