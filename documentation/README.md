@@ -13,14 +13,15 @@ mapping, and surviving source libraries.
 
 ## Start here
 
-1. [Official Application Board cookbook (archived)](archived-guides/mbed-application-board-cookbook.html)
-2. [Application Board Revision-B schematic](exact-hardware/mbed-014.1-rev-b-application-board-schematic.pdf)
-3. [LPC1768 module schematic](exact-hardware/mbed-005.1-lpc1768-module-schematic.pdf)
-4. [LPC17xx user manual UM10360](lpc1768/UM10360-LPC17xx-user-manual.pdf)
-5. [LPC1769/68 family datasheet](lpc1768/LPC1769-63-family-datasheet-rev9.7.pdf)
-6. [Modernized Application Board examples](examples/MBED-Application-board-examples/)
-7. [Archived LPC1768 platform page](archived-module-guides/mbed-LPC1768-platform.html)
-8. [Verified university, project, code and video resources](VERIFIED-RESOURCES.md)
+1. [EdgeOps-86 MVP architecture, setup and acceptance checklist](EDGEOPS-86-MVP.md)
+2. [Official Application Board cookbook (archived)](archived-guides/mbed-application-board-cookbook.html)
+3. [Application Board Revision-B schematic](exact-hardware/mbed-014.1-rev-b-application-board-schematic.pdf)
+4. [LPC1768 module schematic](exact-hardware/mbed-005.1-lpc1768-module-schematic.pdf)
+5. [LPC17xx user manual UM10360](lpc1768/UM10360-LPC17xx-user-manual.pdf)
+6. [LPC1769/68 family datasheet](lpc1768/LPC1769-63-family-datasheet-rev9.7.pdf)
+7. [Modernized Application Board examples](examples/MBED-Application-board-examples/)
+8. [Archived LPC1768 platform page](archived-module-guides/mbed-LPC1768-platform.html)
+9. [Verified university, project, code and video resources](VERIFIED-RESOURCES.md)
 
 ## Directory map
 
@@ -41,7 +42,7 @@ mapping, and surviving source libraries.
 
 | Local document | Original/public source | Status |
 |---|---|---|
-| [mbed-014.1 Revision-B Application Board schematic](exact-hardware/mbed-014.1-rev-b-application-board-schematic.pdf) | [Pololu mirror](https://www.pololu.com/file/download/mbed-app-board-schematic.pdf?file_id=0J397), [archived mbed copy](https://web.archive.org/web/20251211180628/https://os.mbed.com/media/uploads/chris/mbed-014.1_b.pdf) | Downloaded and PDF-validated |
+| [mbed-014.1 Revision-B Application Board schematic](exact-hardware/mbed-014.1-rev-b-application-board-schematic.pdf) | [Archived mbed copy](https://web.archive.org/web/20130220003612id_/http://mbed.org/media/uploads/chris/mbed-014.1_b.pdf) | Verified three-page Revision-B schematic |
 | [mbed-005.1 LPC1768 module schematic](exact-hardware/mbed-005.1-lpc1768-module-schematic.pdf) | [Archived mbed copy](https://web.archive.org/web/20260608121737/https://os.mbed.com/media/uploads/chris/mbed-005.1.pdf) | Downloaded and PDF-validated |
 | [Application Board cookbook](archived-guides/mbed-application-board-cookbook.html) | [Archived official page](https://web.archive.org/web/20260608054705/https://os.mbed.com/cookbook/mbed-application-board) | Downloaded HTML |
 
