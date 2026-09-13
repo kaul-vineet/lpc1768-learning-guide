@@ -1,5 +1,6 @@
 import "dotenv/config";
 import express, { type Response } from "express";
+import { createSocket, type Socket as UdpSocket } from "node:dgram";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import azureIotDevice from "azure-iot-device";
@@ -61,9 +62,12 @@ const simulatorEnabled = process.env.ENABLE_SIMULATOR !== "false";
 const simulatorCloudEnabled = process.env.ENABLE_SIMULATOR_CLOUD === "true";
 const serialPreference = process.env.SERIAL_PORT ?? "auto";
 const serialBaud = Number(process.env.SERIAL_BAUD ?? 115200);
+const boardDeviceId = process.env.DEVICE_ID ?? "lpc1768-01";
+const deviceTransport = process.env.DEVICE_TRANSPORT ?? "ethernet";
+const udpPort = Number(process.env.UDP_PORT ?? 41234);
 
 const initialTelemetry: Telemetry = {
-  deviceId: "lpc1768-01",
+  deviceId: boardDeviceId,
   loadPercent: 0,
   state: "normal",
   sequence: 0,
@@ -93,6 +97,10 @@ let previousState: MachineState = "normal";
 let lastCloudSend = 0;
 let cloudBusy = false;
 let iotClient: ReturnType<typeof Client.fromConnectionString> | null = null;
+let activeSerialPort: SerialPort | null = null;
+let activeUdpSocket: UdpSocket | null = null;
+let udpBoardSeen = false;
+let lastBoardReceivedAt = 0;
 
 function log(message: string): void {
   const entry = `${new Date().toLocaleTimeString("en-GB", { hour12: false })}  ${message}`;
@@ -354,27 +362,39 @@ async function startSerial(): Promise<boolean> {
     return false;
   }
 
-  const serial = new SerialPort({ path: serialPath, baudRate: serialBaud });
-  const parser = serial.pipe(new ReadlineParser({ delimiter: "\n" }));
+  activeSerialPort = new SerialPort({ path: serialPath, baudRate: serialBaud });
+  const parser = activeSerialPort.pipe(new ReadlineParser({ delimiter: "\n" }));
 
-  serial.on("open", () => {
-    dashboard.links.board = "ready";
-    log(`Board connected on ${serialPath}`);
-    broadcast();
+  activeSerialPort.on("open", () => {
+    activeSerialPort?.set({ dtr: true, rts: true }, (error) => {
+      if (error) {
+        dashboard.links.board = "error";
+        log(`Could not assert serial ready signals: ${error.message}`);
+      } else {
+        dashboard.links.board = "ready";
+        log(`Board connected on ${serialPath}`);
+      }
+      broadcast();
+    });
   });
-  serial.on("error", (error) => {
+  activeSerialPort.on("error", (error) => {
     dashboard.links.board = "error";
     log(`Serial error: ${error.message}`);
     broadcast();
   });
-  serial.on("close", () => {
+  activeSerialPort.on("close", () => {
     dashboard.links.board = "offline";
     log("Board serial connection closed");
     broadcast();
   });
   parser.on("data", (line: string) => {
     try {
-      const telemetry = validateTelemetry(JSON.parse(line.trim()), "board");
+      const parsed: unknown = JSON.parse(line.trim());
+      const serialMessage =
+        parsed && typeof parsed === "object" && !Array.isArray(parsed)
+          ? { ...(parsed as Record<string, unknown>), deviceId: boardDeviceId }
+          : parsed;
+      const telemetry = validateTelemetry(serialMessage, "board");
       void processTelemetry(telemetry);
     } catch (error) {
       log(`Rejected serial message: ${error instanceof Error ? error.message : String(error)}`);
@@ -384,14 +404,53 @@ async function startSerial(): Promise<boolean> {
   return true;
 }
 
+function startUdp(): void {
+  activeUdpSocket = createSocket("udp4");
+  activeUdpSocket.on("error", (error) => {
+    dashboard.links.board = "error";
+    log(`UDP listener error: ${error.message}`);
+    broadcast();
+  });
+  activeUdpSocket.on("message", (message, remote) => {
+    try {
+      const parsed: unknown = JSON.parse(message.toString("utf8"));
+      const udpMessage =
+        parsed && typeof parsed === "object" && !Array.isArray(parsed)
+          ? { ...(parsed as Record<string, unknown>), deviceId: boardDeviceId }
+          : parsed;
+      const telemetry = validateTelemetry(udpMessage, "board");
+      lastBoardReceivedAt = Date.now();
+      if (!udpBoardSeen) {
+        udpBoardSeen = true;
+        dashboard.links.board = "ready";
+        log(`Board telemetry received over UDP from ${remote.address}:${remote.port}`);
+      }
+      void processTelemetry(telemetry);
+    } catch (error) {
+      log(`Rejected UDP message: ${error instanceof Error ? error.message : String(error)}`);
+      broadcast();
+    }
+  });
+  activeUdpSocket.bind(udpPort, "0.0.0.0", () => {
+    log(`Listening for board telemetry on UDP ${udpPort}`);
+  });
+}
+
 function startSimulator(): void {
-  dashboard.links.board = "ready";
-  log("Simulator active because no board COM port is available");
+  log("Simulator active while waiting for the physical board");
   if (!simulatorCloudEnabled) {
     log("Simulator cloud traffic is disabled to protect the daily quota");
   }
   let sequence = 1;
   setInterval(() => {
+    if (Date.now() - lastBoardReceivedAt <= 8_000) {
+      return;
+    }
+    if (dashboard.telemetry.source === "board") {
+      udpBoardSeen = false;
+      dashboard.links.board = "offline";
+      log("Board telemetry timed out after 8 seconds; simulator resumed");
+    }
     const cycle = sequence % 80;
     const base =
       cycle < 25 ? 35 + cycle : cycle < 45 ? 60 + (cycle - 25) * 1.5 : cycle < 60 ? 90 - (cycle - 45) : 50;
@@ -399,7 +458,7 @@ function startSimulator(): void {
     const state: MachineState =
       loadPercent >= 85 ? "critical" : loadPercent >= 70 ? "warning" : "normal";
     const telemetry = validateTelemetry(
-      { deviceId: "lpc1768-01", loadPercent, state, sequence: sequence++ },
+      { deviceId: boardDeviceId, loadPercent, state, sequence: sequence++ },
       "simulator"
     );
     void processTelemetry(telemetry);
@@ -408,6 +467,28 @@ function startSimulator(): void {
 
 const app = express();
 app.disable("x-powered-by");
+app.use(express.json({ limit: "1kb" }));
+app.post("/api/telemetry", (request, response) => {
+  try {
+    const input =
+      request.body && typeof request.body === "object" && !Array.isArray(request.body)
+        ? { ...(request.body as Record<string, unknown>), deviceId: boardDeviceId }
+        : request.body;
+    const telemetry = validateTelemetry(input, "board");
+    lastBoardReceivedAt = Date.now();
+    if (!udpBoardSeen) {
+      udpBoardSeen = true;
+      dashboard.links.board = "ready";
+      log(`Board telemetry received over HTTP from ${request.ip}`);
+    }
+    void processTelemetry(telemetry);
+    response.status(202).json({ accepted: true });
+  } catch (error) {
+    log(`Rejected HTTP telemetry: ${error instanceof Error ? error.message : String(error)}`);
+    broadcast();
+    response.status(400).json({ accepted: false, error: "Invalid telemetry" });
+  }
+});
 app.get("/api/status", (_request, response) => response.json(dashboard));
 app.get("/api/health", (_request, response) =>
   response.json({ status: "ok", source: dashboard.telemetry.source, links: dashboard.links })
@@ -437,13 +518,28 @@ async function main(): Promise<void> {
     log(`IoT Hub startup error: ${error instanceof Error ? error.message : String(error)}`);
   }
 
-  const serialStarted = await startSerial().catch((error) => {
-    dashboard.links.board = "error";
-    log(`Serial startup error: ${error instanceof Error ? error.message : String(error)}`);
-    return false;
-  });
-  if (!serialStarted && simulatorEnabled) {
-    startSimulator();
+  if (deviceTransport === "ethernet") {
+    startUdp();
+    if (simulatorEnabled) {
+      startSimulator();
+    }
+  } else {
+    const serialStarted = await startSerial().catch((error) => {
+      dashboard.links.board = "error";
+      log(`Serial startup error: ${error instanceof Error ? error.message : String(error)}`);
+      return false;
+    });
+    if (!serialStarted && simulatorEnabled) {
+      startSimulator();
+    }
+  }
+
+  if (deviceTransport !== "ethernet" && deviceTransport !== "serial") {
+    throw new Error(`Unsupported DEVICE_TRANSPORT: ${deviceTransport}`);
+  }
+
+  if (!simulatorEnabled && deviceTransport === "ethernet") {
+    log("Waiting for physical board telemetry");
   }
 
   app.listen(port, () => log(`Dashboard available at http://localhost:${port}`));

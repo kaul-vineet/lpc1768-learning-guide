@@ -134,7 +134,7 @@ export function App() {
 
       {telemetry.source === "simulator" && (
         <div className="simulation-banner">
-          SIMULATOR INPUT ACTIVE / CONNECT NATIVE USB CDC TO USE PHYSICAL CONTROL P19
+          SIMULATOR INPUT ACTIVE / CONNECT LPC1768 ETHERNET TO USE PHYSICAL CONTROL P19
         </div>
       )}
 
