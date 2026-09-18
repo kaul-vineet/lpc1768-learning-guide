@@ -14,14 +14,15 @@ mapping, and surviving source libraries.
 ## Start here
 
 1. [EdgeOps-86 MVP architecture, setup and acceptance checklist](EDGEOPS-86-MVP.md)
-2. [Official Application Board cookbook (archived)](archived-guides/mbed-application-board-cookbook.html)
-3. [Application Board Revision-B schematic](exact-hardware/mbed-014.1-rev-b-application-board-schematic.pdf)
-4. [LPC1768 module schematic](exact-hardware/mbed-005.1-lpc1768-module-schematic.pdf)
-5. [LPC17xx user manual UM10360](lpc1768/UM10360-LPC17xx-user-manual.pdf)
-6. [LPC1769/68 family datasheet](lpc1768/LPC1769-63-family-datasheet-rev9.7.pdf)
-7. [Modernized Application Board examples](examples/MBED-Application-board-examples/)
-8. [Archived LPC1768 platform page](archived-module-guides/mbed-LPC1768-platform.html)
-9. [Verified university, project, code and video resources](VERIFIED-RESOURCES.md)
+2. [Validated IoT-to-LLM engineering learnings](EDGEOPS-86-VALIDATED-LEARNINGS.md)
+3. [Official Application Board cookbook (archived)](archived-guides/mbed-application-board-cookbook.html)
+4. [Application Board Revision-B schematic](exact-hardware/mbed-014.1-rev-b-application-board-schematic.pdf)
+5. [LPC1768 module schematic](exact-hardware/mbed-005.1-lpc1768-module-schematic.pdf)
+6. [LPC17xx user manual UM10360](lpc1768/UM10360-LPC17xx-user-manual.pdf)
+7. [LPC1769/68 family datasheet](lpc1768/LPC1769-63-family-datasheet-rev9.7.pdf)
+8. [Modernized Application Board examples](examples/MBED-Application-board-examples/)
+9. [Archived LPC1768 platform page](archived-module-guides/mbed-LPC1768-platform.html)
+10. [Verified university, project, code and video resources](VERIFIED-RESOURCES.md)
 
 ## Directory map
 

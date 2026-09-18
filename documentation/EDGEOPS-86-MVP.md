@@ -1,205 +1,228 @@
-# EdgeOps-86 MVP Tutorial
+# EdgeOps-86 Multi-Control MVP Tutorial
 
-## What this demonstration proves
+## Goal
 
-EdgeOps-86 connects one physical control on the original mbed hardware to a
-modern Azure AI workflow. Turning the Application Board potentiometer `p19`
-changes a simulated equipment-load value. The LPC1768 classifies that value
-locally, sends it to a Windows gateway over Ethernet, and the gateway presents
-the signal in a browser, forwards selected telemetry to Azure IoT Hub, and asks
-Azure AI Foundry for a bounded incident explanation.
-
-The important design boundary is:
-
-> The LPC1768 decides the machine state. The LLM explains the observed incident.
-
-The LLM is not part of the safety loop and cannot control or acknowledge the
-device.
-
-## Hardware and software
-
-The tutorial uses only:
-
-- mbed NXP LPC1768 module, hardware version mbed-005.1
-- mbed Application Board, MSI-0315B / mbed-014.1 Revision B
-- Application Board potentiometer 1, connected to LPC1768 pin `p19`
-- Application Board RJ45 Ethernet connector
-- USB cable connected to the narrow LPC1768 module for programming and power
-- Windows PC with Node.js, npm, and PlatformIO
-- Azure IoT Hub device identity
-- Azure AI Foundry chat-completions deployment
-
-No `p20`, joystick, temperature sensor, accelerometer, LCD, RGB LED, speaker,
-database, cloud-to-device command, or automated control is part of this MVP.
-
-## Architecture
+Build a repeatable two-minute hackathon demonstration using only the peripherals
+already present on the mbed LPC1768 Application Board:
 
 ```text
-             deterministic edge boundary
-             ---------------------------
-p19 knob --> LPC1768 ADC --> threshold classification
-                                |
-                                | JSON over Ethernet HTTP
-                                v
-                         Windows Node gateway
-                          /        |        \
-                         /         |         \
-              React dashboard  Azure IoT Hub  Azure AI Foundry
-                   SSE          rate-limited   incident-only
+physical controls -> deterministic edge decision -> Azure delivery
+                  -> evidence-grounded LLM interpretation
 ```
 
-The Windows gateway is deliberately responsible for TLS and Azure credentials.
-The microcontroller contains no cloud secret.
+The demonstration is intentionally not a production monitoring product. It has
+no database, authentication, prediction, arbitrary chat, or device-control path.
 
-## Deterministic state model
+## Hardware roles
 
-The firmware converts the ADC reading to an integer percentage and applies:
+| Board input | Pin or bus | Demonstration role |
+|---|---|---|
+| Potentiometer 1 | `p19` | Simulated equipment demand/load |
+| Potentiometer 2 | `p20` | Simulated cooling capacity |
+| Joystick centre | `p14` | NORMAL operating mode |
+| Joystick up | `p15` | BOOST operating mode |
+| Joystick down | `p12` | MAINTENANCE operating mode |
+| LM75B | SDA `p28`, SCL `p27`, address `0x48` | Actual ambient temperature supporting evidence |
+| C12832 LCD | SPI `p5/p7`, reset `p6`, A0 `p8`, CS `p11` | Local edge dashboard output |
 
-| Load | State | Meaning in the demo |
-|---:|---|---|
-| 0-69% | `normal` | Simulated equipment is within the operating limit |
-| 70-84% | `warning` | Simulated load is approaching the limit |
-| 85-100% | `critical` | Simulated load limit is exceeded |
+Joystick left `p13` and right `p16` are deliberately unused.
 
-These thresholds are compiled into `projects/lxp-iot-llm/src/main.cpp`. The
-gateway validates that the reported state matches the reported load, so malformed
-or inconsistent telemetry is rejected instead of displayed as valid data.
+The potentiometers are continuous inputs. Joystick selections are latched by
+firmware, so the selected mode remains after the joystick is released.
 
-## Why Ethernet HTTP is used
+Physical testing established that the joystick switches are active-high on this
+board. The firmware uses `PullDown`, treats `1` as pressed, and polls every 20
+ms in a dedicated thread so momentary presses are not hidden by slow network
+operations.
 
-The LPC1768 native USB device can enumerate on Windows as
-`VID_1F00/PID_2012`, but the tested Mbed OS 6 USB CDC path stalled after its
-first message. This behavior is consistent with the known LPC17xx USB HAL
-regression documented in ARMmbed/mbed-os#9002.
+Each analog channel discards one settling read, waits 100 microseconds, averages
+16 samples, and applies a one-percentage-point deadband. This prevents
+cross-channel movement and visible noise.
 
-The reliable MVP transport is therefore the Application Board Ethernet PHY and
-a small HTTP request:
+## Architecture and responsibility
 
-```http
-POST /api/telemetry HTTP/1.1
-Content-Type: application/json
-
-{"deviceId":"lpc1768-01","loadPercent":72,"state":"warning","sequence":83}
+```text
+p19 load --------\
+p20 cooling ------+--> LPC1768 deterministic risk
+joystick mode ----+             |
+LM75B temperature-/             | Ethernet HTTP JSON
+          |                     v
+          v              Windows Node gateway
+    C12832 LCD            /        |        \
+                        /         |         \
+               React dashboard  IoT Hub   AI Foundry
+                    SSE         telemetry  interpretation
 ```
 
-UDP support remains available in the gateway for compatibility experiments, but
-the validated physical board path is HTTP.
+The responsibility boundary is strict:
 
-## Network configuration
+- **LPC1768:** reads hardware and assigns deterministic risk.
+- **C12832 LCD:** shows local edge facts even when Azure is unavailable.
+- **Gateway:** validates telemetry and calculates mathematical evidence.
+- **IoT Hub:** receives rate-limited device telemetry.
+- **Foundry:** explains supplied evidence in operational language.
+- **Dashboard:** displays the physical signal, evidence, delivery, and
+  explanation.
 
-The validated network used a Windows PC on Wi-Fi and the board connected by
-Ethernet to a TP-Link range extender. A direct PC Ethernet connection is not
-required; both devices only need IP reachability through the same LAN.
+Foundry cannot override the deterministic risk and there is no
+cloud-to-device control.
+
+## Deterministic risk model
+
+The firmware and gateway use the same rules:
+
+```text
+headroom = coolingPercent - loadPercent
+
+CRITICAL when loadPercent >= 85 and headroom < 0
+WARNING  when loadPercent >= 70 or headroom < 0
+NORMAL   otherwise
+```
+
+Examples:
+
+| Load | Cooling | Headroom | Result |
+|---:|---:|---:|---|
+| 40% | 70% | +30 | NORMAL |
+| 76% | 85% | +9 | WARNING because load is high |
+| 65% | 40% | -25 | WARNING because demand exceeds capacity |
+| 88% | 35% | -53 | CRITICAL |
+
+Mode and temperature add context but do not change these rules. This keeps the
+safety story explainable and testable.
+
+## Gateway evidence model
+
+The gateway keeps the latest 120 samples in memory and derives:
+
+- Capacity headroom
+- Load trend
+- Cooling trend
+- Temperature trend
+- Capacity-deficit duration
+- Balanced, transient-deficit, or sustained-deficit pattern
+- Authoritative deterministic risk
+
+Trend is intentionally simple: changes above a small deadband are rising or
+falling; smaller changes are stable. A deficit becomes sustained after ten
+seconds. These values disappear when the gateway stops.
+
+## Network setup
+
+The validated LAN addresses are:
 
 ```text
 Windows gateway: 192.168.29.226
-Board:           192.168.29.240
-Netmask:         255.255.255.0
-Router:          192.168.29.1
-Gateway port:    8080
-Optional UDP:    41234
+LPC1768 board:    192.168.29.240
+Netmask:          255.255.255.0
+Router:           192.168.29.1
+HTTP port:        8080
+Optional UDP:     41234
 ```
 
-The board appeared as a wired client named `ANONYMOUS` with MAC address
-`00-02-F7-F1-7E-71`. The application does not depend on that client name.
+The PC can use Wi-Fi while the Application Board connects by Ethernet to the
+same router or range extender. If the network changes, edit `gatewayIp`,
+`boardIp`, `netmask`, and `routerIp` in
+`projects/lxp-iot-llm/src/main.cpp`.
 
-If the LAN uses different addresses, edit these constants in
-`projects/lxp-iot-llm/src/main.cpp`:
+USB is retained for drag-and-drop programming and power. Ethernet HTTP is used
+for telemetry because the tested LPC1768/Mbed native USB CDC path stalled after
+its first message.
 
-```cpp
-constexpr char gatewayIp[] = "192.168.29.226";
-constexpr uint16_t gatewayPort = 8080;
-constexpr char boardIp[] = "192.168.29.240";
-constexpr char netmask[] = "255.255.255.0";
-constexpr char routerIp[] = "192.168.29.1";
-```
+## Build and flash firmware
 
-Choose an unused board address in the LAN subnet. Rebuild and reflash after any
-firmware network change.
-
-## Step 1: Build the firmware
-
-The legacy PlatformIO Mbed integration needs Python 3.11 because it imports
-Python modules removed in Python 3.12.
-
-From `projects/lxp-iot-llm`:
+From `projects/lxp-iot-llm`, build with the Python 3.11 PlatformIO environment:
 
 ```powershell
 C:\Users\vineetkaul\.platformio-py311\Scripts\platformio.exe run
 ```
 
-The expected artifact is:
+The binary is:
 
 ```text
 .pio\build\lpc1768\firmware.bin
 ```
 
-## Step 2: Flash and connect the board
+1. Connect USB to the narrow LPC1768 module.
+2. Copy `firmware.bin` to the mounted `MBED` drive.
+3. Keep USB connected for power.
+4. Connect the Application Board RJ45 port.
+5. Press reset.
 
-1. Connect the USB cable to the narrow LPC1768 module.
-2. Confirm that Windows mounts the `MBED` drive.
-3. Copy `.pio\build\lpc1768\firmware.bin` to `MBED`.
-4. Wait for the copy to complete.
-5. Keep this USB cable connected to power the module and Application Board.
-6. Connect the Application Board RJ45 socket to the router or extender.
-7. Press the LPC1768 reset button.
+The firmware reads all inputs, assigns state, and posts:
 
-The firmware repeatedly:
-
-1. Reads only `p19`.
-2. Converts the ADC value to 0-100%.
-3. Assigns `normal`, `warning`, or `critical`.
-4. Increments a sequence number.
-5. Opens a TCP socket and posts JSON to the gateway.
-6. Toggles LED1 after a successful send.
-
-## Step 3: Configure the gateway
-
-Copy `.env.example` to `.env`:
-
-```powershell
-Copy-Item .env.example .env
+```json
+{
+  "deviceId": "lpc1768-01",
+  "loadPercent": 82,
+  "coolingPercent": 35,
+  "mode": "normal",
+  "temperatureC": 27.4,
+  "temperatureValid": true,
+  "state": "warning",
+  "sequence": 84
+}
 ```
 
-Set the secrets in `.env`:
+LM75B failure is explicit:
+
+```json
+{
+  "temperatureC": null,
+  "temperatureValid": false
+}
+```
+
+The firmware never substitutes a fabricated temperature.
+
+## Local C12832 screen
+
+The LCD driver uses a buffered Mbed 6 implementation and a dedicated display
+thread. This keeps page switching and critical blinking responsive while the
+legacy Ethernet stack opens and closes TCP connections.
+
+During NORMAL operation, the screen alternates every two seconds:
+
+```text
+L40 C70 H+30 TX:OK
+[load bar]
+[cooling bar]
+```
+
+```text
+MODE normal
+TEMP 27.4 C
+STATE NORMAL H+30
+```
+
+WARNING and CRITICAL override both pages:
+
+```text
+! WARNING ! TX:OK
+LOAD 82 COOL 35
+DEF -47 14s boost
+```
+
+The CRITICAL page blinks by alternating normal and inverted display modes.
+`TX:OK` means only that the board sent the HTTP request to the gateway. The
+screen does not claim IoT Hub acceptance or Foundry completion.
+
+The board does not display LLM prose. Keeping the full explanation in the
+browser avoids a cloud-to-device return path and preserves the clean
+edge-versus-cloud responsibility boundary.
+
+## Configure Azure and start the gateway
+
+Copy `.env.example` to `.env` and set:
 
 ```text
 IOT_HUB_DEVICE_CONNECTION_STRING=
 FOUNDRY_API_KEY=
 ```
 
-The complete non-secret configuration is:
-
-```text
-PORT=8080
-DEVICE_ID=lpc1768-01
-DEVICE_TRANSPORT=ethernet
-UDP_PORT=41234
-SERIAL_PORT=auto
-SERIAL_BAUD=115200
-ENABLE_SIMULATOR=true
-ENABLE_SIMULATOR_CLOUD=false
-CLOUD_INTERVAL_MS=30000
-FOUNDRY_ENDPOINT=https://stell-foundry.openai.azure.com
-FOUNDRY_DEPLOYMENT=gpt-5
-FOUNDRY_API_VERSION=2024-10-21
-```
-
-The validated Azure resources were:
-
-```text
-IoT Hub:          stell-iot-hub.azure-devices.net
-Device identity:  lpc1768-01
-Foundry account:  stell-foundry
-Foundry project:  proj-default
-Deployment:       gpt-5
-```
-
-Never commit `.env`. The repository ignores it.
-
-## Step 4: Build and run the dashboard
-
-From `projects/lxp-iot-llm`:
+The non-secret defaults select Ethernet, port 8080, device
+`lpc1768-01`, a 30-second IoT heartbeat, and a local-only simulator.
+Never commit `.env`.
 
 ```powershell
 npm install
@@ -213,171 +236,208 @@ Open:
 http://localhost:8080
 ```
 
-Useful endpoints:
+Endpoints:
 
 ```text
-GET  /api/health       compact health and link state
-GET  /api/status       complete dashboard state
-POST /api/telemetry    physical-board telemetry
-GET  /events           server-sent event stream
+GET  /api/health
+GET  /api/status
+POST /api/telemetry
+GET  /events
 ```
 
-The server listens on all local interfaces. Existing Windows inbound rules for
-Node must allow TCP port 8080 on the active network profile.
+## Dashboard design
 
-## Step 5: Understand the dashboard
+The dashboard presents one simple causal story:
 
-| Display | Interpretation |
+```text
+observe physical inputs -> detect at the edge -> deliver through IoT
+                        -> explain with Foundry -> human action
+```
+
+| Area | Display |
 |---|---|
-| BOARD ready | A valid physical message arrived within the last eight seconds |
-| BOARD offline | No recent physical message |
-| SIMULATOR INPUT ACTIVE | The PC simulator is supplying clearly labelled local data |
-| IOT HUB ready | The Azure device client is connected |
-| FOUNDRY ready | Foundry configuration is present and the last request succeeded |
-| CLOUD TX | Count of messages accepted by IoT Hub |
-| MACHINE STATE | Deterministic state reported by the board |
-| LIVE SIGNAL | Most recent 120 samples |
-| INCIDENT TIMELINE | State transitions, not every telemetry sample |
+| Risk | Deterministic NORMAL, WARNING, or CRITICAL |
+| Load | Large equipment-load percentage gauge |
+| Cooling | Large cooling-capacity percentage gauge |
+| Context | Joystick mode, temperature, and temperature trend |
+| Balance | Positive headroom, balanced, or negative deficit |
+| Evidence | Load trend, cooling trend, deficit duration, pattern |
+| AI assessment | Assessment, factors, action, recovery, limitation |
+| Delivery | Separate board, IoT Hub, and Foundry readiness |
 
-The dashboard is served by the PC. Unplugging the board does not stop the
-dashboard. After eight seconds without a board message, the board link becomes
-offline and the simulator resumes.
+The browser contains no duplicate software controls. The physical board drives
+the demonstration.
 
-## Step 6: Validate the physical path
+If no board message arrives for eight seconds, the board indicator changes to
+offline and a clearly labelled simulator resumes. The dashboard remains running
+because it is hosted by the PC.
 
-1. Start the gateway before resetting the board.
-2. Open `http://localhost:8080/api/health`.
-3. Reset the board.
-4. Confirm the gateway reports board telemetry received over HTTP.
-5. Confirm **BOARD** changes to ready and the simulator banner disappears.
-6. Turn the left-hand `p19` knob and confirm the load gauge changes.
-7. Hold the value below 70 and confirm `normal`.
-8. Move through 70-84 and confirm `warning`.
-9. Observe an immediate IoT Hub state-change message.
-10. Observe a Foundry explanation attached to the warning incident.
-11. Optionally move to 85 or higher and confirm `critical`.
+## Controlled Foundry prompt
 
-The physical tests completed for this MVP observed loads around 28%, 63-64%,
-and 72-74%. The 72-74% range correctly produced `warning`; sequence 83 was
-accepted by IoT Hub and received a Foundry explanation. A physical
-`critical >= 85%` transition remains an optional final exercise.
+The prompt is versioned as `edgeops-multicontrol-v1`. It defines:
 
-## Step 7: Test the API without hardware
+- Load as simulated demand
+- Cooling as simulated available capacity
+- Headroom as cooling minus load
+- Negative headroom as a capacity deficit
+- NORMAL, BOOST, and MAINTENANCE mode meanings
+- Temperature as supporting evidence only
+- Deterministic risk as authoritative
 
-Use PowerShell:
+It prohibits invented measurements, unsupported fault claims, risk
+reclassification, and device commands. Foundry must return:
+
+```json
+{
+  "assessment": "Concise interpretation of the supplied condition",
+  "contributingFactors": [
+    "One to five evidence-grounded factors"
+  ],
+  "recommendedAction": "One safe human check or simulated adjustment",
+  "expectedRecovery": "Observable evidence that conditions are improving",
+  "limitation": "What cannot be concluded from these inputs"
+}
+```
+
+The gateway rejects a response that does not match this structure.
+
+Foundry is requested on:
+
+- A transition to WARNING or CRITICAL
+- A recovery transition
+- A joystick mode change while risk is active
+
+It is not requested for every knob movement.
+
+## Test without the board
+
+The built-in simulator cycles through balanced operation, increasing demand,
+critical deficit, BOOST recovery, and MAINTENANCE. Simulator traffic remains
+local unless `ENABLE_SIMULATOR_CLOUD=true`.
+
+Post a physical-style message with PowerShell:
 
 ```powershell
 Invoke-RestMethod -Method Post `
   -Uri http://localhost:8080/api/telemetry `
   -ContentType application/json `
-  -Body '{"deviceId":"test","loadPercent":72,"state":"warning","sequence":1}'
+  -Body '{"deviceId":"test","loadPercent":82,"coolingPercent":35,"mode":"normal","temperatureC":27.4,"temperatureValid":true,"state":"warning","sequence":1}'
 ```
 
-The gateway replaces the submitted device identity with the configured
-`DEVICE_ID`, validates the percentage, state, and sequence, adds a timestamp, and
-returns:
+Expected result:
 
 ```json
 {"accepted":true}
 ```
 
-Invalid data returns HTTP 400:
+Invalid input returns HTTP 400. This includes an invalid mode, percentage,
+temperature range, inconsistent temperature validity, or state that disagrees
+with the deterministic rules.
 
-```json
-{"accepted":false,"error":"Invalid telemetry"}
-```
+## Physical acceptance test
 
-## Azure delivery behavior
+The following acceptance sequence has been completed on the physical board:
 
-The local dashboard is intentionally more responsive than the cloud path:
+1. Start the gateway.
+2. Flash the multi-control firmware.
+3. Reset the board and confirm BOARD becomes ready.
+4. Turn `p19`; confirm only the load gauge follows it.
+5. Turn `p20`; confirm only the cooling gauge follows it.
+6. Press joystick up; confirm BOOST remains selected after release.
+7. Press joystick down; confirm MAINTENANCE remains selected.
+8. Press joystick centre; confirm NORMAL returns.
+9. Confirm LM75B reports a plausible room temperature.
+10. Confirm the LCD alternates between its balance and context pages.
+11. Hold load below cooling and confirm positive headroom on LCD and browser.
+12. Raise load above cooling and confirm the LCD WARNING override.
+13. Raise load to at least 85 while cooling remains lower and confirm the
+    blinking CRITICAL override.
+14. Select BOOST and raise cooling; confirm the deficit shrinks.
+15. Lower load below 70 with non-negative headroom; confirm recovery to NORMAL.
+16. Confirm IoT Hub accepts the transition and Foundry returns the five required
+    fields.
+17. Unplug the board and confirm simulator fallback after eight seconds.
 
-- Every valid board sample updates the local dashboard.
-- IoT Hub receives a heartbeat once every `CLOUD_INTERVAL_MS`, default 30
-  seconds.
-- A state change is sent immediately.
-- Simulator messages remain local while
-  `ENABLE_SIMULATOR_CLOUD=false`.
-- Foundry is called only when a new incident enters `warning` or `critical`.
+Observed incident and recovery values:
 
-This rate limiting protects the daily message budget. At a 30-second heartbeat,
-one continuously running device sends about 2,880 heartbeat messages per day,
-plus state changes, below a 6,400-message daily planning threshold.
+| Phase | Load | Cooling | Headroom | Result |
+|---|---:|---:|---:|---|
+| Baseline | 64% | 77% | +13 | NORMAL |
+| Threshold | 71% | 73% | +2 | WARNING |
+| Deficit | 84% | 73% | -11 | WARNING |
+| Incident | 90% | 73% | -17 | CRITICAL |
+| Partial recovery | 90% | 92% | +2 | WARNING |
+| Full recovery | 62% | 92% | +30 | NORMAL |
 
-## How the LLM explanation is bounded
+Partial recovery remains WARNING because load is still above 70%, even though
+cooling has restored positive headroom.
 
-Foundry receives only the reported device identity, current load, deterministic
-state, and the two thresholds. The system prompt requires valid JSON:
+## Two-minute hackathon script
 
-```json
-{
-  "verifiedFacts": "Facts supplied by telemetry",
-  "possibleCause": "A clearly labelled hypothesis",
-  "suggestedCheck": "A safe human inspection step",
-  "limitation": "What cannot be concluded from this data"
-}
-```
+1. **Balanced:** Set load near 40% and cooling near 70%. Point to positive
+   headroom and NORMAL.
+2. **Deficit:** Raise load above cooling. Point to negative headroom, rising
+   duration, and WARNING.
+3. **Critical:** Move load above 85% while cooling remains lower. Point to the
+   deterministic CRITICAL decision.
+4. **Response:** Push joystick up for BOOST and raise cooling.
+5. **Recovery:** Lower load or raise cooling until headroom is non-negative and
+   load is below 70%.
+6. **AI value:** Show the Foundry assessment, ranked factors, safe action,
+   recovery evidence, and limitation.
 
-This format demonstrates useful AI reasoning without exposing hidden
-chain-of-thought, inventing measurements, or proposing device control.
+Temperature can be warmed gently by hand as optional supporting evidence. Do not
+make the core demonstration depend on a rapid temperature change.
 
-A future `p19`-only enhancement could provide derived evidence such as previous
-value, rolling average, recent minimum/maximum, trend, time above threshold, and
-threshold margin. That would make explanations richer without adding another
-physical input. It is not implemented in this MVP.
+## Cloud behavior
 
-## Disconnect and shutdown behavior
+- Every valid sample updates the local dashboard.
+- IoT Hub receives a heartbeat approximately every 30 seconds.
+- State transitions and relevant mode events send immediately.
+- Simulator cloud delivery is disabled by default.
+- Foundry runs only for meaningful transitions.
 
-To validate loss of the physical source:
+At a 30-second heartbeat, one continuously running device produces about 2,880
+heartbeat messages per day, plus transitions.
 
-1. Unplug or power off the LPC1768.
-2. Wait eight seconds.
-3. Confirm **BOARD** changes to offline.
-4. Confirm the simulator banner appears.
-5. Confirm cloud counts do not increase from simulator traffic under the default
-   configuration.
+## Troubleshooting
 
-To stop the dashboard and gateway, press `Ctrl+C` in the terminal running
-`npm start`. Stopping the board alone cannot stop software hosted by the PC.
-
-## Troubleshooting guide
-
-| Symptom | Resolution |
+| Symptom | Check |
 |---|---|
-| Board does not appear on the network | Check USB power, RJ45 cable, extender/router client list, and Ethernet link/activity LEDs. |
-| Board responds to ping but no dashboard data arrives | Confirm the PC address matches `gatewayIp`, TCP 8080 is allowed for Node, rebuild, reflash, and press reset. |
-| Physical values alternate with simulator values | The stale timeout must exceed the physical send cadence. The gateway uses eight seconds. |
-| Physical updates arrive around every five seconds | The firmware creates a new TCP connection per request; the legacy stack makes this slower than the nominal 500 ms loop. |
-| Dashboard remains available after unplugging the board | Expected. It is a PC-hosted application and switches to the simulator. |
-| CLOUD TX does not increase for every turn | Expected. IoT Hub sends are rate-limited to 30 seconds except for state changes. |
-| Foundry does not run for normal samples | Expected. It runs only for new warning or critical incidents. |
-| A second gateway will not start | Port 8080 is already owned by the first gateway; stop the first process. |
-| USB CDC produces only one JSON record | Use the Ethernet HTTP transport. |
-| UDP test works but physical UDP does not | Use the validated HTTP endpoint; UDP is not required by this tutorial. |
+| Dashboard remains running after the board is unplugged | Expected; the PC hosts it and the simulator resumes after eight seconds. |
+| Board does not become ready | Check USB power, Ethernet cable/link lights, board IP, gateway IP, and TCP port 8080. |
+| One potentiometer changes the wrong gauge | Verify `p19` is load and `p20` is cooling. |
+| Potentiometer direction feels reversed | Invert the corresponding ADC percentage in firmware. |
+| Joystick mode does not change | Verify active-high wiring, `PullDown`, pressed state `1`, the 20 ms polling thread, and pins `p12/p14/p15`. |
+| Both analog values move while touching one control | Verify the discarded settling read, 100 microsecond settling delay, 16-sample average, and one-point deadband. |
+| Temperature shows SENSOR ERROR | Reseat the LPC1768 module and verify I2C `p28/p27`; the gateway will not invent a reading. |
+| LCD is blank or reversed | Press reset, verify the module is fully seated, then check orientation and contrast on the physical board. |
+| LCD shows `TX:--` | The last gateway socket send failed; verify Ethernet and the configured gateway address. |
+| Physical updates arrive every few seconds | The legacy stack opens a new TCP connection for every request; this is acceptable for the demo. |
+| IoT count does not change for every movement | Expected because the cloud heartbeat is rate-limited. |
+| Foundry does not run continuously | Expected; it is transition-driven. |
+| A second gateway cannot start | Stop the first process because port 8080 is already occupied. |
 
-## Security and reliability boundaries
+Stop the gateway with `Ctrl+C`.
 
-- Secrets remain only in ignored `.env`.
-- The gateway enforces the configured device identity.
-- Incoming JSON is limited to 1 KB and validated.
-- Errors are surfaced in gateway logs and dashboard link state.
-- The microcontroller makes the alarm decision even if Azure is unavailable.
-- Azure and the browser have no device-control path.
-- No telemetry persistence is provided.
-- Static IPs must be maintained or replaced with a deployment-appropriate
-  discovery/configuration mechanism.
+## Validation status
 
-## Acceptance status
+- [x] Multi-control firmware compiles and fits LPC1768 memory.
+- [x] C12832 driver and local display thread compile.
+- [x] Dashboard and gateway compile.
+- [x] Simulator provides all demonstration phases.
+- [x] Valid multi-control HTTP telemetry returns 202.
+- [x] Invalid temperature validity returns 400.
+- [x] Physical `p19` and `p20` are validated with stable independent readings.
+- [x] Active-high joystick mode latching is validated.
+- [x] Physical LM75B temperature is validated.
+- [x] Physical LCD orientation, contrast, refresh, alert override, blink, and
+  TX status are validated.
+- [x] Physical NORMAL, WARNING, CRITICAL, BOOST, and recovery are validated.
+- [x] IoT Hub delivery is validated.
+- [x] Strict Foundry WARNING, CRITICAL, BOOST, and recovery responses are
+  validated.
 
-- [x] Firmware builds and fits LPC1768 flash/RAM.
-- [x] Drag-and-drop flashing works.
-- [x] Board is reachable at its static Ethernet address.
-- [x] Physical HTTP telemetry reaches the Windows gateway.
-- [x] Turning `p19` changes the dashboard.
-- [x] Physical NORMAL and WARNING states are observed.
-- [x] Physical WARNING reaches IoT Hub.
-- [x] Physical WARNING receives a Foundry explanation.
-- [x] Gateway and React dashboard build.
-- [x] Invalid telemetry is rejected.
-- [x] Stale physical telemetry falls back to a labelled simulator.
-- [x] Simulator cloud traffic is disabled by default.
-- [ ] Physical CRITICAL is explicitly exercised.
+See
+[Validated IoT-to-LLM Learnings](EDGEOPS-86-VALIDATED-LEARNINGS.md)
+for the consolidated physical findings and reusable design conclusions.

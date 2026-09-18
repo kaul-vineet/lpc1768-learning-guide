@@ -1,5 +1,9 @@
 import "dotenv/config";
-import express, { type Response } from "express";
+import express, {
+  type NextFunction,
+  type Request,
+  type Response
+} from "express";
 import { createSocket, type Socket as UdpSocket } from "node:dgram";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
@@ -13,30 +17,57 @@ const { Mqtt } = azureIotMqtt;
 
 type MachineState = "normal" | "warning" | "critical";
 type LinkState = "ready" | "offline" | "error";
+type OperatingMode = "normal" | "boost" | "maintenance";
+type Trend = "rising" | "falling" | "stable" | "unknown";
+type Pattern = "balanced" | "transient-deficit" | "sustained-deficit";
 
-interface Telemetry {
+interface IncomingTelemetry {
   deviceId: string;
   loadPercent: number;
+  coolingPercent: number;
+  mode: OperatingMode;
+  temperatureC: number | null;
+  temperatureValid: boolean;
   state: MachineState;
   sequence: number;
   timestamp: string;
   source: "board" | "simulator";
 }
 
+interface Analysis {
+  headroom: number;
+  loadTrend: Trend;
+  coolingTrend: Trend;
+  temperatureTrend: Trend;
+  deficitDurationSeconds: number;
+  pattern: Pattern;
+  risk: MachineState;
+}
+
+interface Telemetry extends IncomingTelemetry {
+  analysis: Analysis;
+}
+
 interface Incident {
   id: string;
   timestamp: string;
+  event: "state-change" | "mode-change";
   from: MachineState;
   to: MachineState;
   loadPercent: number;
+  coolingPercent: number;
+  mode: OperatingMode;
+  headroom: number;
   explanation?: IncidentExplanation;
 }
 
 interface IncidentExplanation {
-  verifiedFacts: unknown;
-  possibleCause: string;
-  suggestedCheck: string;
+  assessment: string;
+  contributingFactors: string[];
+  recommendedAction: string;
+  expectedRecovery: string;
   limitation: string;
+  promptVersion: string;
 }
 
 interface DashboardState {
@@ -65,14 +96,28 @@ const serialBaud = Number(process.env.SERIAL_BAUD ?? 115200);
 const boardDeviceId = process.env.DEVICE_ID ?? "lpc1768-01";
 const deviceTransport = process.env.DEVICE_TRANSPORT ?? "ethernet";
 const udpPort = Number(process.env.UDP_PORT ?? 41234);
+const promptVersion = "edgeops-multicontrol-v1";
 
 const initialTelemetry: Telemetry = {
   deviceId: boardDeviceId,
   loadPercent: 0,
+  coolingPercent: 0,
+  mode: "normal",
+  temperatureC: null,
+  temperatureValid: false,
   state: "normal",
   sequence: 0,
   timestamp: new Date().toISOString(),
-  source: "simulator"
+  source: "simulator",
+  analysis: {
+    headroom: 0,
+    loadTrend: "unknown",
+    coolingTrend: "unknown",
+    temperatureTrend: "unknown",
+    deficitDurationSeconds: 0,
+    pattern: "balanced",
+    risk: "normal"
+  }
 };
 
 const dashboard: DashboardState = {
@@ -95,12 +140,15 @@ const dashboard: DashboardState = {
 const clients = new Set<Response>();
 let previousState: MachineState = "normal";
 let lastCloudSend = 0;
-let cloudBusy = false;
+let cloudSendQueue: Promise<void> = Promise.resolve();
 let iotClient: ReturnType<typeof Client.fromConnectionString> | null = null;
 let activeSerialPort: SerialPort | null = null;
 let activeUdpSocket: UdpSocket | null = null;
 let udpBoardSeen = false;
 let lastBoardReceivedAt = 0;
+let previousTelemetry: Telemetry | null = null;
+let previousMode: OperatingMode = "normal";
+let deficitStartedAt: number | null = null;
 
 function log(message: string): void {
   const entry = `${new Date().toLocaleTimeString("en-GB", { hour12: false })}  ${message}`;
@@ -116,16 +164,29 @@ function broadcast(): void {
   }
 }
 
-function validateTelemetry(input: unknown, source: Telemetry["source"]): Telemetry {
+function determineState(loadPercent: number, coolingPercent: number): MachineState {
+  if (loadPercent >= 85 && coolingPercent < loadPercent) {
+    return "critical";
+  }
+  if (loadPercent >= 70 || coolingPercent < loadPercent) {
+    return "warning";
+  }
+  return "normal";
+}
+
+function validateTelemetry(input: unknown, source: IncomingTelemetry["source"]): IncomingTelemetry {
   if (!input || typeof input !== "object") {
     throw new Error("Telemetry must be a JSON object");
   }
 
   const candidate = input as Record<string, unknown>;
   const loadPercent = Number(candidate.loadPercent);
+  const coolingPercent = Number(candidate.coolingPercent);
   const sequence = Number(candidate.sequence);
   const state = candidate.state;
   const deviceId = candidate.deviceId;
+  const mode = candidate.mode;
+  const temperatureValid = candidate.temperatureValid;
 
   if (typeof deviceId !== "string" || deviceId.length < 1 || deviceId.length > 64) {
     throw new Error("Invalid deviceId");
@@ -133,22 +194,49 @@ function validateTelemetry(input: unknown, source: Telemetry["source"]): Telemet
   if (!Number.isFinite(loadPercent) || loadPercent < 0 || loadPercent > 100) {
     throw new Error("loadPercent must be between 0 and 100");
   }
+  if (!Number.isFinite(coolingPercent) || coolingPercent < 0 || coolingPercent > 100) {
+    throw new Error("coolingPercent must be between 0 and 100");
+  }
   if (!Number.isInteger(sequence) || sequence < 0) {
     throw new Error("sequence must be a non-negative integer");
   }
+  if (mode !== "normal" && mode !== "boost" && mode !== "maintenance") {
+    throw new Error("Invalid operating mode");
+  }
+  if (typeof temperatureValid !== "boolean") {
+    throw new Error("temperatureValid must be boolean");
+  }
+
+  let temperatureC: number | null = null;
+  if (temperatureValid) {
+    if (typeof candidate.temperatureC !== "number") {
+      throw new Error("temperatureC must be numeric when valid");
+    }
+    temperatureC = candidate.temperatureC;
+    if (!Number.isFinite(temperatureC) || temperatureC < -55 || temperatureC > 125) {
+      throw new Error("temperatureC must be between -55 and 125 when valid");
+    }
+    temperatureC = Math.round(temperatureC * 10) / 10;
+  } else if (candidate.temperatureC !== null) {
+    throw new Error("temperatureC must be null when temperatureValid is false");
+  }
+
   if (state !== "normal" && state !== "warning" && state !== "critical") {
     throw new Error("Invalid machine state");
   }
 
-  const deterministicState: MachineState =
-    loadPercent >= 85 ? "critical" : loadPercent >= 70 ? "warning" : "normal";
+  const deterministicState = determineState(loadPercent, coolingPercent);
   if (state !== deterministicState) {
-    throw new Error(`State ${state} disagrees with deterministic threshold ${deterministicState}`);
+    throw new Error(`State ${state} disagrees with deterministic risk ${deterministicState}`);
   }
 
   return {
     deviceId,
     loadPercent: Math.round(loadPercent),
+    coolingPercent: Math.round(coolingPercent),
+    mode,
+    temperatureC,
+    temperatureValid,
     state,
     sequence,
     timestamp: new Date().toISOString(),
@@ -158,15 +246,40 @@ function validateTelemetry(input: unknown, source: Telemetry["source"]): Telemet
 
 function runValidationSelfCheck(): void {
   validateTelemetry(
-    { deviceId: "self-test", loadPercent: 50, state: "normal", sequence: 0 },
+    {
+      deviceId: "self-test",
+      loadPercent: 50,
+      coolingPercent: 60,
+      mode: "normal",
+      temperatureC: 25,
+      temperatureValid: true,
+      state: "normal",
+      sequence: 0
+    },
     "simulator"
   );
 
   const invalidMessages = [
-    { deviceId: "self-test", loadPercent: -1, state: "normal", sequence: 1 },
-    { deviceId: "self-test", loadPercent: 88, state: "normal", sequence: 2 },
-    { deviceId: "", loadPercent: 50, state: "normal", sequence: 3 },
-    { deviceId: "self-test", loadPercent: 50, state: "unknown", sequence: 4 }
+    {
+      deviceId: "self-test", loadPercent: -1, coolingPercent: 60, mode: "normal",
+      temperatureC: 25, temperatureValid: true, state: "normal", sequence: 1
+    },
+    {
+      deviceId: "self-test", loadPercent: 88, coolingPercent: 30, mode: "normal",
+      temperatureC: 25, temperatureValid: true, state: "normal", sequence: 2
+    },
+    {
+      deviceId: "", loadPercent: 50, coolingPercent: 60, mode: "normal",
+      temperatureC: 25, temperatureValid: true, state: "normal", sequence: 3
+    },
+    {
+      deviceId: "self-test", loadPercent: 50, coolingPercent: 60, mode: "invalid",
+      temperatureC: 25, temperatureValid: true, state: "normal", sequence: 4
+    },
+    {
+      deviceId: "self-test", loadPercent: 50, coolingPercent: 60, mode: "normal",
+      temperatureC: null, temperatureValid: true, state: "normal", sequence: 5
+    }
   ];
 
   for (const message of invalidMessages) {
@@ -208,6 +321,7 @@ async function sendToIoTHub(telemetry: Telemetry): Promise<void> {
   message.contentType = "application/json";
   message.contentEncoding = "utf-8";
   message.properties.add("state", telemetry.state);
+  message.properties.add("mode", telemetry.mode);
   message.properties.add("source", telemetry.source);
 
   await new Promise<void>((resolve, reject) => {
@@ -220,14 +334,101 @@ async function sendToIoTHub(telemetry: Telemetry): Promise<void> {
   log(`IoT Hub accepted sequence ${telemetry.sequence}`);
 }
 
+function enqueueIoTHubSend(telemetry: Telemetry): Promise<boolean> {
+  const send = cloudSendQueue.then(async () => {
+    try {
+      await sendToIoTHub(telemetry);
+      return true;
+    } catch (error) {
+      dashboard.links.iotHub = "error";
+      dashboard.cloud.lastError = error instanceof Error ? error.message : String(error);
+      log(`IoT Hub error: ${dashboard.cloud.lastError}`);
+      return false;
+    } finally {
+      broadcast();
+    }
+  });
+  cloudSendQueue = send.then(() => undefined);
+  return send;
+}
+
+function trend(current: number, previous: number | undefined, deadband: number): Trend {
+  if (previous === undefined) {
+    return "unknown";
+  }
+  const change = current - previous;
+  if (change > deadband) {
+    return "rising";
+  }
+  if (change < -deadband) {
+    return "falling";
+  }
+  return "stable";
+}
+
+function analyzeTelemetry(input: IncomingTelemetry): Telemetry {
+  const comparablePrevious =
+    previousTelemetry?.source === input.source ? previousTelemetry : null;
+  if (!comparablePrevious) {
+    deficitStartedAt = null;
+  }
+
+  const headroom = input.coolingPercent - input.loadPercent;
+  const now = Date.parse(input.timestamp);
+  if (headroom < 0) {
+    deficitStartedAt ??= now;
+  } else {
+    deficitStartedAt = null;
+  }
+  const deficitDurationSeconds =
+    deficitStartedAt === null ? 0 : Math.max(0, Math.floor((now - deficitStartedAt) / 1000));
+  const temperatureTrend =
+    input.temperatureValid && comparablePrevious?.temperatureValid
+      ? trend(input.temperatureC ?? 0, comparablePrevious.temperatureC ?? undefined, 0.2)
+      : "unknown";
+
+  return {
+    ...input,
+    analysis: {
+      headroom,
+      loadTrend: trend(input.loadPercent, comparablePrevious?.loadPercent, 1),
+      coolingTrend: trend(input.coolingPercent, comparablePrevious?.coolingPercent, 1),
+      temperatureTrend,
+      deficitDurationSeconds,
+      pattern:
+        headroom >= 0
+          ? "balanced"
+          : deficitDurationSeconds >= 10
+            ? "sustained-deficit"
+            : "transient-deficit",
+      risk: input.state
+    }
+  };
+}
+
 function normalizeExplanation(raw: string): IncidentExplanation {
   const cleaned = raw.replace(/^```json\s*/i, "").replace(/\s*```$/i, "").trim();
-  const parsed = JSON.parse(cleaned) as Partial<IncidentExplanation>;
+  const parsed = JSON.parse(cleaned) as Record<string, unknown>;
+  const contributingFactors = parsed.contributingFactors;
+  if (
+    typeof parsed.assessment !== "string" ||
+    !Array.isArray(contributingFactors) ||
+    contributingFactors.length < 1 ||
+    contributingFactors.length > 5 ||
+    !contributingFactors.every((factor) => typeof factor === "string") ||
+    typeof parsed.recommendedAction !== "string" ||
+    typeof parsed.expectedRecovery !== "string" ||
+    typeof parsed.limitation !== "string"
+  ) {
+    throw new Error("Foundry explanation did not match the required schema");
+  }
   return {
-    verifiedFacts: parsed.verifiedFacts ?? "No verified facts returned",
-    possibleCause: String(parsed.possibleCause ?? "No hypothesis returned"),
-    suggestedCheck: String(parsed.suggestedCheck ?? "No inspection guidance returned"),
-    limitation: String(parsed.limitation ?? "No limitation returned")
+    assessment: parsed.assessment,
+    contributingFactors,
+    recommendedAction: parsed.recommendedAction,
+    expectedRecovery: parsed.expectedRecovery,
+    limitation: parsed.limitation,
+    promptVersion
   };
 }
 
@@ -254,17 +455,71 @@ async function explainIncident(telemetry: Telemetry): Promise<IncidentExplanatio
           {
             role: "system",
             content:
-              "Return concise valid JSON with keys verifiedFacts, possibleCause, suggestedCheck, limitation. " +
-              "Use supplied facts only, label hypotheses, never invent measurements, and never propose device control."
+              `Prompt version: ${promptVersion}. You are an industrial incident explanation assistant for a ` +
+              "hackathon simulation. loadPercent is simulated equipment demand. coolingPercent is simulated " +
+              "available cooling capacity. capacity headroom equals cooling minus load; negative headroom means " +
+              "demand exceeds capacity. NORMAL is standard operation, BOOST means corrective cooling action is " +
+              "active, and MAINTENANCE means intentionally restricted operation. Temperature is supporting " +
+              "ambient evidence only. The supplied deterministic risk is authoritative: never recalculate or " +
+              "override it. Use only supplied evidence, distinguish facts from hypotheses, never invent a " +
+              "measurement or fault, and never issue a device command. Return only concise valid JSON with " +
+              "assessment (string), contributingFactors (1-5 short strings), recommendedAction (string), " +
+              "expectedRecovery (string), and limitation (string)."
           },
           {
             role: "user",
-            content:
-              `Device ${telemetry.deviceId} reports simulated load ${telemetry.loadPercent} percent, ` +
-              `deterministic state ${telemetry.state}, warning threshold 70 percent, critical threshold 85 percent.`
+            content: JSON.stringify({
+              task:
+                "Explain the operational condition, identify the primary contributing factors, suggest one safe human check or simulated adjustment, and state what evidence would indicate recovery.",
+              evidence: {
+                deviceId: telemetry.deviceId,
+                loadPercent: telemetry.loadPercent,
+                coolingPercent: telemetry.coolingPercent,
+                operatingMode: telemetry.mode,
+                temperatureC: telemetry.temperatureC,
+                temperatureValid: telemetry.temperatureValid,
+                capacityHeadroom: telemetry.analysis.headroom,
+                deficitDurationSeconds: telemetry.analysis.deficitDurationSeconds,
+                loadTrend: telemetry.analysis.loadTrend,
+                coolingTrend: telemetry.analysis.coolingTrend,
+                temperatureTrend: telemetry.analysis.temperatureTrend,
+                pattern: telemetry.analysis.pattern,
+                deterministicRisk: telemetry.analysis.risk
+              }
+            })
           }
         ],
-        max_completion_tokens: 1000,
+        response_format: {
+          type: "json_schema",
+          json_schema: {
+            name: "edgeops_incident_assessment",
+            strict: true,
+            schema: {
+              type: "object",
+              additionalProperties: false,
+              properties: {
+                assessment: { type: "string" },
+                contributingFactors: {
+                  type: "array",
+                  minItems: 1,
+                  maxItems: 5,
+                  items: { type: "string" }
+                },
+                recommendedAction: { type: "string" },
+                expectedRecovery: { type: "string" },
+                limitation: { type: "string" }
+              },
+              required: [
+                "assessment",
+                "contributingFactors",
+                "recommendedAction",
+                "expectedRecovery",
+                "limitation"
+              ]
+            }
+          }
+        },
+        max_completion_tokens: 700,
         reasoning_effort: "minimal"
       })
     }
@@ -286,55 +541,67 @@ async function explainIncident(telemetry: Telemetry): Promise<IncidentExplanatio
   return normalizeExplanation(content);
 }
 
-async function processTelemetry(telemetry: Telemetry): Promise<void> {
+async function processTelemetry(input: IncomingTelemetry): Promise<void> {
+  const telemetry = analyzeTelemetry(input);
   dashboard.telemetry = telemetry;
   dashboard.history.push(telemetry);
   dashboard.history = dashboard.history.slice(-120);
 
-  const stateChanged = telemetry.state !== previousState;
+  const sourceChanged =
+    previousTelemetry !== null && telemetry.source !== previousTelemetry.source;
+  const stateChanged = !sourceChanged && telemetry.state !== previousState;
+  const modeChanged = !sourceChanged && telemetry.mode !== previousMode;
+  const explanationRequested = stateChanged || (modeChanged && telemetry.state !== "normal");
   let incident: Incident | undefined;
-  if (stateChanged) {
+  if (explanationRequested) {
     incident = {
       id: `${telemetry.sequence}-${Date.now()}`,
       timestamp: telemetry.timestamp,
+      event: stateChanged ? "state-change" : "mode-change",
       from: previousState,
       to: telemetry.state,
-      loadPercent: telemetry.loadPercent
+      loadPercent: telemetry.loadPercent,
+      coolingPercent: telemetry.coolingPercent,
+      mode: telemetry.mode,
+      headroom: telemetry.analysis.headroom
     };
     dashboard.incidents.unshift(incident);
     dashboard.incidents = dashboard.incidents.slice(0, 20);
-    log(`State changed ${previousState.toUpperCase()} -> ${telemetry.state.toUpperCase()}`);
-    previousState = telemetry.state;
+    if (stateChanged) {
+      log(`State changed ${previousState.toUpperCase()} -> ${telemetry.state.toUpperCase()}`);
+    } else {
+      log(`Operating mode changed ${previousMode.toUpperCase()} -> ${telemetry.mode.toUpperCase()}`);
+    }
   }
+  if (sourceChanged) {
+    log(`Telemetry source changed to ${telemetry.source.toUpperCase()}`);
+  }
+  previousState = telemetry.state;
+  previousMode = telemetry.mode;
+  previousTelemetry = telemetry;
 
   broadcast();
 
   const cloudAllowed = telemetry.source === "board" || simulatorCloudEnabled;
   const cloudDue = Date.now() - lastCloudSend >= cloudIntervalMs;
-  if (cloudAllowed && !cloudBusy && (cloudDue || stateChanged)) {
-    cloudBusy = true;
+  let deliveredToIoTHub = false;
+  if (cloudAllowed && (cloudDue || explanationRequested)) {
     lastCloudSend = Date.now();
-    try {
-      await sendToIoTHub(telemetry);
-    } catch (error) {
-      dashboard.links.iotHub = "error";
-      dashboard.cloud.lastError = error instanceof Error ? error.message : String(error);
-      log(`IoT Hub error: ${dashboard.cloud.lastError}`);
-    } finally {
-      cloudBusy = false;
-      broadcast();
-    }
+    deliveredToIoTHub = await enqueueIoTHubSend(telemetry);
   }
 
-  if (cloudAllowed && incident && telemetry.state !== "normal") {
+  if (cloudAllowed && incident && deliveredToIoTHub) {
     try {
-      log(`Requesting Foundry explanation for ${telemetry.state} incident`);
+      log(`Requesting Foundry explanation for ${incident.event}`);
       incident.explanation = await explainIncident(telemetry);
       log("Foundry explanation received");
     } catch (error) {
       dashboard.links.foundry = "error";
       log(`Foundry error: ${error instanceof Error ? error.message : String(error)}`);
     }
+    broadcast();
+  } else if (cloudAllowed && incident) {
+    log(`Foundry skipped because IoT Hub did not accept sequence ${telemetry.sequence}`);
     broadcast();
   }
 }
@@ -452,13 +719,48 @@ function startSimulator(): void {
       log("Board telemetry timed out after 8 seconds; simulator resumed");
     }
     const cycle = sequence % 80;
-    const base =
-      cycle < 25 ? 35 + cycle : cycle < 45 ? 60 + (cycle - 25) * 1.5 : cycle < 60 ? 90 - (cycle - 45) : 50;
-    const loadPercent = Math.max(0, Math.min(100, Math.round(base)));
-    const state: MachineState =
-      loadPercent >= 85 ? "critical" : loadPercent >= 70 ? "warning" : "normal";
+    let loadPercent: number;
+    let coolingPercent: number;
+    let mode: OperatingMode;
+    let temperatureC: number;
+    if (cycle < 20) {
+      loadPercent = 45;
+      coolingPercent = 65;
+      mode = "normal";
+      temperatureC = 26;
+    } else if (cycle < 40) {
+      loadPercent = Math.round(55 + (cycle - 20) * 1.5);
+      coolingPercent = 45;
+      mode = "normal";
+      temperatureC = 26 + (cycle - 20) * 0.1;
+    } else if (cycle < 50) {
+      loadPercent = 88;
+      coolingPercent = 38;
+      mode = "normal";
+      temperatureC = 28 + (cycle - 40) * 0.12;
+    } else if (cycle < 65) {
+      loadPercent = Math.round(80 - (cycle - 50) * 0.9);
+      coolingPercent = Math.round(45 + (cycle - 50) * 3);
+      mode = "boost";
+      temperatureC = 29 - (cycle - 50) * 0.08;
+    } else {
+      loadPercent = 45;
+      coolingPercent = 55;
+      mode = "maintenance";
+      temperatureC = 27;
+    }
+    const state = determineState(loadPercent, coolingPercent);
     const telemetry = validateTelemetry(
-      { deviceId: boardDeviceId, loadPercent, state, sequence: sequence++ },
+      {
+        deviceId: boardDeviceId,
+        loadPercent,
+        coolingPercent,
+        mode,
+        temperatureC,
+        temperatureValid: true,
+        state,
+        sequence: sequence++
+      },
       "simulator"
     );
     void processTelemetry(telemetry);
@@ -468,6 +770,28 @@ function startSimulator(): void {
 const app = express();
 app.disable("x-powered-by");
 app.use(express.json({ limit: "1kb" }));
+app.use(
+  (
+    error: unknown,
+    _request: Request,
+    response: Response,
+    next: NextFunction
+  ) => {
+    const status =
+      error && typeof error === "object" && "status" in error
+        ? Number((error as { status?: unknown }).status)
+        : undefined;
+    if (error instanceof SyntaxError && status === 400) {
+      log("Rejected malformed JSON telemetry");
+      response.status(400).json({
+        accepted: false,
+        error: "Malformed JSON"
+      });
+      return;
+    }
+    next(error);
+  }
+);
 app.post("/api/telemetry", (request, response) => {
   try {
     const input =
