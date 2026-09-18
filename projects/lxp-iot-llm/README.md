@@ -213,10 +213,8 @@ movement.
   output are validated.
 - [x] HTTP accepts valid telemetry and rejects invalid state or sensor data.
 
-See
-[Validated IoT-to-LLM Learnings](../../documentation/EDGEOPS-86-VALIDATED-LEARNINGS.md)
-for the physical results, implementation constraints, incident values, and
-reusable design conclusions.
+The root learning website's final capstone contains the physical results,
+implementation constraints, incident values, and reusable design conclusions.
 
 No database, prediction, authentication, extra sensors, speaker,
 cloud-to-device control, or arbitrary AI chat is included.

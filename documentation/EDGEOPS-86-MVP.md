@@ -438,6 +438,5 @@ Stop the gateway with `Ctrl+C`.
 - [x] Strict Foundry WARNING, CRITICAL, BOOST, and recovery responses are
   validated.
 
-See
-[Validated IoT-to-LLM Learnings](EDGEOPS-86-VALIDATED-LEARNINGS.md)
-for the consolidated physical findings and reusable design conclusions.
+The root learning website's final capstone contains the consolidated physical
+findings and reusable design conclusions.

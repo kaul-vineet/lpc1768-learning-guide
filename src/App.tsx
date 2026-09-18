@@ -92,7 +92,7 @@ const courseSequence: CourseStep[] = [
   { number: 8, title: "Build and flash the first program", phase: "First firmware", trackId: "setup", category: "Programming", description: "Compile a .bin file, copy it to the MBED drive, and reset the target." },
   { number: 9, title: "Blink the onboard LED", phase: "First firmware", trackId: "embedded", category: "GPIO output", description: "Use a digital output and verify the complete edit-build-flash cycle." },
   { number: 10, title: "Print serial messages", phase: "First firmware", trackId: "embedded", category: "Debugging", description: "Send diagnostic text from the LPC1768 to a Windows serial terminal." },
-  { number: 11, title: "Read the joystick", phase: "Inputs & outputs", trackId: "embedded", category: "Digital input", description: "Read the five Application Board joystick switches and handle active-low logic." },
+  { number: 11, title: "Read the joystick", phase: "Inputs & outputs", trackId: "embedded", category: "Digital input", description: "Read the Application Board joystick, verify its electrical polarity, and capture short presses reliably." },
   { number: 12, title: "Read the potentiometers", phase: "Inputs & outputs", trackId: "embedded", category: "Analog input", description: "Measure both onboard potentiometers through ADC pins p19 and p20." },
   { number: 13, title: "Control the RGB LED", phase: "Inputs & outputs", trackId: "embedded", category: "PWM output", description: "Mix colors with the common-anode RGB LED on p23, p24, and p25." },
   { number: 14, title: "Generate speaker tones", phase: "Inputs & outputs", trackId: "embedded", category: "PWM audio", description: "Create audible frequencies through the onboard speaker on p26." },
@@ -107,7 +107,7 @@ const courseSequence: CourseStep[] = [
   { number: 23, title: "Create the Windows gateway", phase: "Azure & AI", trackId: "azure", category: "Gateway", description: "Validate serial telemetry and keep cloud credentials away from firmware." },
   { number: 24, title: "Route through IoT Hub", phase: "Azure & AI", trackId: "azure", category: "Azure IoT", description: "Register the prototype, publish telemetry, and route incident events." },
   { number: 25, title: "Explain incidents", phase: "Azure & AI", trackId: "foundry", category: "Azure AI", description: "Use Foundry for grounded explanations, inspection guidance, and handovers." },
-  { number: 26, title: "Complete the industrial capstone", phase: "Azure & AI", trackId: "foundry", category: "Capstone", description: "Demonstrate the complete condition monitor and maintenance copilot safely." },
+  { number: 26, title: "Complete the industrial capstone", phase: "Azure & AI", trackId: "foundry", category: "Validated capstone", description: "Study and reproduce the physically validated multi-control IoT-to-LLM decision-support system." },
 ];
 
 const initialCompleted: string[] = [];
@@ -177,7 +177,7 @@ const trackContent = {
       [ShieldCheck, "Security", "Protect credentials", "Keep modern TLS and Azure secrets on the PC gateway, not the microcontroller."],
     ],
     concept: "Secure telemetry pipeline",
-    conceptText: "The board sends serial data to a trusted PC gateway, which authenticates with Azure IoT Hub and routes events to cloud processing.",
+    conceptText: "The validated capstone sends Ethernet HTTP telemetry to a trusted PC gateway, which validates events, authenticates with Azure IoT Hub, and requests Foundry explanations after successful delivery.",
     objective: "Create a dependable cloud bridge",
     objectiveText: "You’ll understand device identity, secure transport, telemetry contracts, and resilient local behavior during outages.",
   },
@@ -2310,11 +2310,11 @@ int main() {
     checkpoint: "You can explain what mbed_override_console does, and you have observed both a correct startup message and a stable once-per-second counter that restarts cleanly after a fresh reset.",
   },
   "Read the joystick": {
-    outcome: "Read all five Application Board joystick switches on their verified active-low pins, print exactly one labelled direction per physical press, and add debouncing so a held switch does not flood the terminal.",
-    hardware: "Joystick down p12, left p13, center p14, up p15, and right p16, all active-low",
+    outcome: "Read all five Application Board joystick switches using the active-high behavior confirmed on the physical Revision-B board, print exactly one labelled direction per press, and debounce a held switch.",
+    hardware: "Joystick down p12, left p13, center p14, up p15, and right p16; tested active-high with PullDown",
     estimatedTime: "40-60 minutes.",
     overview: [
-      "The joystick is not one analog direction sensor; it is five separate mechanical switches that each connect their pin to ground when pressed. This chapter treats it exactly that way.",
+      "The joystick is not one analog direction sensor; it is five separate mechanical switches. On the tested Revision-B board each input reads 1 while pressed and 0 while released.",
       "The direction-reading logic is built in passes: first prove all five switches are readable, then print a label only on press, then add debouncing so one physical press produces exactly one line instead of a rapid burst.",
       "This project reuses the serial retarget technique from Chapter 10 so results are visible in the same PlatformIO Serial Monitor workflow.",
     ],
@@ -2323,8 +2323,8 @@ int main() {
       "Chapter 1's verified pin map: joystick down p12, left p13, center p14, up p15, right p16.",
     ],
     glossary: [
-      { term: "Active-low", meaning: "A switch wiring convention where the pin reads logical 0 while pressed and logical 1 while released." },
-      { term: "Pull-up resistor", meaning: "A resistor that holds an input pin at logical 1 when nothing else is driving it, so a released switch reads a clean 1 instead of a floating value." },
+      { term: "Active-high", meaning: "A switch behavior where the input reads logical 1 while pressed and logical 0 while released." },
+      { term: "Pull-down resistor", meaning: "A resistor that holds an input at logical 0 while released so it cannot float and produce false presses." },
       { term: "Debounce", meaning: "Waiting briefly, or waiting for a clean release, so a single mechanical press cannot be misread as several rapid presses." },
     ],
     projectFiles: [
@@ -2338,7 +2338,7 @@ framework = mbed
 monitor_speed = 115200`,
     concepts: [
       "Each joystick direction is an independent DigitalIn; there is no single analog value to interpret.",
-      "Because every switch is active-low, each DigitalIn must be configured with PullUp so an untouched switch reads a stable 1 instead of floating.",
+      "Physical testing showed the switches are active-high on this board, so each DigitalIn uses PullDown and a value of 1 means pressed.",
       "Checking directions in a fixed order and stopping at the first pressed switch guarantees exactly one label per pass through the loop.",
       "Waiting for every switch to release before accepting the next action turns a bouncing mechanical contact into one clean event.",
     ],
@@ -2357,7 +2357,7 @@ monitor_speed = 115200`,
       },
       {
         title: "Declare the five inputs and paste the reader",
-        detail: "Open src/main.cpp, press Ctrl+A, paste the complete program shown below, and press Ctrl+S. Confirm it declares five DigitalIn objects on p12 through p16, each constructed with PullUp.",
+        detail: "Open src/main.cpp, press Ctrl+A, paste the complete program shown below, and press Ctrl+S. Confirm it declares five DigitalIn objects on p12 through p16, each constructed with PullDown.",
         expected: "The project builds and all five declarations use the verified pins from Chapter 1's identification sheet.",
         ifNot: "Compare each line with the Revision-B schematic; do not infer direction from declaration order alone.",
       },
@@ -2365,7 +2365,7 @@ monitor_speed = 115200`,
         title: "Build, flash, and open the monitor",
         detail: "Build the project, copy firmware.bin to the MBED drive, reset once, then open the PlatformIO Serial Monitor at 115200 baud.",
         expected: "The monitor prints read-joystick ready once after reset, with no further lines while the joystick is untouched.",
-        ifNot: "If lines print continuously with nothing pressed, confirm every DigitalIn constructor includes PullUp.",
+        ifNot: "If lines print continuously with nothing pressed, confirm every DigitalIn constructor includes PullDown and pressed comparisons use 1.",
       },
       {
         title: "Test each direction individually",
@@ -2402,18 +2402,18 @@ monitor_speed = 115200`,
 
 using namespace std::chrono_literals;
 
-DigitalIn down(p12, PullUp);
-DigitalIn left(p13, PullUp);
-DigitalIn center(p14, PullUp);
-DigitalIn up(p15, PullUp);
-DigitalIn right(p16, PullUp);
+DigitalIn down(p12, PullDown);
+DigitalIn left(p13, PullDown);
+DigitalIn center(p14, PullDown);
+DigitalIn up(p15, PullDown);
+DigitalIn right(p16, PullDown);
 
 static BufferedSerial serialPort(USBTX, USBRX, 115200);
 FileHandle *mbed::mbed_override_console(int) { return &serialPort; }
 
 bool anyPressed() {
-    return down.read() == 0 || left.read() == 0 || center.read() == 0 ||
-           up.read() == 0 || right.read() == 0;
+    return down.read() == 1 || left.read() == 1 || center.read() == 1 ||
+           up.read() == 1 || right.read() == 1;
 }
 
 int main() {
@@ -2421,11 +2421,11 @@ int main() {
 
     while (true) {
         const char *label = nullptr;
-        if (down.read() == 0) label = "DOWN";
-        else if (left.read() == 0) label = "LEFT";
-        else if (center.read() == 0) label = "CENTER";
-        else if (up.read() == 0) label = "UP";
-        else if (right.read() == 0) label = "RIGHT";
+        if (down.read() == 1) label = "DOWN";
+        else if (left.read() == 1) label = "LEFT";
+        else if (center.read() == 1) label = "CENTER";
+        else if (up.read() == 1) label = "UP";
+        else if (right.read() == 1) label = "RIGHT";
 
         if (label == nullptr) {
             ThisThread::sleep_for(20ms);
@@ -2443,13 +2443,13 @@ int main() {
     }
 }`,
     codeWalkthrough: [
-      { title: "PullUp on every DigitalIn", detail: "Each joystick switch only connects its pin to ground when pressed; PullUp supplies the resistor that holds the pin at a clean 1 the rest of the time, so a released switch never reads as an undefined, floating value." },
+      { title: "PullDown on every DigitalIn", detail: "Physical testing showed that each joystick input reads 1 while pressed. PullDown holds the released input at a clean 0 so it cannot float and create a false press." },
       { title: "Fixed if/else-if order", detail: "Checking down, then left, then center, then up, then right, and stopping at the first match guarantees exactly one label per pass through the loop, even if two switches were briefly pressed together." },
       { title: "anyPressed()", detail: "This helper reads all five switches again after printing a label. The main loop waits here until every one reports released, which absorbs mechanical bounce and any brief re-press before the next reading is trusted." },
       { title: "Two different sleep_for calls", detail: "The 20 ms waits are short polling delays used while waiting for a press or a release; the final 30 ms pause after release adds a small safety margin before the next reading is trusted." },
     ],
     expectedResults: [
-      "The project builds with all five DigitalIn objects using the verified pins p12-p16.",
+      "The project builds with all five DigitalIn objects using PullDown on the verified pins p12-p16.",
       "Pressing each direction individually prints exactly one matching direction=... line, including CENTER.",
       "Holding a direction down with the while (anyPressed()) block temporarily commented out produces a rapid burst of identical lines.",
       "With the debounced program flashed, holding the same direction for two seconds produces exactly one line.",
@@ -2462,7 +2462,7 @@ int main() {
     ],
     troubleshooting: [
       { symptom: "A direction never prints, no matter how hard it is pressed.", action: "Recheck that pin against the Revision-B schematic; a swapped pin number will silently read a different, unpressed switch." },
-      { symptom: "Idle switches appear to be pressed at startup.", action: "Confirm every DigitalIn constructor includes PullUp; without it, an unconnected input can float and read as 0." },
+      { symptom: "Idle switches appear to be pressed at startup.", action: "Confirm every DigitalIn constructor includes PullDown and that the pressed comparison is 1." },
       { symptom: "One press still prints several lines.", action: "Confirm anyPressed() checks all five switches and that the while loop truly blocks until every one reads released." },
       { symptom: "Two directions print for what felt like one press.", action: "This usually means the joystick was pressed diagonally; press straight in one direction and retest." },
     ],
@@ -3037,7 +3037,7 @@ monitor_speed = 115200`,
       { title: "Open serial monitoring", detail: "Start PlatformIO Serial Monitor at 115200 baud and press reset once.", expected: "One line appears every 500 ms with temp_c, x_g, y_g, z_g, load_pct, speed_pct, and page.", ifNot: "Select the recorded COM port, close competing terminals, and match baud rate." },
       { title: "Test p19 and p20", detail: "Turn one potentiometer at a time while watching L and S on the LCD and load_pct and speed_pct in serial.", expected: "p19 changes only load and p20 changes only speed through most of 0-100%.", ifNot: "Check AnalogIn assignments and identify knobs by displayed response rather than assumed direction." },
       { title: "Test the accelerometer", detail: "Hold the board by its edges and tilt it gently while watching X, Y, and Z in serial.", expected: "At least one axis changes smoothly and returns near its earlier value when restored.", ifNot: "Confirm testConnection succeeded and inspect the MMA7660 driver before continuing." },
-      { title: "Change LCD pages", detail: "Press and release joystick center p14 once. Repeat while watching the LCD.", expected: "The LCD alternates between the temperature/load page and the X/Y/Z page once per press.", ifNot: "Confirm p14 is active-low with PullUp and wait for release to prevent repeated changes." },
+      { title: "Change LCD pages", detail: "Press and release joystick center p14 once. Repeat while watching the LCD.", expected: "The LCD alternates between the temperature/load page and the X/Y/Z page once per press.", ifNot: "Confirm p14 uses the polarity proven in Chapter 11 and wait for release to prevent repeated changes." },
       { title: "Confirm the RGB heartbeat", detail: "Observe the RGB LED while the dashboard runs normally.", expected: "The LED remains green, showing the update loop reached initialization and is running.", ifNot: "Check common-anode inversion and p23/p24/p25; do not change sensor values to fix an LED mapping problem." },
       { title: "Record the integration result", detail: "Write down one snapshot from serial and compare it with the LCD at the same moment. Repeat after turning each pot and tilting the board.", expected: "The LCD and serial values describe the same inputs within display rounding.", ifNot: "Read each device once into DashboardSnapshot and pass that object to both render functions." },
     ],
@@ -3202,7 +3202,7 @@ monitor_speed = 115200`,
       { title: "Update applyIndicators() to accept acknowledgement", detail: "Change the signature to `void applyIndicators(Severity severity, bool isAcknowledged)` and add the early-return silence check: `if (severity == Severity::Normal || isAcknowledged) { speaker.write(0.0f); return; }` before the existing tone code.", expected: "The speaker now falls silent immediately after an acknowledgement, without the severity itself changing.", ifNot: "Confirm every call site of applyIndicators() was updated to pass the new second argument — the compiler will list each one that was missed." },
       { title: "Update showSnapshot() to a single combined view", detail: "Replace the whole function body with the three-line T/M, L/S, STATE+ACK layout shown in Section 6, and add a second parameter `bool isAcknowledged`. Remove the DashboardSnapshot page member and the page/previousPress globals entirely.", expected: "The LCD now always shows the same layout; there is no longer a second page.", ifNot: "If old page-related code still compiles elsewhere, delete it — it is now dead code and a common source of an unused-variable warning." },
       { title: "Rebuild main() around the flags", detail: "Remove the manual button-polling lines. After captureBaseline(), attach the Ticker with `sampleTicker.attach(&onSampleTick, 500ms);` and the interrupt with `ackButton.fall(&onButtonFall);`. Replace the loop body with the sampleDue/ackRequested/1ms-yield structure shown in Section 6.", expected: "The project builds with SUCCESS and no reference to page, previousPress, or centerButton remains.", ifNot: "Work through the compiler's first undeclared-identifier error; it usually names exactly the leftover variable to delete." },
-      { title: "Flash and confirm the acknowledge flow", detail: "Turn a pot until an alarm is active, then press the center button once.", expected: "The alarm color and text stay active, ACK appears on the LCD, acknowledged=true appears in serial, and the speaker silences immediately.", ifNot: "Confirm ackButton.fall(&onButtonFall) is called after captureBaseline() completes, not skipped, and that PullUp matches active-low wiring." },
+      { title: "Flash and confirm the acknowledge flow", detail: "Turn a pot until an alarm is active, then press the center button once.", expected: "The alarm color and text stay active, ACK appears on the LCD, acknowledged=true appears in serial, and the speaker silences immediately.", ifNot: "Confirm the interrupt edge and pull resistor match the active-high behavior proven in Chapter 11, and that the callback is attached after captureBaseline() completes." },
       { title: "Test debounce with a deliberate double-press", detail: "Press the button twice as quickly as you can, within well under a tenth of a second.", expected: "Exactly one acknowledgement is registered; the serial log does not show acknowledged toggling back and forth.", ifNot: "Increase the Timeout in rearmButton() from 40ms toward 60-80ms if your particular switch is noisier than average." },
       { title: "Test responsiveness while sensors keep running", detail: "While continuously turning a potentiometer, press the acknowledge button mid-turn.", expected: "The press registers on the very next serial line; turning the pot never delays or blocks the button.", ifNot: "Confirm no long call (printf, an LCD write, an I2C read) was accidentally left inside onSampleTick() or onButtonFall()." },
       { title: "Reconcile this lesson with Chapter 22", detail: "Read the checkpoint below and note explicitly that Chapter 22's own main.cpp — which you are not editing — instead polls the button inside a simple 500 ms blocking loop for teaching clarity at a slower pace.", expected: "You can explain, out loud, why a capstone aimed at first-time users might deliberately choose the simpler architecture even though this lesson's is more responsive.", ifNot: "Re-read the overview above; this is a deliberate, documented trade-off, not an inconsistency to fix." },
@@ -3864,7 +3864,7 @@ monitor_speed = 115200`,
         title: "Acknowledge the active alarm",
         detail: "Press the joystick straight down in its center and release it once. Do not push the joystick sideways. Watch both the LCD and serial terminal immediately after the press.",
         expected: "CRITICAL remains active, ACK appears on the LCD, acknowledged=true appears in serial, the red LED stays on, and the speaker becomes silent. This proves acknowledgement is not the same as clearing.",
-        ifNot: "If nothing changes, confirm the center switch is p14 and active-low. If it rapidly changes several times, add a short debounce delay or edge timer. If the state becomes NORMAL, restore the logic that keeps severity independent from acknowledgement.",
+        ifNot: "If nothing changes, confirm the center switch is p14 and follows the active-high behavior proven in Chapter 11. If it rapidly changes several times, add a short debounce delay or edge timer. If the state becomes NORMAL, restore the logic that keeps severity independent from acknowledgement.",
       },
       {
         title: "Clear the alarm correctly",
@@ -4056,7 +4056,7 @@ int main() {
     }
 }`,
     codeWalkthrough: [
-      { title: "Hardware objects", detail: "The declarations at the top connect software names to fixed Application Board pins. For example, simulatedLoad reads p19 and acknowledgeButton reads the active-low center switch on p14." },
+      { title: "Hardware objects", detail: "The declarations at the top connect software names to fixed Application Board pins. For example, simulatedLoad reads p19 and acknowledgeButton reads the center switch on p14; use the active-high behavior proven in Chapter 11." },
       { title: "MachineSnapshot", detail: "This structure keeps one complete set of readings together. Passing one snapshot to the LCD, indicators, and serial logger prevents different outputs from using readings captured at different times." },
       { title: "Common-anode RGB handling", detail: "The board's RGB LED turns a channel brighter when its PWM value is reduced. setRgb() hides that inversion so the rest of the program can use intuitive values such as red=1 and green=0." },
       { title: "Baseline capture", detail: "captureBaseline() averages 32 X/Y/Z samples while the board is still. Averaging reduces random variation. Later readings are subtracted from these three stored reference values." },
@@ -4370,112 +4370,118 @@ if __name__ == "__main__":
     checkpoint: "main.py runs for at least 30 seconds printing a steady stream of ACCEPTED lines that match the LCD and PlatformIO serial monitor, all five pytest cases pass, the gateway keeps working with the network disabled, the disconnect watchdog produces STALE lines instead of hanging, and .env is confirmed absent from any tracked file.",
   },
   "Complete the industrial capstone": {
-    outcome: "Demonstrate and evidence the complete LPC1768-to-gateway-to-IoT-Hub-to-Foundry pipeline end to end, proving what is measured, what is simulated, what is deterministic, and what the language model contributes - and that every layer degrades safely when the next one is unavailable.",
-    hardware: "Both exact boards with the Chapter 22 firmware, the Chapter 23-25 Windows gateway, Azure IoT Hub, and the Azure AI Foundry deployment",
-    estimatedTime: "2-3 hours for a full rehearsed run-through, including deliberate failure tests.",
+    outcome: "Explain, reproduce, and validate the proven multi-control LPC1768-to-Ethernet-gateway-to-IoT-Hub-to-Foundry system, including its deterministic safety boundary, physical-board quirks, incident evidence, and human-in-the-loop recovery model.",
+    hardware: "mbed-005.1 LPC1768 module, MSI-0315B / mbed-014.1 Revision-B Application Board, Ethernet, Windows TypeScript gateway, Azure IoT Hub, Azure AI Foundry, and the React dashboard",
+    estimatedTime: "60-90 minutes to study the architecture and repeat the validated physical scenario.",
     overview: [
-      "This chapter introduces no new source code. It runs the exact system built in Chapters 22-25 through scripted scenarios and requires you to capture evidence for each one.",
-      "A single architecture diagram and a single responsibility table are the deliverables a reviewer should be able to read in under two minutes and use to understand exactly where sensing, validation, transport, routing, and explanation each live.",
-      "The capstone explicitly tests degraded-mode behavior at every boundary: board disconnected, network disabled, and Foundry unreachable. Each failure must be visible and local safety must never depend on a remote layer.",
+      "This chapter records the final system that was built and physically tested, not a proposed architecture. Both potentiometers, the active-high joystick, LM75B temperature, C12832 LCD, Ethernet telemetry, IoT Hub delivery, and strict Foundry output were exercised on the real board.",
+      "The central pattern is IoT-to-LLM decision support: the device senses, the edge decides, IoT delivers, Foundry explains, and the human acts.",
+      "The LPC1768 remains the authoritative safety layer. Foundry is the LLM intelligence and explanation layer; it receives already-classified evidence and cannot override risk or control the board.",
+      "The implementation also captures reusable lessons from legacy embedded hardware: multiplexed ADC settling, fast independent input polling, integer temperature formatting, honest link-status semantics, queued cloud delivery, and explicit separation between live telemetry and the incident snapshot analyzed by the LLM.",
     ],
     prerequisites: [
-      "Chapters 22 through 25 completed with their own acceptance tests passing.",
-      "A way to capture evidence: screenshots, saved console output, or a simple markdown log file.",
-      "Both potentiometers accessible for creating a controlled incident on demand.",
+      "The LPC1768 module is fully seated in the Application Board and can be programmed through the MBED USB drive.",
+      "The PC and Application Board Ethernet connector can reach the same local network.",
+      "The project under projects/lxp-iot-llm has been built and its ignored .env contains the required Azure credentials.",
     ],
     glossary: [
-      { term: "Capstone", meaning: "A final integrating exercise that exercises every earlier chapter together instead of testing any one part in isolation." },
-      { term: "Degraded mode", meaning: "Reduced but still safe and honest behavior when a dependency (network, gateway, or model) is unavailable." },
-      { term: "Evidence log", meaning: "A dated record of what was observed during a test, used to prove a scenario actually ran rather than merely being described." },
+      { term: "IoT-to-LLM decision support", meaning: "A pattern in which physical telemetry and deterministic decisions are delivered through IoT services and transformed into human guidance by an LLM." },
+      { term: "Headroom", meaning: "Cooling capacity minus equipment load. A negative result is a cooling deficit." },
+      { term: "Incident snapshot", meaning: "The exact state, load, cooling, mode, trends, and deficit evidence captured when a transition requested an explanation." },
+      { term: "Intelligence layer", meaning: "Foundry's advisory role: correlate supplied evidence, explain it, recommend human action, and state limitations without controlling equipment." },
     ],
     projectFiles: [
-      { path: "capstone/architecture.md", purpose: "One-page diagram and responsibility table covering LPC1768, gateway, IoT Hub, and Foundry." },
-      { path: "capstone/evidence-log.md", purpose: "Dated records of every scenario run, its screenshots or console captures, and pass/fail." },
+      { path: "projects/lxp-iot-llm/src/main.cpp", purpose: "Physical inputs, active-high joystick polling, ADC stabilization, deterministic risk, LM75B reading, C12832 display, and Ethernet JSON telemetry." },
+      { path: "projects/lxp-iot-llm/gateway/server.ts", purpose: "Telemetry validation, evidence derivation, serialized IoT Hub delivery, strict Foundry contract, simulator, HTTP endpoint, and live state." },
+      { path: "projects/lxp-iot-llm/dashboard/src/App.tsx", purpose: "The physical-signal, deterministic-decision, IoT-delivery, Foundry-explanation, and human-action story." },
     ],
     concepts: [
-      "The LPC1768 alone owns sensing, thresholds, local status, alarms, and operator acknowledgement; it works with every downstream layer disconnected.",
-      "The gateway alone owns validation, credential handling, and forwarding; it keeps logging locally with the network disabled and never crashes when Azure or Foundry is unreachable.",
-      "IoT Hub alone owns device identity, ingestion, and routing; it never decides what counts as an alarm.",
-      "Azure AI Foundry alone owns advisory explanation of already-decided, already-transmitted facts; it never controls the simulator and its absence never blocks local operation.",
-      "A reviewer should be able to point at any single behavior in the demo and name exactly one layer responsible for it.",
+      "The LPC1768 reads equipment load, cooling capacity, temperature, and operating mode, then assigns the authoritative NORMAL, WARNING, or CRITICAL state locally.",
+      "The deterministic contract is headroom = cooling - load; CRITICAL requires load of at least 85% with negative headroom; WARNING requires load of at least 70% or negative headroom.",
+      "The gateway validates every message, derives trends and deficit evidence, queues transition sends so incidents are not skipped, and requests Foundry only after IoT Hub accepts the incident snapshot.",
+      "Foundry uses strict JSON-schema output to return an assessment, contributing factors, recommended action, expected recovery, and limitation. Prompt instructions alone were not reliable enough.",
+      "The dashboard labels current telemetry separately from the analyzed incident snapshot, because live values may change while a transition-driven Foundry request is in progress.",
+      "The complete responsibility chain is: device senses, edge decides, IoT delivers, Foundry explains, human acts.",
     ],
     steps: [
       {
-        title: "Build the architecture diagram and responsibility table",
-        detail: "Create capstone/architecture.md with four boxes - LPC1768, Windows Gateway, Azure IoT Hub, Azure AI Foundry - and a table with columns Layer, Owns, Never does. Fill every cell before running any scenario.",
-        expected: "Each Never does cell contains a concrete boundary, for example Foundry: Never does - change alarm state, send commands, control hardware.",
-        ifNot: "If a cell is vague ('be careful'), rewrite it as a testable statement you can actually verify in the next steps.",
+        title: "Trace the proven responsibility boundary",
+        detail: "Follow one reading from the physical controls through main.cpp, the gateway, IoT Hub, Foundry, and the dashboard. For each layer, identify what it owns and what it is forbidden to decide.",
+        expected: "You can state that the LPC1768 owns risk, the gateway owns validation and evidence, IoT Hub owns delivery, Foundry owns explanation, and the human owns action.",
+        ifNot: "Re-read the core concepts until no cloud or LLM layer is described as changing the firmware's risk state.",
       },
       {
-        title: "Run the normal scenario",
-        detail: "Power the board, run the gateway from Chapter 24, leave both pots low, and let the system run for two minutes untouched.",
-        expected: "LCD and RGB show NORMAL throughout, the IoT Hub metric from Chapter 24 rises steadily, and no incident-events route matches occur.",
-        ifNot: "Fix whichever earlier chapter's acceptance test is failing before continuing; the capstone assumes Chapters 22-24 already pass independently.",
+        title: "Verify responsive physical input handling",
+        detail: "Inspect the joystick and ADC code. Confirm the joystick uses PullDown, treats 1 as pressed, and is sampled every 20 ms. Confirm each analog channel discards a settling conversion, waits 100 microseconds, averages 16 samples, and applies a one-point deadband.",
+        expected: "Short joystick presses latch NORMAL, BOOST, or MAINTENANCE, and touching one potentiometer no longer causes both displayed percentages to wander.",
+        ifNot: "Do not compensate in the dashboard. Fix polarity, polling, settling, or filtering at the firmware input boundary.",
       },
       {
-        title: "Run the incident scenario end to end",
-        detail: "Turn p19 above 85% to force CRITICAL, watch the LCD/LED/speaker respond locally first, then check the IoT Hub metric, then call explain_incident() from Chapter 25 with the resulting context and display its five sections.",
-        expected: "Local outputs change within one 500 ms cycle, the IoT Hub side reflects the same event within a few seconds, and the explanation's facts section exactly matches the values you observed locally.",
-        ifNot: "If the explanation's facts do not match what the LCD showed, the context builder in Chapter 25 is stale or mismatched; rebuild it from the exact accepted record, not a remembered value.",
+        title: "Establish the validated normal baseline",
+        detail: "Set equipment load near 64% and cooling near 77%. Observe the physical controls, LCD, deterministic state, dashboard, and IoT link separately.",
+        expected: "Headroom is +13 and the authoritative state is NORMAL. Foundry may describe positive capacity and no deficit, but it does not calculate or own that state.",
+        ifNot: "Verify p19 is load, p20 is cooling, both ADC values are stable, and firmware and gateway use the same headroom formula.",
       },
       {
-        title: "Acknowledge and clear the incident",
-        detail: "Press the joystick center to acknowledge as in Chapter 22, then lower p19 below the clearing threshold.",
-        expected: "Acknowledgement and clearing behave exactly as documented in Chapter 22, and the same transitions are visible in the gateway console and the IoT Hub metric.",
-        ifNot: "Re-run Chapter 22's acknowledgement test cases in isolation if behavior differs; the capstone should not be the first place this is debugged.",
+        title: "Cross the deterministic warning threshold",
+        detail: "Raise load to about 71% while cooling is about 73%. Watch the edge state change first, then IoT Hub delivery, then the later Foundry explanation.",
+        expected: "The edge declares WARNING with +2 headroom because load crossed 70%. The Foundry panel later explains the captured warning snapshot rather than reclassifying it.",
+        ifNot: "If the system remains NORMAL, compare firmware and gateway thresholds. If Foundry appears to describe newer gauges, verify the analyzed-snapshot banner is visible.",
       },
       {
-        title: "Test board disconnection",
-        detail: "Unplug the LPC1768 USB cable while the gateway keeps running.",
-        expected: "The gateway logs STALE messages from Chapter 23 instead of crashing or printing fabricated telemetry.",
-        ifNot: "If the gateway prints a made-up reading instead of STALE, remove any code path that substitutes a default value when the serial read times out.",
+        title: "Grow the cooling deficit",
+        detail: "Continue raising load to about 84% while cooling remains near 73%. Correlate the two physical values with headroom, trends, and deficit duration.",
+        expected: "The dashboard shows an 11-point deficit and remains WARNING because load is below the 85% critical threshold.",
+        ifNot: "Recalculate 73 minus 84. A negative value must be displayed as an 11-point deficit, not positive headroom.",
       },
       {
-        title: "Test network and Foundry disconnection",
-        detail: "Reconnect the board, then disable the gateway PC's Wi-Fi/Ethernet, force another CRITICAL event, and attempt to call explain_incident().",
-        expected: "Local alarm behavior on the LPC1768 is completely unaffected; the gateway logs SEND FAILED from Chapter 24 instead of crashing; the explanation call fails fast with an explicit unavailable result instead of hanging or inventing text.",
-        ifNot: "Trace whichever layer failed silently or hung, add explicit error handling there, and repeat this step before signing off the capstone.",
+        title: "Trigger and explain the critical incident",
+        detail: "Raise load to about 90% while cooling remains near 73%. Observe the local CRITICAL state and 17-point deficit before waiting for IoT Hub acceptance and the Foundry update.",
+        expected: "The LPC1768 declares CRITICAL immediately. IoT Hub receives the exact transition, then Foundry identifies sustained insufficient cooling and recommends BOOST or reducing nonessential load.",
+        ifNot: "If the transition is skipped, verify cloud sends are serialized. If Foundry runs after a failed IoT send, restore the successful-delivery gate.",
       },
       {
-        title: "Complete a secret hygiene audit",
-        detail: "Reconnect the network. Review every file intended to be shared (architecture.md, evidence-log.md, screenshots) and confirm none contain the IoT Hub connection string or the Foundry API key.",
-        expected: "A text search for AZURE_IOT_CONNECTION_STRING, FOUNDRY_API_KEY, and any copied key value returns no matches outside .env.",
-        ifNot: "Redact or regenerate any exposed credential immediately in the Azure portal before sharing anything.",
+        title: "Prove partial and full recovery",
+        detail: "Select BOOST, raise cooling to about 92%, then lower load. Compare the 90/92 partial-recovery state with the 62/92 full-recovery state.",
+        expected: "At 90/92 the +2 headroom is still WARNING because load remains above 70%. At 62/92 the +30 headroom returns the deterministic state to NORMAL.",
+        ifNot: "Do not equate positive headroom with full recovery. Both headroom and the independent load threshold must satisfy the deterministic contract.",
       },
       {
-        title: "Sign off with the reviewer checklist",
-        detail: "Complete capstone/evidence-log.md with every scenario's result, then read it end to end as if you were a reviewer who did not build the system.",
-        expected: "A reviewer can state, using only your evidence log, what is measured, what is simulated, what is deterministic, and what the language model contributed, with no unresolved failing row.",
-        ifNot: "Do not mark the capstone complete with an open failing row; fix the underlying chapter, rerun only the affected scenario, and update the log.",
+        title: "Explain status and failure semantics honestly",
+        detail: "Disconnect the physical board and compare LCD, board, IoT Hub, Foundry, and simulator indicators. Explain what each status proves and what it does not prove.",
+        expected: "TX:OK means only that HTTP reached the Windows gateway. After eight seconds the physical source becomes offline and any resumed simulator is clearly labelled and not presented as board telemetry.",
+        ifNot: "Remove success-shaped fallbacks. Every unavailable sensor, link, or cloud stage must be shown explicitly rather than replaced by fabricated physical evidence.",
       },
     ],
     expectedResults: [
-      "The architecture.md responsibility table names exactly one owning layer for every behavior demonstrated.",
-      "The normal scenario shows stable local NORMAL state and a steadily rising IoT Hub metric with no incident-events matches.",
-      "The incident scenario shows local response first, cloud ingestion within seconds, and a grounded explanation whose facts match what was observed locally.",
-      "Board disconnection produces STALE gateway logs, never fabricated telemetry.",
-      "Network/Foundry disconnection leaves local LPC1768 behavior completely unaffected while the gateway logs explicit failures instead of crashing or hanging.",
-      "The secret hygiene audit finds zero credential exposure in any shared artifact.",
+      "Both potentiometers move independently after ADC settling, averaging, and deadband are applied.",
+      "Active-high joystick presses are captured reliably and the selected mode remains latched.",
+      "The LM75B reports plausible ambient temperature or an explicit unavailable value; firmware never fabricates temperature.",
+      "The C12832 alternates local context pages, overrides them for WARNING, and blinks for CRITICAL.",
+      "The physical sequence produces NORMAL at 64/77, WARNING at 71/73, an 11-point deficit at 84/73, and CRITICAL at 90/73.",
+      "Every Foundry explanation is attached to its analyzed incident snapshot and follows successful IoT Hub acceptance.",
+      "BOOST, partial recovery at 90/92, full recovery at 62/92, and return to NORMAL mode all remain explainable from deterministic rules.",
     ],
     testCases: [
-      { action: "Run the normal scenario for two minutes.", expected: "NORMAL locally throughout; steady IoT Hub metric; no incident route matches." },
-      { action: "Force CRITICAL with p19 and request an explanation.", expected: "Local response first, cloud event within seconds, explanation facts match observed values." },
-      { action: "Acknowledge, then clear the incident.", expected: "Behavior matches Chapter 22 exactly, visible in gateway console and IoT Hub metric." },
-      { action: "Unplug the LPC1768 USB cable for 10 seconds.", expected: "Gateway logs STALE; no fabricated telemetry; resumes automatically on reconnect." },
-      { action: "Disable the network and force another CRITICAL event.", expected: "Local LCD/LED/speaker unaffected; gateway logs SEND FAILED; explanation call fails fast." },
-      { action: "Search all shared files and screenshots for AZURE_IOT_CONNECTION_STRING and FOUNDRY_API_KEY.", expected: "No matches outside the untracked .env file." },
-      { action: "Read evidence-log.md end to end as an outside reviewer.", expected: "Every scenario has a pass result and no ambiguous or unresolved row remains." },
+      { action: "Set load to 64% and cooling to 77%.", expected: "NORMAL with +13 headroom." },
+      { action: "Set load to 71% and cooling to 73%.", expected: "WARNING with +2 headroom because the load threshold was crossed." },
+      { action: "Set load to 84% and cooling to 73%.", expected: "WARNING with an 11-point deficit." },
+      { action: "Set load to 90% and cooling to 73%.", expected: "CRITICAL with a 17-point deficit; IoT delivery precedes Foundry analysis." },
+      { action: "Select BOOST and set load to 90%, cooling to 92%.", expected: "WARNING with +2 headroom because load remains above 70%." },
+      { action: "Set load to 62% and cooling to 92%.", expected: "NORMAL with +30 headroom and measurable recovery." },
+      { action: "Disconnect the board for more than eight seconds.", expected: "Physical board becomes offline; simulator, if enabled, is clearly labelled." },
     ],
     troubleshooting: [
-      { symptom: "The incident scenario's explanation facts don't match the LCD.", action: "Rebuild incident_context.py's input from the exact ACCEPTED record captured at the same moment, not from memory or an earlier test run." },
-      { symptom: "Local alarms pause or flicker when the network is disabled.", action: "This is a regression from Chapter 22; local classify() and outputs must never read gateway or Azure state, directly or indirectly." },
-      { symptom: "A credential appears in a screenshot.", action: "Regenerate that credential immediately in the Azure portal, then redo the capture with the relevant panel cropped out or the value manually blacked out before saving." },
-      { symptom: "evidence-log.md has a scenario marked pass without an attached screenshot or console capture.", action: "Treat unverifiable rows as failing; rerun the scenario and attach real evidence before marking it pass." },
-      { symptom: "The IoT Hub Free tier daily message quota is exceeded during rehearsal.", action: "Keep each test run short (a few minutes), or temporarily use a Basic tier hub for extended rehearsal, then confirm the final graded run stays within quota." },
-      { symptom: "A reviewer cannot tell which values are measured versus simulated from the evidence log alone.", action: "Add the word measured or simulated next to every numeric value in architecture.md and evidence-log.md; do not rely on the reviewer already knowing." },
+      { symptom: "Short joystick presses do not change mode.", action: "Use active-high inputs with PullDown and pressed state 1, and keep the dedicated 20 ms polling thread independent of network operations." },
+      { symptom: "Both analog values move when one knob is touched.", action: "Discard the first ADC conversion after channel selection, wait 100 microseconds, average 16 readings, and apply the one-point deadband." },
+      { symptom: "Telemetry contains the literal text %.1f or malformed JSON.", action: "Do not depend on floating-point printf in this legacy build. Format temperature using deterministic integer tenths." },
+      { symptom: "Foundry returns text that the gateway rejects.", action: "Use the Azure response_format json_schema contract and validate all five required fields." },
+      { symptom: "A newer live state appears beside an older explanation.", action: "Show the analyzed incident timestamp, state, load, cooling, and headroom, plus a pending banner for the newer transition." },
+      { symptom: "A transition is missing from IoT Hub.", action: "Serialize IoT sends rather than dropping new incidents while another send is in progress." },
+      { symptom: "The dashboard remains online after the board is unplugged.", action: "This is expected because the PC hosts it. Confirm the source changes from PHYSICAL BOARD to the clearly labelled SIMULATOR state." },
     ],
-    safetyNote: "This capstone remains an educational simulator end to end. No step in any chapter allows the Windows gateway, Azure IoT Hub, or Azure AI Foundry to start, stop, reset, or declare the simulated machine safe. The LPC1768 firmware from Chapter 22 is the sole and final authority over the local alarm state in every scenario, including every degraded-mode test in this chapter.",
-    checkpoint: "All eight steps are complete with recorded evidence, both disconnection tests show correct degraded-mode behavior at every layer, the secret hygiene audit finds zero exposed credentials, and an outside reviewer confirms from evidence-log.md alone what is measured, simulated, deterministic, and AI-generated in this project.",
+    safetyNote: "This remains an educational equipment-monitoring prototype. The LPC1768 is the sole authority for NORMAL, WARNING, and CRITICAL. The gateway, Azure IoT Hub, dashboard, and Azure AI Foundry cannot start, stop, reset, or control equipment. Foundry recommends human-reviewed action from supplied evidence and explicitly states its limitations.",
+    checkpoint: "You can reproduce the validated NORMAL-to-WARNING-to-CRITICAL-to-recovery sequence; explain active-high joystick polling, ADC stabilization, integer temperature formatting, serialized IoT delivery, and strict Foundry output; and defend the boundary that the edge decides, IoT delivers, Foundry explains, and the human acts.",
   },
 };
 
@@ -4674,14 +4680,14 @@ const lessonLinks: Record<string, { label: string; url: string }[]> = {
     { label: "Read Azure IoT security architecture", url: "https://learn.microsoft.com/en-us/azure/iot/iot-security-architecture" },
   ],
   "Complete the industrial capstone": [
-    { label: "Open the verified project plan", url: "/documentation/VERIFIED-RESOURCES.md" },
-    { label: "Open Azure IoT Hub documentation", url: "https://learn.microsoft.com/en-us/azure/iot-hub/" },
-    { label: "Open Azure AI Foundry documentation", url: "https://learn.microsoft.com/en-us/azure/ai-foundry/what-is-azure-ai-foundry" },
-    { label: "Review Chapter 22's acceptance tests", url: "/documentation/VERIFIED-RESOURCES.md" },
-    { label: "Open IoT Hub monitoring guide", url: "https://learn.microsoft.com/en-us/azure/iot-hub/monitor-iot-hub" },
-    { label: "Review pySerial disconnect handling", url: "https://pyserial.readthedocs.io/en/latest/" },
-    { label: "Open the exact Revision-B schematic", url: "/documentation/exact-hardware/mbed-014.1-rev-b-application-board-schematic.pdf" },
-    { label: "Open the complete acceptance plan", url: "/documentation/VERIFIED-RESOURCES.md" },
+    { label: "Open the physical firmware", url: "https://github.com/kaul-vineet/lpc1768-learning-guide/blob/main/projects/lxp-iot-llm/src/main.cpp" },
+    { label: "Open the physical firmware input handling", url: "https://github.com/kaul-vineet/lpc1768-learning-guide/blob/main/projects/lxp-iot-llm/src/main.cpp" },
+    { label: "Open the complete IoT-to-LLM project", url: "https://github.com/kaul-vineet/lpc1768-learning-guide/tree/main/projects/lxp-iot-llm" },
+    { label: "Open the deterministic firmware rules", url: "https://github.com/kaul-vineet/lpc1768-learning-guide/blob/main/projects/lxp-iot-llm/src/main.cpp" },
+    { label: "Open the gateway evidence model", url: "https://github.com/kaul-vineet/lpc1768-learning-guide/blob/main/projects/lxp-iot-llm/gateway/server.ts" },
+    { label: "Open the IoT and Foundry pipeline", url: "https://github.com/kaul-vineet/lpc1768-learning-guide/blob/main/projects/lxp-iot-llm/gateway/server.ts" },
+    { label: "Open the recovery implementation", url: "https://github.com/kaul-vineet/lpc1768-learning-guide/tree/main/projects/lxp-iot-llm" },
+    { label: "Open the live-story dashboard", url: "https://github.com/kaul-vineet/lpc1768-learning-guide/blob/main/projects/lxp-iot-llm/dashboard/src/App.tsx" },
   ],
   "Know your two boards": [
     { label: "Open LPC1768 module schematic", url: "/documentation/exact-hardware/mbed-005.1-lpc1768-module-schematic.pdf" },
