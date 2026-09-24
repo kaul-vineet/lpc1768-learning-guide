@@ -165,6 +165,7 @@ function broadcast(): void {
 }
 
 function determineState(loadPercent: number, coolingPercent: number): MachineState {
+  // VK: Keep this identical to the firmware rule so corrupted or inconsistent telemetry is rejected.
   if (loadPercent >= 85 && coolingPercent < loadPercent) {
     return "critical";
   }
@@ -226,6 +227,7 @@ function validateTelemetry(input: unknown, source: IncomingTelemetry["source"]):
   }
 
   const deterministicState = determineState(loadPercent, coolingPercent);
+  // VK: The gateway validates the device decision; it never quietly replaces it with a cloud decision.
   if (state !== deterministicState) {
     throw new Error(`State ${state} disagrees with deterministic risk ${deterministicState}`);
   }
@@ -335,6 +337,7 @@ async function sendToIoTHub(telemetry: Telemetry): Promise<void> {
 }
 
 function enqueueIoTHubSend(telemetry: Telemetry): Promise<boolean> {
+  // VK: Queue sends so a WARNING or CRITICAL transition cannot disappear behind an in-flight heartbeat.
   const send = cloudSendQueue.then(async () => {
     try {
       await sendToIoTHub(telemetry);
@@ -367,6 +370,7 @@ function trend(current: number, previous: number | undefined, deadband: number):
 }
 
 function analyzeTelemetry(input: IncomingTelemetry): Telemetry {
+  // VK: These are transparent calculations over device facts, not a second risk classifier.
   const comparablePrevious =
     previousTelemetry?.source === input.source ? previousTelemetry : null;
   if (!comparablePrevious) {
@@ -451,6 +455,7 @@ async function explainIncident(telemetry: Telemetry): Promise<IncidentExplanatio
         "content-type": "application/json"
       },
       body: JSON.stringify({
+        // VK: Foundry receives a closed evidence set and an authoritative risk; it is an explanation layer only.
         messages: [
           {
             role: "system",
@@ -551,6 +556,7 @@ async function processTelemetry(input: IncomingTelemetry): Promise<void> {
     previousTelemetry !== null && telemetry.source !== previousTelemetry.source;
   const stateChanged = !sourceChanged && telemetry.state !== previousState;
   const modeChanged = !sourceChanged && telemetry.mode !== previousMode;
+  // VK: Ask the LLM about meaningful transitions, not every small movement of a physical knob.
   const explanationRequested = stateChanged || (modeChanged && telemetry.state !== "normal");
   let incident: Incident | undefined;
   if (explanationRequested) {
@@ -591,6 +597,7 @@ async function processTelemetry(input: IncomingTelemetry): Promise<void> {
   }
 
   if (cloudAllowed && incident && deliveredToIoTHub) {
+    // VK: Preserve the demo's causal order: IoT delivers the incident before Foundry explains it.
     try {
       log(`Requesting Foundry explanation for ${incident.event}`);
       incident.explanation = await explainIncident(telemetry);

@@ -89,6 +89,7 @@ void selectMaintenanceMode()
 
 void joystickTask()
 {
+    // VK: The network call can take seconds, so joystick presses are captured in a small independent loop.
     bool previousDownPressed = false;
     bool previousCenterPressed = false;
     bool previousUpPressed = false;
@@ -150,6 +151,7 @@ void formatTemperature(
     size_t outputSize,
     float temperatureC)
 {
+    // VK: This toolchain did not print floats reliably, so temperature is formatted as integer tenths.
     const int tenths = static_cast<int>(
         temperatureC * 10.0f + (temperatureC >= 0.0f ? 0.5f : -0.5f));
     const unsigned magnitude =
@@ -168,6 +170,7 @@ unsigned readStablePercent(
     unsigned previousPercent,
     bool initialized)
 {
+    // VK: Discard the first conversion after changing ADC channels, then average out the remaining noise.
     input.read_u16();
     wait_us(100);
 
@@ -213,6 +216,7 @@ void drawDisplay(const DisplaySnapshot &snapshot)
     lcd.display(criticalBlink ? INVERT : DEFAULT);
     lcd.fillrect(0, 0, 127, 31, WHITE);
 
+    // VK: Local alarms take over the screen; cloud explanations intentionally stay on the browser.
     if (snapshot.state != RiskState::Normal) {
         lcd.locate(0, 0);
         lcd.printf(
@@ -375,6 +379,7 @@ int main()
 
         mode = selectedMode.load(std::memory_order_relaxed);
 
+        // VK: Risk is decided here on the device. Azure and the LLM can explain it, but cannot change it.
         RiskState state = RiskState::Normal;
         if (loadPercent >= 85 && coolingPercent < loadPercent) {
             state = RiskState::Critical;
@@ -453,6 +458,7 @@ int main()
                 socket.open(&network) == NSAPI_ERROR_OK &&
                 socket.connect(gateway) == NSAPI_ERROR_OK &&
                 sendAll(socket, request, static_cast<size_t>(requestLength));
+            // VK: TX success only confirms delivery to the Windows gateway, not IoT Hub or Foundry.
             socket.close();
             if (gatewayDelivered) {
                 statusLed = !statusLed;

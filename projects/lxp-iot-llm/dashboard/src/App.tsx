@@ -186,6 +186,7 @@ export function App() {
 
   const telemetry = state.telemetry;
   const analysis = telemetry.analysis;
+  // VK: Live gauges and the LLM snapshot may represent different moments, so keep both contexts explicit.
   const latestIncident = state.incidents[0];
   const latestExplainedIncident = state.incidents.find((incident) => incident.explanation);
   const explanation = latestExplainedIncident?.explanation;
@@ -200,6 +201,7 @@ export function App() {
         ? `${Math.abs(analysis.headroom)} POINT DEFICIT`
         : "BALANCED";
 
+  // VK: The screen follows the same story as the architecture: observe, decide, deliver, explain, act.
   return (
     <main className={`demo-console state-${telemetry.state}`}>
       <header className="demo-header">
