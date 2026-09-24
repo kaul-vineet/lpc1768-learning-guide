@@ -15,6 +15,7 @@ import { ReadlineParser } from "@serialport/parser-readline";
 const { Client, Message } = azureIotDevice;
 const { Mqtt } = azureIotMqtt;
 
+// VK: These shared types keep physical telemetry, cloud messages, and dashboard rendering on one vocabulary.
 type MachineState = "normal" | "warning" | "critical";
 type LinkState = "ready" | "offline" | "error";
 type OperatingMode = "normal" | "boost" | "maintenance";
@@ -22,6 +23,7 @@ type Trend = "rising" | "falling" | "stable" | "unknown";
 type Pattern = "balanced" | "transient-deficit" | "sustained-deficit";
 
 interface IncomingTelemetry {
+  // VK: Incoming telemetry contains device facts and the device's authoritative deterministic state.
   deviceId: string;
   loadPercent: number;
   coolingPercent: number;
@@ -35,6 +37,7 @@ interface IncomingTelemetry {
 }
 
 interface Analysis {
+  // VK: Analysis is gateway-derived evidence; risk is copied from the validated device decision.
   headroom: number;
   loadTrend: Trend;
   coolingTrend: Trend;
@@ -49,6 +52,7 @@ interface Telemetry extends IncomingTelemetry {
 }
 
 interface Incident {
+  // VK: An incident freezes the values that triggered Foundry so later live readings cannot rewrite history.
   id: string;
   timestamp: string;
   event: "state-change" | "mode-change";
@@ -62,6 +66,7 @@ interface Incident {
 }
 
 interface IncidentExplanation {
+  // VK: The five fields form the strict human-facing contract expected from Foundry.
   assessment: string;
   contributingFactors: string[];
   recommendedAction: string;
@@ -71,6 +76,7 @@ interface IncidentExplanation {
 }
 
 interface DashboardState {
+  // VK: One state object is broadcast to every browser so cards cannot drift out of sync.
   telemetry: Telemetry;
   history: Telemetry[];
   incidents: Incident[];
@@ -87,6 +93,7 @@ interface DashboardState {
   };
 }
 
+// VK: Environment variables keep deployment choices and secrets outside the submitted source.
 const port = Number(process.env.PORT ?? 8080);
 const cloudIntervalMs = Number(process.env.CLOUD_INTERVAL_MS ?? 30_000);
 const simulatorEnabled = process.env.ENABLE_SIMULATOR !== "false";
@@ -98,6 +105,7 @@ const deviceTransport = process.env.DEVICE_TRANSPORT ?? "ethernet";
 const udpPort = Number(process.env.UDP_PORT ?? 41234);
 const promptVersion = "edgeops-multicontrol-v1";
 
+// VK: The initial simulator-shaped value lets the UI render honestly before the first physical message arrives.
 const initialTelemetry: Telemetry = {
   deviceId: boardDeviceId,
   loadPercent: 0,
@@ -120,6 +128,7 @@ const initialTelemetry: Telemetry = {
   }
 };
 
+// VK: This in-memory dashboard is intentionally lightweight; the prototype does not claim durable storage.
 const dashboard: DashboardState = {
   telemetry: initialTelemetry,
   history: [initialTelemetry],
@@ -137,6 +146,7 @@ const dashboard: DashboardState = {
   }
 };
 
+// VK: SSE clients receive the same authoritative snapshot whenever any layer changes.
 const clients = new Set<Response>();
 let previousState: MachineState = "normal";
 let lastCloudSend = 0;
@@ -151,6 +161,7 @@ let previousMode: OperatingMode = "normal";
 let deficitStartedAt: number | null = null;
 
 function log(message: string): void {
+  // VK: Keep a short operator-friendly history while still writing the complete event to the console.
   const entry = `${new Date().toLocaleTimeString("en-GB", { hour12: false })}  ${message}`;
   dashboard.logs.unshift(entry);
   dashboard.logs = dashboard.logs.slice(0, 12);
@@ -158,6 +169,7 @@ function log(message: string): void {
 }
 
 function broadcast(): void {
+  // VK: Server-sent events are sufficient because this dashboard only needs one-way live updates.
   const payload = `data: ${JSON.stringify(dashboard)}\n\n`;
   for (const client of clients) {
     client.write(payload);
@@ -176,6 +188,7 @@ function determineState(loadPercent: number, coolingPercent: number): MachineSta
 }
 
 function validateTelemetry(input: unknown, source: IncomingTelemetry["source"]): IncomingTelemetry {
+  // VK: Treat every transport as untrusted input, including messages that originated from our own simulator.
   if (!input || typeof input !== "object") {
     throw new Error("Telemetry must be a JSON object");
   }
@@ -210,6 +223,7 @@ function validateTelemetry(input: unknown, source: IncomingTelemetry["source"]):
 
   let temperatureC: number | null = null;
   if (temperatureValid) {
+    // VK: Validity and value must agree; silently substituting a temperature would create false evidence.
     if (typeof candidate.temperatureC !== "number") {
       throw new Error("temperatureC must be numeric when valid");
     }
@@ -247,6 +261,7 @@ function validateTelemetry(input: unknown, source: IncomingTelemetry["source"]):
 }
 
 function runValidationSelfCheck(): void {
+  // VK: Fail at startup if a future edit weakens the telemetry contract or deterministic-state check.
   validateTelemetry(
     {
       deviceId: "self-test",
@@ -299,6 +314,7 @@ function runValidationSelfCheck(): void {
 }
 
 async function openIoTHub(): Promise<void> {
+  // VK: Azure credentials remain on the gateway PC and are never compiled into LPC1768 firmware.
   const connectionString = process.env.IOT_HUB_DEVICE_CONNECTION_STRING;
   if (!connectionString) {
     log("IoT Hub connection string is not configured");
@@ -320,6 +336,7 @@ async function sendToIoTHub(telemetry: Telemetry): Promise<void> {
   }
 
   const message = new Message(JSON.stringify(telemetry));
+  // VK: Message properties make state, mode, and source available for routing without parsing the JSON body.
   message.contentType = "application/json";
   message.contentEncoding = "utf-8";
   message.properties.add("state", telemetry.state);
@@ -356,6 +373,7 @@ function enqueueIoTHubSend(telemetry: Telemetry): Promise<boolean> {
 }
 
 function trend(current: number, previous: number | undefined, deadband: number): Trend {
+  // VK: A deadband prevents one-point measurement noise from being narrated as a meaningful trend.
   if (previous === undefined) {
     return "unknown";
   }
@@ -411,6 +429,7 @@ function analyzeTelemetry(input: IncomingTelemetry): Telemetry {
 }
 
 function normalizeExplanation(raw: string): IncidentExplanation {
+  // VK: Validate the model output again locally even though Azure is asked for strict structured JSON.
   const cleaned = raw.replace(/^```json\s*/i, "").replace(/\s*```$/i, "").trim();
   const parsed = JSON.parse(cleaned) as Record<string, unknown>;
   const contributingFactors = parsed.contributingFactors;
@@ -437,6 +456,7 @@ function normalizeExplanation(raw: string): IncidentExplanation {
 }
 
 async function explainIncident(telemetry: Telemetry): Promise<IncidentExplanation> {
+  // VK: Foundry configuration is mandatory for explanation, but never for local sensing or risk decisions.
   const endpoint = process.env.FOUNDRY_ENDPOINT;
   const deployment = process.env.FOUNDRY_DEPLOYMENT;
   const apiVersion = process.env.FOUNDRY_API_VERSION ?? "2024-10-21";
@@ -495,6 +515,7 @@ async function explainIncident(telemetry: Telemetry): Promise<IncidentExplanatio
           }
         ],
         response_format: {
+          // VK: Strict schema output avoids fragile parsing and prevents missing safety or limitation fields.
           type: "json_schema",
           json_schema: {
             name: "edgeops_incident_assessment",
@@ -547,6 +568,7 @@ async function explainIncident(telemetry: Telemetry): Promise<IncidentExplanatio
 }
 
 async function processTelemetry(input: IncomingTelemetry): Promise<void> {
+  // VK: Update the live dashboard first; cloud work is slower and must not delay local visibility.
   const telemetry = analyzeTelemetry(input);
   dashboard.telemetry = telemetry;
   dashboard.history.push(telemetry);
@@ -560,6 +582,7 @@ async function processTelemetry(input: IncomingTelemetry): Promise<void> {
   const explanationRequested = stateChanged || (modeChanged && telemetry.state !== "normal");
   let incident: Incident | undefined;
   if (explanationRequested) {
+    // VK: Capture the transition values now because the next physical sample may arrive before Foundry responds.
     incident = {
       id: `${telemetry.sequence}-${Date.now()}`,
       timestamp: telemetry.timestamp,
@@ -586,8 +609,10 @@ async function processTelemetry(input: IncomingTelemetry): Promise<void> {
   previousMode = telemetry.mode;
   previousTelemetry = telemetry;
 
+  // VK: Browsers can immediately see the edge transition while IoT Hub and Foundry continue asynchronously.
   broadcast();
 
+  // VK: Physical messages may use cloud services; simulator traffic remains local unless explicitly enabled.
   const cloudAllowed = telemetry.source === "board" || simulatorCloudEnabled;
   const cloudDue = Date.now() - lastCloudSend >= cloudIntervalMs;
   let deliveredToIoTHub = false;
@@ -614,6 +639,7 @@ async function processTelemetry(input: IncomingTelemetry): Promise<void> {
 }
 
 async function chooseSerialPort(): Promise<string | null> {
+  // VK: Serial remains a supported fallback even though Ethernet HTTP is the validated physical path.
   if (serialPreference !== "auto") {
     return serialPreference;
   }
@@ -629,6 +655,7 @@ async function chooseSerialPort(): Promise<string | null> {
 }
 
 async function startSerial(): Promise<boolean> {
+  // VK: This adapter validates serial JSON through the same contract used by Ethernet and UDP.
   const serialPath = await chooseSerialPort();
   if (!serialPath) {
     log("No compatible COM port detected");
@@ -679,6 +706,7 @@ async function startSerial(): Promise<boolean> {
 }
 
 function startUdp(): void {
+  // VK: UDP support is retained for experiments; the submitted firmware currently posts HTTP telemetry.
   activeUdpSocket = createSocket("udp4");
   activeUdpSocket.on("error", (error) => {
     dashboard.links.board = "error";
@@ -711,12 +739,14 @@ function startUdp(): void {
 }
 
 function startSimulator(): void {
+  // VK: The simulator keeps the UI demonstrable, but its source label prevents it being mistaken for hardware.
   log("Simulator active while waiting for the physical board");
   if (!simulatorCloudEnabled) {
     log("Simulator cloud traffic is disabled to protect the daily quota");
   }
   let sequence = 1;
   setInterval(() => {
+    // VK: Physical telemetry always wins; simulation resumes only after an eight-second silence.
     if (Date.now() - lastBoardReceivedAt <= 8_000) {
       return;
     }
@@ -776,6 +806,7 @@ function startSimulator(): void {
 
 const app = express();
 app.disable("x-powered-by");
+// VK: Board messages are intentionally small, so a 1 KB limit rejects accidental or abusive payloads early.
 app.use(express.json({ limit: "1kb" }));
 app.use(
   (
@@ -789,6 +820,7 @@ app.use(
         ? Number((error as { status?: unknown }).status)
         : undefined;
     if (error instanceof SyntaxError && status === 400) {
+      // VK: Return a concise device-facing error instead of leaking a framework stack trace.
       log("Rejected malformed JSON telemetry");
       response.status(400).json({
         accepted: false,
@@ -800,6 +832,7 @@ app.use(
   }
 );
 app.post("/api/telemetry", (request, response) => {
+  // VK: HTTP 202 means the gateway accepted the sample for processing, not that every cloud stage has finished.
   try {
     const input =
       request.body && typeof request.body === "object" && !Array.isArray(request.body)
@@ -825,6 +858,7 @@ app.get("/api/health", (_request, response) =>
   response.json({ status: "ok", source: dashboard.telemetry.source, links: dashboard.links })
 );
 app.get("/events", (request, response) => {
+  // VK: New browsers receive the full current state immediately, then incremental full-state broadcasts.
   response.setHeader("Content-Type", "text/event-stream");
   response.setHeader("Cache-Control", "no-cache");
   response.setHeader("Connection", "keep-alive");
@@ -836,10 +870,12 @@ app.get("/events", (request, response) => {
 
 const currentDirectory = path.dirname(fileURLToPath(import.meta.url));
 const webDirectory = path.resolve(currentDirectory, "../web-dist");
+// VK: The gateway serves the built React app so one process hosts both APIs and the demo screen.
 app.use(express.static(webDirectory));
 app.get("/{*path}", (_request, response) => response.sendFile(path.join(webDirectory, "index.html")));
 
 async function main(): Promise<void> {
+  // VK: Validate local assumptions before opening transports or accepting a physical message.
   runValidationSelfCheck();
 
   try {

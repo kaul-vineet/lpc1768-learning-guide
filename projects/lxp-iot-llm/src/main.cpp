@@ -7,6 +7,7 @@
 using namespace std::chrono_literals;
 
 namespace {
+// VK: These addresses describe the validated demo LAN. Change them together when moving the setup.
 constexpr char gatewayIp[] = "192.168.29.226";
 constexpr uint16_t gatewayPort = 8080;
 constexpr char boardIp[] = "192.168.29.240";
@@ -20,12 +21,14 @@ enum class OperatingMode {
     Maintenance
 };
 
+// VK: Risk is deliberately small and deterministic so the board remains the final authority.
 enum class RiskState {
     Normal,
     Warning,
     Critical
 };
 
+// VK: The display thread receives one complete snapshot so it never mixes values from different samples.
 struct DisplaySnapshot {
     unsigned loadPercent;
     unsigned coolingPercent;
@@ -37,6 +40,7 @@ struct DisplaySnapshot {
     bool gatewayDelivered;
 };
 
+// VK: p19 and p20 are treated as demand and available cooling, not as generic unnamed knobs.
 DigitalOut statusLed(LED1);
 AnalogIn simulatedLoad(p19);
 AnalogIn simulatedCooling(p20);
@@ -48,6 +52,7 @@ C12832A1Z lcd(p5, p7, p6, p8, p11);
 Mutex displayMutex;
 Thread displayThread(osPriorityNormal, 4096);
 Thread joystickThread(osPriorityNormal, 2048);
+// VK: The joystick thread writes the selected mode while the telemetry loop reads it without blocking.
 std::atomic<OperatingMode> selectedMode{OperatingMode::Normal};
 DisplaySnapshot displaySnapshot{
     0,
@@ -62,6 +67,7 @@ DisplaySnapshot displaySnapshot{
 
 const char *modeName(OperatingMode mode)
 {
+    // VK: Lower-case names are part of the JSON contract consumed by the gateway.
     switch (mode) {
         case OperatingMode::Boost:
             return "boost";
@@ -74,6 +80,7 @@ const char *modeName(OperatingMode mode)
 
 void selectNormalMode()
 {
+    // VK: Mode selection is latched; releasing the joystick does not cancel the operator's choice.
     selectedMode.store(OperatingMode::Normal, std::memory_order_relaxed);
 }
 
@@ -116,6 +123,7 @@ void joystickTask()
 
 const char *modeShortName(OperatingMode mode)
 {
+    // VK: The 128x32 display needs compact labels, while telemetry keeps the full names.
     switch (mode) {
         case OperatingMode::Boost:
             return "BST";
@@ -128,6 +136,7 @@ const char *modeShortName(OperatingMode mode)
 
 const char *stateName(RiskState state)
 {
+    // VK: These values must stay aligned with the gateway's MachineState type.
     switch (state) {
         case RiskState::Critical:
             return "critical";
@@ -140,6 +149,7 @@ const char *stateName(RiskState state)
 
 uint64_t millisecondsSinceBoot()
 {
+    // VK: A monotonic clock is used for blink timing and deficit duration; wall-clock time is unnecessary here.
     return static_cast<uint64_t>(
         std::chrono::duration_cast<std::chrono::milliseconds>(
             Kernel::Clock::now().time_since_epoch())
@@ -189,6 +199,7 @@ unsigned readStablePercent(
                 ? percent - previousPercent
                 : previousPercent - percent;
         if (difference <= 1U) {
+            // VK: A one-point deadband stops harmless ADC jitter from looking like operator movement.
             return previousPercent;
         }
     }
@@ -197,6 +208,7 @@ unsigned readStablePercent(
 
 void drawBar(int y, unsigned value)
 {
+    // VK: Bars provide a quick physical comparison when the small screen cannot show a full chart.
     lcd.rectangle(0, y, 127, y + 6);
     if (value > 0) {
         const int width = static_cast<int>((124U * value) / 100U);
@@ -213,6 +225,7 @@ void drawDisplay(const DisplaySnapshot &snapshot)
         snapshot.state == RiskState::Critical &&
         ((millisecondsSinceBoot() / 500U) % 2U) == 0U;
 
+    // VK: Only CRITICAL blinks; WARNING stays readable while still replacing the normal pages.
     lcd.display(criticalBlink ? INVERT : DEFAULT);
     lcd.fillrect(0, 0, 127, 31, WHITE);
 
@@ -273,8 +286,10 @@ void drawDisplay(const DisplaySnapshot &snapshot)
 
 void displayTask()
 {
+    // VK: Rendering runs separately so a slow TCP connection cannot freeze local safety feedback.
     lcd.update(MANUAL);
     while (true) {
+        // VK: Copy under the mutex, then draw without holding it to keep the telemetry loop responsive.
         displayMutex.lock();
         const DisplaySnapshot snapshot = displaySnapshot;
         displayMutex.unlock();
@@ -293,6 +308,7 @@ void updateDisplay(
     unsigned deficitDurationSeconds,
     bool gatewayDelivered)
 {
+    // VK: Publish the whole view atomically rather than updating individual fields during a redraw.
     displayMutex.lock();
     displaySnapshot = {
         loadPercent,
@@ -309,6 +325,7 @@ void updateDisplay(
 
 bool readTemperature(float &temperatureC)
 {
+    // VK: LM75B access is explicit; a failed bus transaction becomes invalid telemetry, never a fake zero.
     char temperatureRegister = 0;
     char data[2];
     if (temperatureBus.write(
@@ -322,11 +339,13 @@ bool readTemperature(float &temperatureC)
             (static_cast<uint16_t>(static_cast<uint8_t>(data[0])) << 8) |
             static_cast<uint8_t>(data[1]));
     temperatureC = static_cast<float>(raw) / 256.0f;
+    // VK: The sensor's documented range is also a useful guard against corrupt I2C bytes.
     return temperatureC >= -55.0f && temperatureC <= 125.0f;
 }
 
 bool sendAll(TCPSocket &socket, const char *data, size_t length)
 {
+    // VK: TCP may accept only part of the request, so keep sending until every byte is written.
     size_t offset = 0;
     while (offset < length) {
         const nsapi_size_or_error_t sent =
@@ -342,16 +361,19 @@ bool sendAll(TCPSocket &socket, const char *data, size_t length)
 
 int main()
 {
+    // VK: Local input and display threads start before networking so the board remains usable during retries.
     temperatureBus.frequency(100000);
     joystickThread.start(joystickTask);
     displayThread.start(displayTask);
 
     EthernetInterface network;
+    // VK: Static addressing made the hackathon setup repeatable on the validated local network.
     network.set_network(
         SocketAddress(boardIp),
         SocketAddress(netmask),
         SocketAddress(routerIp));
     while (network.connect() != NSAPI_ERROR_OK) {
+        // VK: A visible heartbeat shows that firmware is alive even while Ethernet is unavailable.
         statusLed = !statusLed;
         ThisThread::sleep_for(2s);
     }
@@ -390,6 +412,7 @@ int main()
         float temperatureC = 0.0f;
         const bool temperatureValid = readTemperature(temperatureC);
         const uint64_t nowMs = millisecondsSinceBoot();
+        // VK: Deficit duration starts when demand first exceeds cooling and resets only after capacity recovers.
         if (coolingPercent < loadPercent) {
             if (deficitStartedAtMs == 0) {
                 deficitStartedAtMs = nowMs;
@@ -418,9 +441,11 @@ int main()
                 sizeof(temperatureValue),
                 temperatureC);
         } else {
+            // VK: JSON null clearly distinguishes an unavailable sensor from a genuine 0-degree reading.
             snprintf(temperatureValue, sizeof(temperatureValue), "null");
         }
 
+        // VK: The board sends raw facts plus its decision; trends and explanations belong downstream.
         const int bodyLength = snprintf(
             body,
             sizeof(body),
@@ -436,6 +461,7 @@ int main()
             stateName(state),
             sequence++);
 
+        // VK: Connection-close HTTP is simple and dependable on this legacy Ethernet stack.
         const int requestLength = snprintf(
             request,
             sizeof(request),
@@ -448,6 +474,7 @@ int main()
             bodyLength,
             body);
 
+        // VK: Never transmit a truncated payload if either fixed buffer was too small.
         if (bodyLength > 0 &&
             bodyLength < static_cast<int>(sizeof(body)) &&
             requestLength > 0 &&
@@ -474,6 +501,7 @@ int main()
                 gatewayDelivered);
         }
 
+        // VK: Two samples per second are enough for a human-operated demo without flooding the gateway.
         ThisThread::sleep_for(500ms);
     }
 }

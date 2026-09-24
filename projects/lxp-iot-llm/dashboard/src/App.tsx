@@ -1,11 +1,13 @@
 import { useEffect, useMemo, useState } from "react";
 
+// VK: Dashboard types mirror the gateway contract so the UI cannot invent a separate machine model.
 type MachineState = "normal" | "warning" | "critical";
 type LinkState = "ready" | "offline" | "error";
 type OperatingMode = "normal" | "boost" | "maintenance";
 type Trend = "rising" | "falling" | "stable" | "unknown";
 
 interface Analysis {
+  // VK: These fields are transparent evidence calculated by the gateway, not LLM-generated values.
   headroom: number;
   loadTrend: Trend;
   coolingTrend: Trend;
@@ -30,6 +32,7 @@ interface Telemetry {
 }
 
 interface Explanation {
+  // VK: Foundry output is displayed in the same five-part structure enforced by the gateway schema.
   assessment: string;
   contributingFactors: string[];
   recommendedAction: string;
@@ -39,6 +42,7 @@ interface Explanation {
 }
 
 interface Incident {
+  // VK: Each explanation stays attached to the exact transition values that Foundry analyzed.
   id: string;
   timestamp: string;
   event: "state-change" | "mode-change";
@@ -60,6 +64,7 @@ interface DashboardState {
   cloud: { lastSentAt: string | null; lastError: string | null; messagesSent: number };
 }
 
+// VK: A complete empty state avoids partial rendering while the first API request is still in flight.
 const emptyState: DashboardState = {
   telemetry: {
     deviceId: "lpc1768-01",
@@ -98,6 +103,7 @@ function LinkNode({
   detail: string;
   state: LinkState;
 }) {
+  // VK: Each lamp reports one stage only; board readiness never implies Azure or Foundry readiness.
   return (
     <div className={`story-node story-node-${state}`}>
       <span className={`lamp lamp-${state}`} />
@@ -120,6 +126,7 @@ function Gauge({
   value: number;
   kind: "load" | "cooling";
 }) {
+  // VK: The label includes the physical control so observers can connect hand movement to telemetry.
   return (
     <div className={`demo-gauge demo-gauge-${kind}`}>
       <div className="gauge-title">
@@ -135,6 +142,7 @@ function Gauge({
 }
 
 function SignalChart({ history }: { history: Telemetry[] }) {
+  // VK: Both series use the same 0-100 scale, making headroom changes visible without another calculation.
   const points = useMemo(() => {
     const make = (select: (item: Telemetry) => number) =>
       history.length < 2
@@ -163,6 +171,7 @@ function SignalChart({ history }: { history: Telemetry[] }) {
 }
 
 function formatTime(value: string | null): string {
+  // VK: WAITING is clearer than a fabricated timestamp before the first successful cloud delivery.
   if (!value) return "WAITING";
   return new Date(value).toLocaleTimeString([], { hour12: false });
 }
@@ -172,12 +181,14 @@ export function App() {
   const [connected, setConnected] = useState(false);
 
   useEffect(() => {
+    // VK: Fetch one snapshot for immediate paint, then let SSE carry every subsequent gateway update.
     fetch("/api/status")
       .then((response) => response.json())
       .then(setState)
       .catch(() => undefined);
 
     const events = new EventSource("/events");
+    // VK: Connection state here describes the browser-to-gateway stream, not the physical board link.
     events.onopen = () => setConnected(true);
     events.onerror = () => setConnected(false);
     events.onmessage = (event) => setState(JSON.parse(event.data) as DashboardState);
@@ -194,6 +205,7 @@ export function App() {
     latestIncident !== undefined &&
     latestIncident.explanation === undefined &&
     latestIncident.id !== latestExplainedIncident?.id;
+  // VK: Positive headroom, deficit, and exact balance need different language for a quick demo read.
   const headroomText =
     analysis.headroom > 0
       ? `+${analysis.headroom} HEADROOM`
